@@ -4,7 +4,10 @@
 > trabalho. Detalhes longos vivem em `CLAUDE.md`, `REQUISITOS.md`,
 > `SPRINTS.md` e `docs/`.
 
-**Última atualização:** 2026-05-01 (Sprint 3 ✅ fechada)
+**Última atualização:** 2026-05-01 (Sprint 3 ✅ fechada · repo publicado no GitHub)
+
+**Repo:** [`luqalefe/bena`](https://github.com/luqalefe/bena.git) — branch `main` ·
+commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
 
 ---
 
@@ -51,7 +54,7 @@ Alias do middleware mudou de `authelia.auth` → `configure.session`.
 ```bash
 make up                         # docker compose up -d
 docker compose ps               # checar 5 healthy: app, nginx, oracle, redis, traefik
-make test                       # 42 verde
+make test                       # 166 verde / 374 assertions
 ```
 
 Depois abre `https://ponto.localhost` no navegador (aceitar cert
@@ -245,7 +248,7 @@ Lista do que custou tempo. Vale lembrar pra evitar re-aprender:
 ```bash
 # diário
 make up                             # sobe stack
-make test                           # 42 testes
+make test                           # 166 testes
 make pint                           # auto-fix style
 make check                          # pint --test + test  (rodar antes do commit)
 

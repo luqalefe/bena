@@ -192,12 +192,12 @@ NFRs, não em features novas.
 
 | Sprint | Semana | Histórias | Marco | Status |
 |--------|--------|-----------|-------|--------|
-| 0 | 1 | H0.1, H0.2, H0.3, H0.4 | Stack roda | ✅ Done (parcial — H0.3 CI ainda não escrito) |
+| 0 | 1 | H0.1, H0.2, H0.3, H0.4 | Stack roda | ✅ Done (parcial — H0.3 CI ainda não escrito; H0.4 Authelia em dev foi descartada por decisão) |
 | 1 | 2 | H1, H2, H3, H4, H7 | Bate ponto | ✅ **Done** |
-| 2 | 3 | H8, H9, H5, H6 | Folha mensal | 📋 Próxima |
-| 3 | 4 | H10, H11, H12, H13 | PDF + assinatura | 📋 |
-| 4 | 5 | H16, H14, H15 | Visão admin | 📋 |
-| 5 | 6 | H17, H18, H19 | Auditoria + integridade | 📋 |
+| 2 | 3 | H8, H9, H5, H6 | Folha mensal | ✅ **Done** |
+| 4 | 4 | H16, H14, H15 | Visão admin (puxada antes da 3) | ✅ **Done** (parciais em H14/H15/H16 — sem coluna assinatura/filtro supervisor/upload contrato) |
+| 3 | 5 | H10, H11, H12, H13, H20 | PDF + assinatura | ✅ **Done** |
+| 5 | 6 | H17, H18, H19 | Auditoria + integridade | 📋 **Próxima** |
 | 6 | 7 | (NFRs) | Homologação | 📋 |
 
 ---
@@ -220,3 +220,4 @@ NFRs, não em features novas.
 | Data | Mudança |
 |------|---------|
 | 2026-04-30 | Plano inicial: 7 sprints, 19 histórias + iteração 0 + hardening |
+| 2026-05-01 | Sprints 1, 2, 4, 3 fechados (nessa ordem — Sprint 4 puxada à frente da 3 a pedido). H20 (RH baixa PDF) entrou na Sprint 3. Próxima: Sprint 5 (H17/H18/H19). |
