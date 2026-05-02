@@ -1,7 +1,45 @@
 # Ponto — Controle de Frequência de Estagiários
 
-Sistema web de controle de frequência de estagiários no formato CIEE,
-construído para uso interno em tribunal.
+## Visão geral
+
+Sistema web interno de tribunal para registrar, consolidar e assinar a
+**Ficha de Controle de Frequência (FCF)** de estagiários — substituindo o
+preenchimento manual em papel no formato CIEE. O estagiário bate ponto pelo
+navegador, vê a folha do mês com horas calculadas, gera o PDF no layout
+oficial e assina digitalmente; o supervisor contra-assina; o RH baixa o PDF
+assinado pra anexar no processo SEI.
+
+### Inspiração: o modelo SEI
+
+O fluxo de assinatura segue o modelo do **SEI (Sistema Eletrônico de
+Informações)**, usado pelos tribunais brasileiros para tramitar documentos
+oficiais. Como o SEI, este sistema **dispensa certificado ICP-Brasil**: a
+assinatura tem valor institucional pelo conjunto _identidade autenticada
+forte_ + _carimbo de tempo_ + _registro íntegro do conteúdo assinado_.
+Quem opera o sistema já está autenticado pelo SSO institucional com 2FA,
+então o "quem assinou" é confiável sem precisar de token criptográfico.
+
+### Segurança da assinatura
+
+- **Identidade.** Em produção, autenticação é delegada ao **Authelia atrás
+  do reverse proxy** (forward-auth), com **TOTP/2FA obrigatório** e LDAP/AD
+  do tribunal como fonte de usuários. A app nunca vê senha — só recebe os
+  headers `Remote-User`/`Remote-Groups` injetados após login validado.
+- **Snapshot canônico.** Ao assinar, o `AssinaturaService` extrai um
+  snapshot determinístico da folha do mês (campos significativos, ordem
+  fixa, sem timestamps internos) e serializa em JSON UTF-8.
+- **Hash SHA-256 + carimbo.** O hash do snapshot é gravado junto com o
+  `assinante_username`, `assinado_em` (timestamp servidor), `papel`
+  (estagiário/supervisor) e `ip`. O snapshot completo também é
+  persistido — verificação = re-hash + comparação.
+- **Detecção de adulteração.** Se qualquer registro de frequência mudar
+  depois da assinatura, o hash recalculado diverge e a folha exibe
+  badge "⚠ alterada" (H18, em desenvolvimento).
+- **Ordem dos papéis.** Supervisor só consegue contra-assinar **depois**
+  que o estagiário assinou. Cada papel só pode assinar uma vez por mês.
+- **Slot pra PAdES.** O `AssinaturaService` é a única superfície que
+  toca crypto — quando exigido, troca-se hash+carimbo por ICP-Brasil
+  PAdES sem mexer no resto do código.
 
 **Stack:** Laravel 11 · PHP 8.2 · Oracle 19c+ · gov.br DS v3 (tema TRE-AC) · Authelia (SSO+2FA, em prod) · Docker
 
