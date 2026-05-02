@@ -1,0 +1,62 @@
+###############################################################################
+# Traefik v3 — configuração estática.
+# Dynamic rules (routers, middlewares) vêm das labels do compose e do
+# diretório docker/traefik/dynamic/.
+###############################################################################
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+api:
+  dashboard: true
+  insecure: true   # OK em dev — em prod expor só via rota com auth.
+
+ping:
+  entryPoint: traefik   # responde em :8080/ping junto com a API
+
+log:
+  level: INFO
+  format: common
+
+accessLog:
+  format: common
+
+###
+### Entrypoints
+###
+entryPoints:
+  web:
+    address: ':80'
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: ':443'
+    http:
+      tls: {}
+
+###
+### Providers
+###
+### Em dev usamos só o provider de arquivo. O provider docker fica
+### desabilitado porque Docker Desktop expõe um socket que não implementa
+### o API antigo (retorna 400 em /info), e Traefik não consegue descobrir
+### labels nesse cenário. Roteamento estático em dynamic/routers.yml resolve.
+###
+providers:
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+###
+### TLS — em dev, certificado auto-assinado gerado pelo Traefik.
+###
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12

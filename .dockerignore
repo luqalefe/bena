@@ -1,0 +1,57 @@
+# VCS
+.git
+.gitignore
+.gitattributes
+
+# Local env / secrets — NEVER ship in image
+.env
+.env.*
+!.env.example
+
+# Dependencies (build inside the image)
+vendor/
+node_modules/
+
+# Tests / dev artifacts not needed in prod
+tests/
+.phpunit.result.cache
+.phpunit.cache/
+phpunit.xml.bak
+coverage/
+.coverage/
+
+# Storage / caches (regenerated at runtime)
+storage/app/*
+!storage/app/.gitkeep
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/logs/*
+bootstrap/cache/*
+!bootstrap/cache/.gitkeep
+
+# Editor / IDE
+.idea/
+.vscode/
+.fleet/
+.nova/
+.zed/
+
+# Docs (only README ships)
+*.md
+!README.md
+
+# CI / docker
+.github/
+.gitlab-ci.yml
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+Makefile
+
+# Logs / temp
+*.log
+*.cache
+*.tmp
+.DS_Store

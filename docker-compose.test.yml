@@ -1,0 +1,43 @@
+###############################################################################
+# Override de CI / TESTES.
+# Usado com:
+#   docker compose -f docker-compose.yml -f docker-compose.test.yml run --rm app make check
+#
+# Em CI:
+#   - Sem Oracle (testes usam SQLite in-memory via phpunit.xml)
+#   - Sem Authelia, sem Traefik, sem nginx
+#   - Apenas a imagem 'app' é construída e roda a suíte
+###############################################################################
+
+services:
+  traefik:
+    profiles: ["never"]
+    deploy: { replicas: 0 }
+
+  authelia:
+    profiles: ["never"]
+    deploy: { replicas: 0 }
+
+  oracle:
+    profiles: ["never"]
+    deploy: { replicas: 0 }
+
+  nginx:
+    profiles: ["never"]
+    deploy: { replicas: 0 }
+
+  redis:
+    profiles: ["never"]
+    deploy: { replicas: 0 }
+
+  app:
+    build:
+      target: dev
+    environment:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ":memory:"
+    depends_on: !reset []
+    healthcheck: !reset
+      disable: true
+    command: ["sh", "-c", "composer install --no-interaction --prefer-dist && ./vendor/bin/pint --test && php artisan test --coverage"]

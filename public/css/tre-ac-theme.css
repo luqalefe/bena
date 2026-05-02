@@ -1,0 +1,101 @@
+/*
+ * Tema TRE-AC — sobrescreve os tokens primários do gov.br DS para usar
+ * a paleta institucional do Tribunal Regional Eleitoral do Acre.
+ *
+ * Carregar SEMPRE depois do core.min.css do gov.br DS, ou os overrides
+ * são vencidos pelos defaults.
+ *
+ * Paleta de referência (extraída de tre-ac.jus.br):
+ *   #003366 — azul escuro institucional (cabeçalho, logo, botões primários)
+ *   #0066cc — azul médio (links, destaques)
+ *   #001f3f — azul mais profundo (hover/active de primário)
+ *   #cce0ff — pastel claro (backgrounds suaves)
+ *   #e91e63 — magenta acento (cards/categorias temáticas)
+ *
+ * Mantemos o resto dos tokens do gov.br (cinzas, semantics, support
+ * colors) intactos — só trocamos a "cor primária" para a institucional
+ * do tribunal.
+ */
+
+:root {
+  /* === Primária (mapeia para a navy do TRE-AC) ============================ */
+  --color-primary-default:    #003366;
+  --color-primary-darken-01:  #001f3f;
+  --color-primary-darken-02:  #000d1a;
+  --color-primary-lighten-01: #0066cc;
+  --color-primary-lighten-02: #3399ff;
+  --color-primary-pastel-01:  #cce0ff;
+  --color-primary-pastel-02:  #e6f0ff;
+
+  /* === Brand (logo / topbar institucional) ================================ */
+  --brand-tre-ac:             #003366;
+  --brand-tre-ac-contrast:    #ffffff;
+
+  /* === Acento (categorias / badges destacados) ============================ */
+  --accent-tre-ac:            #e91e63;
+  --accent-tre-ac-contrast:   #ffffff;
+}
+
+/*
+ * Ajustes finos: o cabeçalho (.br-header) padrão do gov.br tem um
+ * fundo neutro. Para o tribunal, usamos um modo "institucional" com
+ * fundo na cor primária e texto contrastante.
+ */
+
+.br-header.tre-ac {
+  background-color: var(--brand-tre-ac);
+  color: var(--brand-tre-ac-contrast);
+}
+
+.br-header.tre-ac .header-sign,
+.br-header.tre-ac .header-title,
+.br-header.tre-ac .header-subtitle {
+  color: var(--brand-tre-ac-contrast);
+}
+
+.br-header.tre-ac a {
+  color: var(--brand-tre-ac-contrast);
+  text-decoration: underline;
+}
+
+/*
+ * Badges de status (entrada/saída/feriado) — convenção visual usada na
+ * folha mensal. Definidas aqui pra ficar perto da paleta.
+ */
+
+.badge-tre-ac {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.badge-tre-ac.is-entrada   { background: var(--color-primary-pastel-01); color: var(--color-primary-darken-01); }
+.badge-tre-ac.is-completo  { background: #d4edda; color: #155724; }
+.badge-tre-ac.is-feriado   { background: #fff3cd; color: #856404; }
+.badge-tre-ac.is-fimdesemana { background: var(--color-secondary-03); color: var(--color-secondary-07); }
+.badge-tre-ac.is-pendente  { background: #f8d7da; color: #721c24; }
+
+/* Util: pequenas margens / spacings reutilizáveis */
+.tre-ac-card {
+  background: var(--pure-0);
+  border-radius: 8px;
+  border: 1px solid var(--color-secondary-03);
+  padding: 1.5rem;
+}
+
+.tre-ac-card h3 {
+  color: var(--color-primary-default);
+  margin: 0 0 0.5rem 0;
+}
+
+.tre-ac-card .metric {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary-darken-01);
+  line-height: 1.2;
+}

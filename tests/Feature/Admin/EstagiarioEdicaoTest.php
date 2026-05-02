@@ -1,0 +1,231 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests\Feature\Admin;
+
+use App\Models\Estagiario;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class EstagiarioEdicaoTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @return array<string, string> */
+    private function adminHeaders(): array
+    {
+        return [
+            'Remote-User' => 'marco.admin',
+            'Remote-Groups' => 'admin',
+        ];
+    }
+
+    /** @return array<string, string> */
+    private function estagiarioHeaders(): array
+    {
+        return [
+            'Remote-User' => 'lucas.dev',
+            'Remote-Groups' => 'estagiarios',
+        ];
+    }
+
+    public function test_estagiario_comum_em_form_de_edicao_recebe_403(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->estagiarioHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo))
+            ->assertStatus(403);
+    }
+
+    public function test_admin_ve_form_pre_preenchido_com_campos_administrativos(): void
+    {
+        $alvo = Estagiario::factory()->create([
+            'matricula' => 'EST12345',
+            'lotacao' => 'Gabinete 1',
+            'supervisor_nome' => 'Dra. Joana Silva',
+            'sei' => 'SEI-00123/2026',
+            'inicio_estagio' => '2026-03-01',
+            'fim_estagio' => '2026-12-01',
+            'horas_diarias' => 5.00,
+            'ativo' => true,
+        ]);
+
+        $response = $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo));
+
+        $response->assertStatus(200)
+            ->assertSee('name="matricula"', false)
+            ->assertSee('name="lotacao"', false)
+            ->assertSee('name="supervisor_nome"', false)
+            ->assertSee('name="sei"', false)
+            ->assertSee('name="inicio_estagio"', false)
+            ->assertSee('name="fim_estagio"', false)
+            ->assertSee('name="horas_diarias"', false)
+            ->assertSee('name="ativo"', false)
+            ->assertSee('value="EST12345"', false)
+            ->assertSee('value="Gabinete 1"', false)
+            ->assertSee('value="Dra. Joana Silva"', false);
+    }
+
+    public function test_form_nao_inclui_inputs_para_username_nome_email(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $response = $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo));
+
+        $response->assertDontSee('name="username"', false);
+        $response->assertDontSee('name="nome"', false);
+        $response->assertDontSee('name="email"', false);
+    }
+
+    public function test_admin_atualiza_dados_administrativos_e_redireciona(): void
+    {
+        $alvo = Estagiario::factory()->create([
+            'matricula' => null,
+            'lotacao' => null,
+            'horas_diarias' => 5.00,
+            'ativo' => true,
+        ]);
+
+        $response = $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'matricula' => 'EST99999',
+                'lotacao' => 'CTI',
+                'supervisor_nome' => 'Carlos Souza',
+                'sei' => 'SEI-77777/2026',
+                'inicio_estagio' => '2026-04-01',
+                'fim_estagio' => '2026-09-30',
+                'horas_diarias' => '6',
+                'ativo' => '1',
+            ]);
+
+        $response->assertRedirect(route('admin.estagiarios.index'));
+        $response->assertSessionHas('sucesso');
+
+        $alvo->refresh();
+        $this->assertSame('EST99999', $alvo->matricula);
+        $this->assertSame('CTI', $alvo->lotacao);
+        $this->assertSame('Carlos Souza', $alvo->supervisor_nome);
+        $this->assertSame('SEI-77777/2026', $alvo->sei);
+        $this->assertSame('2026-04-01', $alvo->inicio_estagio->format('Y-m-d'));
+        $this->assertSame('2026-09-30', $alvo->fim_estagio->format('Y-m-d'));
+        $this->assertSame('6.00', (string) $alvo->horas_diarias);
+        $this->assertTrue($alvo->ativo);
+    }
+
+    public function test_admin_atualiza_supervisor_username(): void
+    {
+        $alvo = Estagiario::factory()->create(['supervisor_username' => null]);
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'supervisor_username' => 'marco.supervisor',
+                'horas_diarias' => '5',
+                'ativo' => '1',
+            ])
+            ->assertRedirect(route('admin.estagiarios.index'));
+
+        $this->assertSame('marco.supervisor', $alvo->fresh()->supervisor_username);
+    }
+
+    public function test_form_de_edicao_inclui_campo_supervisor_username(): void
+    {
+        $alvo = Estagiario::factory()->create(['supervisor_username' => 'lucas.supervisor']);
+
+        $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo))
+            ->assertSee('name="supervisor_username"', false)
+            ->assertSee('value="lucas.supervisor"', false);
+    }
+
+    public function test_admin_pode_inativar_estagiario_omitindo_checkbox_ativo(): void
+    {
+        $alvo = Estagiario::factory()->create(['ativo' => true]);
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'lotacao' => 'CTI',
+                'horas_diarias' => '5',
+                // ativo não enviado = inativado
+            ])
+            ->assertRedirect(route('admin.estagiarios.index'));
+
+        $this->assertFalse($alvo->fresh()->ativo);
+    }
+
+    public function test_update_nao_altera_username_nome_ou_email(): void
+    {
+        $alvo = Estagiario::factory()->create([
+            'username' => 'original.user',
+            'nome' => 'Nome Original',
+            'email' => 'original@example.local',
+        ]);
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'username' => 'tentativa.hack',
+                'nome' => 'Nome Falso',
+                'email' => 'falso@example.local',
+                'lotacao' => 'CTI',
+                'horas_diarias' => '5',
+                'ativo' => '1',
+            ]);
+
+        $alvo->refresh();
+        $this->assertSame('original.user', $alvo->username);
+        $this->assertSame('Nome Original', $alvo->nome);
+        $this->assertSame('original@example.local', $alvo->email);
+    }
+
+    public function test_validacao_horas_diarias_obrigatorias_e_positivas(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'horas_diarias' => '0',
+            ])
+            ->assertSessionHasErrors(['horas_diarias']);
+    }
+
+    public function test_validacao_horas_diarias_max_24(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'horas_diarias' => '25',
+            ])
+            ->assertSessionHasErrors(['horas_diarias']);
+    }
+
+    public function test_validacao_fim_estagio_posterior_a_inicio(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'inicio_estagio' => '2026-12-01',
+                'fim_estagio' => '2026-06-01',
+                'horas_diarias' => '5',
+            ])
+            ->assertSessionHasErrors(['fim_estagio']);
+    }
+
+    public function test_estagiario_comum_em_put_de_update_recebe_403(): void
+    {
+        $alvo = Estagiario::factory()->create(['matricula' => null]);
+
+        $this->withHeaders($this->estagiarioHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'matricula' => 'HACK0001',
+                'horas_diarias' => '5',
+            ])
+            ->assertStatus(403);
+
+        $this->assertNull($alvo->fresh()->matricula);
+    }
+}

@@ -1,0 +1,23 @@
+###############################################################################
+# Middlewares dinâmicos.
+#
+# Em DEV temos apenas o secure-headers. O forward-auth para Authelia é
+# definido em docker-compose.prod.yml — em produção o tribunal usa LDAP
+# atrás do Authelia, e este middleware passa a fazer sentido.
+###############################################################################
+
+http:
+  middlewares:
+    ###
+    ### Cabeçalhos de segurança padronizados.
+    ###
+    secure-headers:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 63072000
+        customFrameOptionsValue: SAMEORIGIN
+        referrerPolicy: strict-origin-when-cross-origin

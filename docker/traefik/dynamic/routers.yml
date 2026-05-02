@@ -1,0 +1,25 @@
+###############################################################################
+# Roteamento via arquivo (provider docker desabilitado por incompatibilidade
+# do Docker Desktop 29.x com a API do Traefik).
+#
+# Em DEV não usamos Authelia — só HTTPS + roteamento. A autenticação é
+# simulada via AUTHELIA_DEV_BYPASS=true no app Laravel (ver
+# config/authelia.php e app/Http/Middleware/AutheliaAuth.php).
+###############################################################################
+
+http:
+  routers:
+    app:
+      rule: "Host(`ponto.localhost`)"
+      service: app
+      entryPoints:
+        - websecure
+      middlewares:
+        - secure-headers@file
+      tls: {}
+
+  services:
+    app:
+      loadBalancer:
+        servers:
+          - url: "http://nginx:80"
