@@ -22,8 +22,9 @@
 
     <style>
         /* ─────────────────────────────────────────────────────────────
-           Header Bena — escopado em .bena-header / .bena-* pra não
-           conflitar com classes do gov.br DS.
+           Header Bena — branco frosted glass com texto navy (cor da
+           logo). Escopado em .bena-header / .bena-* pra não conflitar
+           com classes do gov.br DS.
            ───────────────────────────────────────────────────────────── */
 
         .skip-link {
@@ -31,14 +32,14 @@
             top: -100px;
             left: 1rem;
             padding: 0.5rem 1rem;
-            background: #fff;
-            color: #003366;
-            border-radius: 4px;
+            background: #003366;
+            color: #fff;
+            border-radius: 6px;
             font-weight: 600;
             z-index: 1000;
             text-decoration: none;
             transition: top 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 18px rgba(0, 51, 102, 0.25);
         }
         .skip-link:focus {
             top: 0.5rem;
@@ -47,9 +48,12 @@
         }
 
         .bena-header {
-            background: linear-gradient(135deg, #002347 0%, #003366 50%, #003d7a 100%);
-            color: #fff;
-            box-shadow: 0 2px 12px rgba(0, 35, 71, 0.25);
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03), 0 4px 12px rgba(15, 23, 42, 0.04);
+            color: #0f172a;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -76,26 +80,31 @@
             text-decoration: none;
             color: inherit;
             padding: 0.25rem 0.5rem;
-            border-radius: 8px;
+            border-radius: 10px;
             transition: background 0.2s ease;
         }
         .bena-brand:hover {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(0, 51, 102, 0.04);
         }
         .bena-brand__logo {
             width: 56px;
             height: 56px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06),
+                        0 4px 14px rgba(0, 51, 102, 0.08),
+                        0 0 0 1px rgba(0, 51, 102, 0.05);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .bena-brand:hover .bena-brand__logo {
             transform: scale(1.04);
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08),
+                        0 8px 22px rgba(0, 51, 102, 0.14),
+                        0 0 0 1px rgba(0, 51, 102, 0.08);
         }
         .bena-brand__logo img {
             width: 48px;
@@ -107,22 +116,23 @@
             font-size: 1.4rem;
             font-weight: 700;
             line-height: 1.1;
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
+            color: #003366;
         }
         .bena-brand__subtitle {
             font-size: 0.78rem;
             font-weight: 500;
-            color: rgba(255, 255, 255, 0.78);
+            color: #475569;
             margin-top: 0.15rem;
             letter-spacing: 0.02em;
         }
         .bena-brand__meta {
             font-size: 0.68rem;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.5);
-            margin-top: 0.18rem;
+            font-weight: 500;
+            color: #94a3b8;
+            margin-top: 0.2rem;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.08em;
         }
 
         /* Navegação por grupo */
@@ -133,17 +143,17 @@
             margin-left: auto;
         }
         .bena-nav a {
-            color: rgba(255, 255, 255, 0.85);
+            color: #475569;
             text-decoration: none;
-            padding: 0.5rem 0.875rem;
-            border-radius: 6px;
+            padding: 0.5rem 0.9rem;
+            border-radius: 8px;
             font-size: 0.875rem;
             font-weight: 500;
             transition: background 0.2s ease, color 0.2s ease;
         }
         .bena-nav a:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
+            background: rgba(0, 51, 102, 0.06);
+            color: #003366;
         }
 
         /* Bloco do usuário (avatar + nome + cargo) */
@@ -151,39 +161,43 @@
             display: flex;
             align-items: center;
             gap: 0.625rem;
-            padding: 0.4rem 0.6rem;
-            border-radius: 8px;
+            padding: 0.4rem 0.6rem 0.4rem 0.4rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.03);
+            border: 1px solid rgba(15, 23, 42, 0.05);
         }
         .bena-user__avatar {
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.78) 100%);
-            color: #003366;
+            background: linear-gradient(135deg, #003366 0%, #00528c 100%);
+            color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.85rem;
             font-weight: 700;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 51, 102, 0.22),
+                        inset 0 0 0 2px rgba(255, 255, 255, 0.08);
             flex-shrink: 0;
+            letter-spacing: 0.02em;
         }
         .bena-user__name {
             font-size: 0.875rem;
             font-weight: 600;
-            color: #fff;
+            color: #0f172a;
             line-height: 1.1;
         }
         .bena-user__role {
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.62);
+            color: #64748b;
             margin-top: 0.15rem;
         }
 
         /* Focus visible — a11y obrigatória pra órgão público (WCAG 2.1 AA) */
         .bena-brand:focus-visible,
         .bena-nav a:focus-visible {
-            outline: 2px solid #60a5fa;
+            outline: 2px solid #003366;
             outline-offset: 2px;
         }
 
@@ -210,6 +224,9 @@
             }
             .bena-user__avatar {
                 width: 34px; height: 34px;
+            }
+            .bena-user {
+                padding: 0.3rem;
             }
         }
     </style>
