@@ -20,6 +20,200 @@
     {{-- Tema institucional TRE-AC (carregado DEPOIS pra sobrescrever tokens) --}}
     <link href="{{ asset('css/tre-ac-theme.css') }}?v={{ filemtime(public_path('css/tre-ac-theme.css')) }}" rel="stylesheet">
 
+    <style>
+        /* ─────────────────────────────────────────────────────────────
+           Header Bena — escopado em .bena-header / .bena-* pra não
+           conflitar com classes do gov.br DS.
+           ───────────────────────────────────────────────────────────── */
+
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            background: #fff;
+            color: #003366;
+            border-radius: 4px;
+            font-weight: 600;
+            z-index: 1000;
+            text-decoration: none;
+            transition: top 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        .skip-link:focus {
+            top: 0.5rem;
+            outline: 2px solid #60a5fa;
+            outline-offset: 2px;
+        }
+
+        .bena-header {
+            background: linear-gradient(135deg, #002347 0%, #003366 50%, #003d7a 100%);
+            color: #fff;
+            box-shadow: 0 2px 12px rgba(0, 35, 71, 0.25);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            animation: benaHeaderSlideDown 0.35s ease-out both;
+        }
+
+        @keyframes benaHeaderSlideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .bena-header__inner {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 0.875rem 1rem;
+        }
+
+        /* Brand: logo + textos */
+        .bena-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.875rem;
+            text-decoration: none;
+            color: inherit;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+        .bena-brand:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .bena-brand__logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+        .bena-brand:hover .bena-brand__logo {
+            transform: scale(1.04);
+        }
+        .bena-brand__logo img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+        .bena-brand__title {
+            font-family: 'Raleway', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+        }
+        .bena-brand__subtitle {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.78);
+            margin-top: 0.15rem;
+            letter-spacing: 0.02em;
+        }
+        .bena-brand__meta {
+            font-size: 0.68rem;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 0.18rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        /* Navegação por grupo */
+        .bena-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-left: auto;
+        }
+        .bena-nav a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            padding: 0.5rem 0.875rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .bena-nav a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        /* Bloco do usuário (avatar + nome + cargo) */
+        .bena-user {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 8px;
+        }
+        .bena-user__avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.78) 100%);
+            color: #003366;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+        .bena-user__name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.1;
+        }
+        .bena-user__role {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.62);
+            margin-top: 0.15rem;
+        }
+
+        /* Focus visible — a11y obrigatória pra órgão público (WCAG 2.1 AA) */
+        .bena-brand:focus-visible,
+        .bena-nav a:focus-visible {
+            outline: 2px solid #60a5fa;
+            outline-offset: 2px;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .bena-header__inner {
+                gap: 0.75rem;
+                padding: 0.625rem 0.75rem;
+            }
+            .bena-brand__subtitle,
+            .bena-brand__meta,
+            .bena-user__info,
+            .bena-nav {
+                display: none;
+            }
+            .bena-brand__logo {
+                width: 44px; height: 44px;
+            }
+            .bena-brand__logo img {
+                width: 36px; height: 36px;
+            }
+            .bena-brand__title {
+                font-size: 1.05rem;
+            }
+            .bena-user__avatar {
+                width: 34px; height: 34px;
+            }
+        }
+    </style>
+
     @stack('styles')
 </head>
 <body>
@@ -34,6 +228,8 @@
         a app está usando usuário simulado em vez do Authelia real).
         Em produção, config('authelia.dev_bypass') é false → banner some.
     --}}
+    <a href="#main-content" class="skip-link">Pular para o conteúdo</a>
+
     @if (config('authelia.dev_bypass') && ! app()->environment('production'))
         <div style="background: var(--accent-tre-ac); color: var(--accent-tre-ac-contrast); padding: 0.5rem 1rem; font-size: 0.875rem; text-align: center;">
             <i class="fas fa-flask" aria-hidden="true"></i>
@@ -44,43 +240,62 @@
         </div>
     @endif
 
-    <header class="br-header tre-ac" id="header">
-        <div class="container-lg">
-            <div class="header-top">
-                <div class="header-logo">
-                    <span class="header-sign">Tribunal Regional Eleitoral do Acre</span>
+    <header class="bena-header" id="header">
+        <div class="container-lg bena-header__inner">
+            <a href="{{ route('dashboard') }}" class="bena-brand" aria-label="Bena — ir para o dashboard">
+                <div class="bena-brand__logo">
+                    <img src="{{ asset('img/bena.png') }}" alt="">
                 </div>
-                <div class="header-actions">
-                    @auth
-                        <span class="header-functions" style="margin-right: 1rem;">
-                            <i class="fas fa-user-circle"></i>
-                            {{ auth()->user()->nome ?? auth()->user()->username }}
-                        </span>
-                    @endauth
+                <div class="bena-brand__text">
+                    <div class="bena-brand__title">@yield('header-title', 'Bena')</div>
+                    <div class="bena-brand__subtitle">@yield('header-subtitle', 'Controle de Frequência de Estagiários')</div>
+                    <div class="bena-brand__meta">
+                        Tribunal Regional Eleitoral do Acre · {{ now()->translatedFormat('F / Y') }}
+                    </div>
                 </div>
-            </div>
-            <div class="header-bottom">
-                <div class="header-menu">
-                    <a href="{{ route('dashboard') }}" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
-                        <img src="{{ asset('img/bena.png') }}" alt="Bena" style="height: 56px; width: auto; background: #fff; border-radius: 4px; padding: 4px;">
-                        <div class="header-info">
-                            <div class="header-title">@yield('header-title', 'Bena')</div>
-                            <div class="header-subtitle">@yield('header-subtitle', 'Controle de Frequência de Estagiários')</div>
-                        </div>
-                    </a>
-                    @if (session('grupodeacesso') === '0')
-                        <nav aria-label="Navegação administrativa" style="margin-left: auto; display: flex; gap: 1rem; align-items: center;">
-                            <a href="{{ route('admin.dashboard') }}" style="color: var(--brand-tre-ac-contrast, #fff); text-decoration: none;">Dashboard</a>
-                            <a href="{{ route('admin.estagiarios.index') }}" style="color: var(--brand-tre-ac-contrast, #fff); text-decoration: none;">Estagiários</a>
-                            <a href="{{ route('admin.feriados.index') }}" style="color: var(--brand-tre-ac-contrast, #fff); text-decoration: none;">Feriados</a>
-                        </nav>
-                    @elseif (session('grupodeacesso') === 'S')
-                        <nav aria-label="Navegação supervisor" style="margin-left: auto; display: flex; gap: 1rem; align-items: center;">
-                            <a href="{{ route('supervisor.dashboard') }}" style="color: var(--brand-tre-ac-contrast, #fff); text-decoration: none;">Meus estagiários</a>
-                        </nav>
-                    @endif
+            </a>
+
+            @auth
+                @php
+                    $grupo = session('grupodeacesso');
+                @endphp
+
+                @if ($grupo === '0')
+                    <nav class="bena-nav" aria-label="Navegação administrativa">
+                        <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+                        <a href="{{ route('admin.estagiarios.index') }}">Estagiários</a>
+                        <a href="{{ route('admin.feriados.index') }}">Feriados</a>
+                    </nav>
+                @elseif ($grupo === 'S')
+                    <nav class="bena-nav" aria-label="Navegação supervisor">
+                        <a href="{{ route('supervisor.dashboard') }}">Meus estagiários</a>
+                    </nav>
+                @else
+                    <div style="margin-left: auto;"></div>
+                @endif
+
+                @php
+                    $nomeCompleto = auth()->user()->nome ?? auth()->user()->username;
+                    $partes = preg_split('/\s+/', trim((string) $nomeCompleto)) ?: [(string) $nomeCompleto];
+                    $iniciais = strtoupper(
+                        substr($partes[0] ?? '?', 0, 1)
+                        .(count($partes) > 1 ? substr((string) end($partes), 0, 1) : '')
+                    );
+                    $cargo = match($grupo) {
+                        '0' => 'Admin / RH',
+                        'S' => 'Supervisor',
+                        'E' => 'Estagiário',
+                        default => 'Usuário',
+                    };
+                @endphp
+                <div class="bena-user">
+                    <div class="bena-user__avatar" aria-hidden="true">{{ $iniciais }}</div>
+                    <div class="bena-user__info">
+                        <div class="bena-user__name">{{ $nomeCompleto }}</div>
+                        <div class="bena-user__role">{{ $cargo }}</div>
+                    </div>
                 </div>
-            </div>
+            @endauth
         </div>
     </header>
 
