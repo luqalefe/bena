@@ -40,4 +40,4 @@ services:
     depends_on: !reset []
     healthcheck: !reset
       disable: true
-    command: ["sh", "-c", "composer install --no-interaction --prefer-dist && ./vendor/bin/pint --test && php artisan test --coverage"]
+    command: ["sh", "-c", "composer install --no-interaction --prefer-dist && ./vendor/bin/pint --test && php artisan test --coverage --min=80"]

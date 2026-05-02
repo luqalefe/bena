@@ -137,7 +137,15 @@ prática.
 6. Badge de status do CI no README.
 7. Branch protection em `main`: PR não pode ser merged com CI vermelho.
 
-**Status:** 📋 Backlog · **Depende de:** H0.2
+**Status:** 🚧 Em curso **(parcial)** — pipeline local pronto: `make ci`
+constrói a imagem `dev` e executa `composer install` + `pint --test` +
+`php artisan test --coverage --min=80` via `docker-compose.test.yml`.
+Coverage atual = 97.9 % em 167 testes. **Pendente:** o arquivo de CI
+(`.gitlab-ci.yml`) será criado quando o repositório migrar pro GitLab
+interno do tribunal (2026-05-04). Outros pendentes: critério 4 —
+enforcement **per-service ≥ 90 %** (hoje todos ≥ 98 % na prática, sem
+gate automatizado); critério 7 — branch protection em `main`
+(configuração no UI do GitLab). **Depende de:** H0.2
 
 ---
 

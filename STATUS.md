@@ -4,7 +4,7 @@
 > trabalho. Detalhes longos vivem em `CLAUDE.md`, `REQUISITOS.md`,
 > `SPRINTS.md` e `docs/`.
 
-**Última atualização:** 2026-05-01 (Sprint 3 ✅ fechada · repo publicado no GitHub)
+**Última atualização:** 2026-05-02 (Sprint 5 iniciada · H0.3 pipeline local pronto · `.gitlab-ci.yml` na migração pra GitLab interno em 2026-05-04)
 
 **Repo:** [`luqalefe/bena`](https://github.com/luqalefe/bena.git) — branch `main` ·
 commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
@@ -26,7 +26,19 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
 - ✅ Onda 2 — H12 (estagiário assina) + H13 (supervisor contra-assina)
 - ✅ Onda 3 — H20 (auto-liberado pra RH no `/admin`) + H10 (editar/remover feriado) + rota `/supervisor`
 
-**Suíte:** 166 testes, 374 assertions
+🚧 **Sprint 5 — CI + fechamento H16 + polimento** — em curso
+- 🚧 **H0.3** — pipeline local pronto: `make ci` constrói a imagem `dev` e
+  roda `composer install` + `pint --test` + `php artisan test --coverage
+  --min=80` via `docker-compose.test.yml`. **Pendente:** criação do
+  `.gitlab-ci.yml` quando o projeto migrar pro GitLab interno (2026-05-04);
+  gate per-service ≥ 90 % (hoje 100 % na prática mas sem enforcement
+  automatizado); branch protection no `main` (config UI).
+- 📋 **H16-fechamento** — upload de contrato PDF + UI `supervisor_username`
+- 📋 **H17** — observações no dia (tooltip + nota no PDF)
+- 📋 **H18** — verificação de integridade da assinatura
+- 📋 **H19** — auditoria de ações
+
+**Suíte:** 167 testes, 377 assertions · cobertura 97.9 % (services 98 %+)
 
 ### Mudanças de modelagem em 2026-05-01 (registradas em REQUISITOS.md)
 Atores refinados: **Supervisor** vira grupo Authelia próprio (`supervisores`),
@@ -84,16 +96,17 @@ clica em "Trocar usuário" no banner.
 
 ---
 
-## Próximo passo concreto — Sprint 5 (Polimento)
+## Próximo passo concreto — Sprint 5 em curso
 
-Sprints 1–4 + 3 fechadas. Restante por iteração:
+H0.3 parcial (pipeline local pronto, `.gitlab-ci.yml` aguarda migração
+pro GitLab interno em 2026-05-04). Próximo na fila: **H16-fechamento**
+(upload contrato PDF + UI `supervisor_username`). Sequência:
 
-- **Sprint 5 (Iteração 6 — Polimento):** H17 (observações no dia),
-  H18 (verificação de integridade da assinatura na visão admin),
-  H19 (auditoria de ações).
-- **Pendência da H16:** upload de contrato PDF (entrou em REQUISITOS,
-  mas ainda não foi codado). Encaixar na próxima sprint.
-- **Sprint 0 — H0.3:** pipeline CI ainda não escrito.
+1. 🚧 **H0.3** — pipeline local OK; CI no GitLab fica pra 2026-05-04
+2. 🚧 **H16-fechamento** — upload PDF + supervisor dropdown
+3. **H17** — observações no dia
+4. **H18** — integridade da assinatura
+5. **H19** — auditoria de ações
 
 **Decisões tomadas nas últimas sessões:**
 - **H7 descartada** (virada meia-noite) — domínio garante turno até 19h.
@@ -227,7 +240,13 @@ Lista do que custou tempo. Vale lembrar pra evitar re-aprender:
   o exemplo institucional também tem `$bypassRouteNames`,
   `$magistradoAllowedRoutes`, e leitura via `$request->server(...)`. A
   base já está no formato certo, falta exercitar.
-- [ ] **H0.3** — pipeline CI (`.github/workflows/ci.yml`)
+- [ ] **H0.3 follow-ups** — criar `.gitlab-ci.yml` quando o projeto
+  migrar pro GitLab interno (2026-05-04). Reaproveitar
+  `docker-compose.test.yml` (`make ci`). Adicionar gate de cobertura
+  **per-service ≥ 90 %** (hoje só `--min=80` global; implementar parser
+  de `clover.xml` ou `php artisan test --coverage-clover` + script
+  de verificação por diretório). Configurar branch protection em `main`
+  no UI do GitLab.
 - [ ] Migrar `gov.br DS` de CDN pra bundle local quando precisar de JS
   dos componentes (dropdown, modal). Hoje só temos CSS do CDN.
 - [ ] Adicionar `phpredis` extension ao Dockerfile e voltar

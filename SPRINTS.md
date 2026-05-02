@@ -144,18 +144,35 @@ de qualquer um e gerencia dados administrativos.
 
 ---
 
-## Sprint 5 — Polimento, auditoria e integridade (semana 6)
+## Sprint 5 — CI + fechamento H16 + polimento (semana 6)
 
-**Objetivo:** sistema tem rastreabilidade completa e mecanismos de
-integridade pós-assinatura.
+**Objetivo:** fundação de CI fechada, débito da Sprint 4 (H16) zerado, e
+sistema com rastreabilidade completa + mecanismos de integridade
+pós-assinatura.
 
-| História | Depende |
-|----------|---------|
-| **H17** — Observações no dia | H12 |
-| **H18** — Verificação de integridade da assinatura | H13 |
-| **H19** — Auditoria de ações | H16 |
+| Ordem | História | Depende |
+|-------|----------|---------|
+| 1 | **H0.3** — Pipeline CI rodando em container | H0.2 |
+| 2 | **H16-fechamento** — Upload contrato PDF + UI `supervisor_username` | H16 |
+| 3 | **H17** — Observações no dia | H12 |
+| 4 | **H18** — Verificação de integridade da assinatura | H13 |
+| 5 | **H19** — Auditoria de ações | H16 |
+
+> **Por que H0.3 primeiro:** cada sprint sem CI é débito de regressão.
+> Custo de adicionar agora (suíte de 167 testes já madura) é o mais
+> baixo que vai ser. Fundação destrava o resto.
+>
+> **Por que H16-fechamento antes de H17–H19:** débito da Sprint 4. A
+> coluna `supervisor_username` já está em uso (H13/SupervisorDashboard),
+> mas o cadastro UI ainda não permite editá-la. E o upload de contrato
+> PDF nunca foi codado.
 
 **DoD:**
+- `.github/workflows/ci.yml` verde em todo PR; pipeline falha se pint
+  detecta problema, qualquer teste falha, ou cobertura cai abaixo de 80%.
+- `/admin/estagiarios/{id}/edit` permite escolher supervisor (dropdown
+  baseado no grupo `supervisores` do Authelia) e fazer upload de
+  contrato PDF (≤ 5 MB, application/pdf).
 - Tabela `auditoria` recebe insert em todas as ações listadas.
 - Folha alterada após assinatura mostra badge "⚠ alterada" + diff.
 - Observação aparece como tooltip na folha e nota de rodapé no PDF.
@@ -163,6 +180,8 @@ integridade pós-assinatura.
 **Riscos:**
 - Auditoria pode virar gargalo se síncrona. Avaliar fila/job se ficar
   lenta — mas só se medir, sem otimização precoce.
+- Upload de PDF privado exige que o disk `local` (não `public`) esteja
+  configurado e a rota de download tenha checagem de permissão correta.
 
 ---
 
@@ -192,12 +211,12 @@ NFRs, não em features novas.
 
 | Sprint | Semana | Histórias | Marco | Status |
 |--------|--------|-----------|-------|--------|
-| 0 | 1 | H0.1, H0.2, H0.3, H0.4 | Stack roda | ✅ Done (parcial — H0.3 CI ainda não escrito; H0.4 Authelia em dev foi descartada por decisão) |
+| 0 | 1 | H0.1, H0.2, H0.3, H0.4 | Stack roda + CI | ✅ Done (parcial — H0.3 pipeline local pronto; arquivo de CI fica pra criação no GitLab interno em 2026-05-04. H0.4 Authelia em dev foi descartada por decisão) |
 | 1 | 2 | H1, H2, H3, H4, H7 | Bate ponto | ✅ **Done** |
 | 2 | 3 | H8, H9, H5, H6 | Folha mensal | ✅ **Done** |
 | 4 | 4 | H16, H14, H15 | Visão admin (puxada antes da 3) | ✅ **Done** (parciais em H14/H15/H16 — sem coluna assinatura/filtro supervisor/upload contrato) |
 | 3 | 5 | H10, H11, H12, H13, H20 | PDF + assinatura | ✅ **Done** |
-| 5 | 6 | H17, H18, H19 | Auditoria + integridade | 📋 **Próxima** |
+| 5 | 6 | H0.3🚧, H16-fechamento, H17, H18, H19 | CI + fechamento H16 + polimento | 🚧 **Em curso** (H0.3 pipeline local pronto, `.gitlab-ci.yml` aguarda migração pro GitLab interno) |
 | 6 | 7 | (NFRs) | Homologação | 📋 |
 
 ---
@@ -221,3 +240,4 @@ NFRs, não em features novas.
 |------|---------|
 | 2026-04-30 | Plano inicial: 7 sprints, 19 histórias + iteração 0 + hardening |
 | 2026-05-01 | Sprints 1, 2, 4, 3 fechados (nessa ordem — Sprint 4 puxada à frente da 3 a pedido). H20 (RH baixa PDF) entrou na Sprint 3. Próxima: Sprint 5 (H17/H18/H19). |
+| 2026-05-02 | Sprint 5 ampliada: começa por **H0.3** (CI pipeline) + **H16-fechamento** (contrato PDF + supervisor_username) antes de H17/H18/H19. Parte da H0.3 fechada — `make ci` valida o pipeline end-to-end (build dev → pint --test → test --coverage --min=80) via `docker-compose.test.yml`. O arquivo de CI propriamente dito fica pra criação como `.gitlab-ci.yml` quando o projeto migrar pro GitLab interno em 2026-05-04 (originalmente cogitado um `.github/workflows/ci.yml`, descartado: PAT do dev não tem escopo `workflow` e o GitHub é só hospedagem temporária). |
