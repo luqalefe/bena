@@ -23,10 +23,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: env('TRUSTED_PROXIES', '127.0.0.1'));
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // Regras de negócio violadas viram 422 com JSON {message:...}.
+        // Regras de negócio violadas:
+        //  - request JSON → 422 com {message: ...}
+        //  - form POST do navegador → volta pra página anterior com flash 'erro'
         $exceptions->render(function (DomainException $e, $request) {
-            if ($request->expectsJson() || $request->isMethod('post')) {
+            if ($request->expectsJson()) {
                 return response()->json(['message' => $e->getMessage()], 422);
+            }
+
+            if ($request->isMethod('post')) {
+                return back()->with('erro', $e->getMessage());
             }
 
             return null;

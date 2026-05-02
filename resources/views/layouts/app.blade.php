@@ -83,15 +83,18 @@
 
     <main id="main-content" class="d-flex flex-fill flex-column" style="min-height: calc(100vh - 200px);">
         <div class="container-lg" style="padding: 2rem 1rem;">
-            @if (session('status'))
+            @if (session('sucesso') || session('status'))
                 <div class="br-message success" role="alert" style="margin-bottom: 1rem;">
-                    <div class="content">{{ session('status') }}</div>
+                    <div class="content">{{ session('sucesso') ?? session('status') }}</div>
                 </div>
             @endif
 
-            @if (session('error'))
-                <div class="br-message danger" role="alert" style="margin-bottom: 1rem;">
-                    <div class="content">{{ session('error') }}</div>
+            @if (session('erro') || session('error'))
+                <div class="br-message danger" role="alert" style="margin-bottom: 1rem; background: #fee2e2; color: #991b1b; padding: 0.75rem 1rem; border-radius: 4px;">
+                    <div class="content">
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                        {{ session('erro') ?? session('error') }}
+                    </div>
                 </div>
             @endif
 

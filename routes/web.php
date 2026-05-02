@@ -19,6 +19,7 @@ Route::middleware('configure.session')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/ponto/entrada', [PontoController::class, 'entrada'])->name('ponto.entrada');
     Route::post('/ponto/saida', [PontoController::class, 'saida'])->name('ponto.saida');
+    Route::get('/ponto/sucesso', [PontoController::class, 'sucesso'])->name('ponto.sucesso');
 
     Route::get('/frequencia', [FolhaMensalController::class, 'redirectMesCorrente'])
         ->name('frequencia.atual');
