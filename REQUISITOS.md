@@ -643,7 +643,22 @@ H11 já preenche os blocos de assinatura quando assinaturas existem.
    nota de rodapé no PDF.
 4. Observação só pode ser editada antes da assinatura do estagiário.
 
-**Status:** 📋 Backlog · **Depende de:** H12
+**Status:** ✅ Done — `App\Http\Controllers\ObservacaoController::salvar`
+em `POST /frequencia/{ano}/{mes}/{dia}/observacao`. Coluna `observacao`
+(string 500) já existia em `frequencias` e já era persistida no
+snapshot canônico do `AssinaturaService`. Quando estagiário sem
+`Frequencia` no dia adiciona observação, criamos uma `Frequencia`
+apenas com `observacao` (entrada/saida/horas nulos) — representa
+"ausência justificada". Texto vazio remove a observação; se a
+`Frequencia` era só observação, ela é deletada inteira. Fim de semana
+e feriado retornam 422; admin/supervisor retornam 403; após
+`Assinatura` papel=estagiario para o mês, edição retorna 422
+("Folha já assinada"). Folha mensal exibe a observação inline +
+`<details>` com `<form>` de edição (textarea maxlength=500); PDF
+mostra na coluna Observação. Tabela ganhou nova coluna **Status** pra
+não conflitar com a coluna **Observação**, agora com texto real. **14
+testes novos** (12 em `ObservacaoControllerTest` + 1 em
+`FolhaMensalTest` + 1 em `PdfFolhaMensalTest`). **Depende de:** H12
 
 ---
 

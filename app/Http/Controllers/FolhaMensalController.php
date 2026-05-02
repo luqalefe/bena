@@ -42,6 +42,7 @@ class FolhaMensalController extends Controller
             'podeContraAssinarComoSupervisor' => $souSupervisorResponsavel
                 && $this->jaAssinou($verificacoes, 'estagiario')
                 && ! $this->jaAssinou($verificacoes, 'supervisor'),
+            'podeEditarObservacao' => $souProprioEstagiario && ! $this->jaAssinou($verificacoes, 'estagiario'),
         ]);
     }
 

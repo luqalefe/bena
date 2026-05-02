@@ -62,6 +62,7 @@
                 <th>Entrada</th>
                 <th>Saída</th>
                 <th>Horas</th>
+                <th>Status</th>
                 <th>Observação</th>
             </tr>
         </thead>
@@ -84,16 +85,23 @@
                     @if ($dia->tipo === 'feriado')
                         <td colspan="3">{{ $dia->descricaoFeriado }}</td>
                         <td>feriado</td>
+                        <td>—</td>
                     @elseif (in_array($dia->tipo, ['sabado', 'domingo'], true))
                         <td colspan="3">—</td>
                         <td>{{ $rotuloFds[$dia->tipo] }}</td>
-                    @elseif ($dia->frequencia !== null)
+                        <td>—</td>
+                    @elseif ($dia->frequencia !== null && ($dia->frequencia->entrada !== null || $dia->frequencia->saida !== null))
                         <td>{{ $dia->frequencia->entrada?->format('H:i') ?? '—' }}</td>
                         <td>{{ $dia->frequencia->saida?->format('H:i') ?? '—' }}</td>
                         <td>{{ $dia->frequencia->horas !== null ? number_format((float) $dia->frequencia->horas, 2, ',', '') : '—' }}</td>
                         <td>{{ $dia->frequencia->saida === null ? 'em andamento' : 'batido' }}</td>
+                        <td>{{ $dia->frequencia->observacao ?? '—' }}</td>
+                    @elseif ($dia->frequencia?->observacao)
+                        <td>—</td><td>—</td><td>—</td><td>justificado</td>
+                        <td>{{ $dia->frequencia->observacao }}</td>
                     @else
                         <td>—</td><td>—</td><td>—</td><td>não batido</td>
+                        <td>—</td>
                     @endif
                 </tr>
             @endforeach
@@ -101,7 +109,7 @@
         <tfoot>
             <tr>
                 <td colspan="4" class="total">Total de horas no mês:</td>
-                <td colspan="2" class="total">{{ number_format($folha->totalHoras, 2, ',', '') }} h</td>
+                <td colspan="3" class="total">{{ number_format($folha->totalHoras, 2, ',', '') }} h</td>
             </tr>
         </tfoot>
     </table>

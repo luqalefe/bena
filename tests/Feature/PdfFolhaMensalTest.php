@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\Estagiario;
 use App\Models\Frequencia;
+use App\Services\FolhaMensalService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -147,5 +148,30 @@ class PdfFolhaMensalTest extends TestCase
         $response->assertStatus(200);
         // O PDF binário não pode ser inspecionado por assertSee — então o
         // controller também tem um modo HTML pra teste.
+    }
+
+    public function test_pdf_view_inclui_observacao_da_frequencia(): void
+    {
+        $estagiario = Estagiario::factory()->create([
+            'username' => 'lucas.dev',
+            'nome' => 'Lucas Dev',
+        ]);
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-05-04',
+            'entrada' => '09:00:00',
+            'saida' => '14:00:00',
+            'horas' => 5.00,
+            'observacao' => 'Atraso justificado por consulta médica',
+        ]);
+
+        $folha = app(FolhaMensalService::class)->montar($estagiario, 2026, 5);
+        $html = view('frequencia.pdf', [
+            'folha' => $folha,
+            'estagiario' => $estagiario,
+            'verificacoes' => [],
+        ])->render();
+
+        $this->assertStringContainsString('Atraso justificado por consulta médica', $html);
     }
 }

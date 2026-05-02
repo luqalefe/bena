@@ -107,10 +107,12 @@
                 <th style="text-align: left; padding: 0.5rem;">Entrada</th>
                 <th style="text-align: left; padding: 0.5rem;">Saída</th>
                 <th style="text-align: left; padding: 0.5rem;">Horas</th>
+                <th style="text-align: left; padding: 0.5rem;">Status</th>
                 <th style="text-align: left; padding: 0.5rem;">Observação</th>
             </tr>
         </thead>
         <tbody>
+            @php $podeEditarObservacao = $podeEditarObservacao ?? false; @endphp
             @foreach ($folha->dias as $dia)
                 <tr style="{{ $coresLinha[$dia->tipo] ?? '' }}">
                     <td style="padding: 0.5rem;">{{ $dia->data->format('d/m') }}</td>
@@ -123,34 +125,49 @@
                         <td style="padding: 0.5rem;">
                             <span class="badge-tre-ac is-pendente">feriado</span>
                         </td>
+                        <td style="padding: 0.5rem;">—</td>
                     @elseif (in_array($dia->tipo, ['sabado', 'domingo'], true))
                         <td colspan="3" style="padding: 0.5rem; color: var(--color-secondary-07);">—</td>
                         <td style="padding: 0.5rem;">
                             <span class="badge-tre-ac">{{ $rotuloFimDeSemana[$dia->tipo] }}</span>
                         </td>
-                    @elseif ($dia->frequencia !== null)
-                        <td style="padding: 0.5rem;">
-                            {{ $dia->frequencia->entrada?->format('H:i') ?? '—' }}
-                        </td>
-                        <td style="padding: 0.5rem;">
-                            {{ $dia->frequencia->saida?->format('H:i') ?? '—' }}
-                        </td>
-                        <td style="padding: 0.5rem;">
-                            {{ $dia->frequencia->horas !== null ? number_format((float) $dia->frequencia->horas, 2, ',', '') : '—' }}
-                        </td>
-                        <td style="padding: 0.5rem;">
-                            @if ($dia->frequencia->saida === null)
-                                <span class="badge-tre-ac is-entrada">em andamento</span>
-                            @else
-                                <span class="badge-tre-ac is-completo">batido</span>
-                            @endif
-                        </td>
+                        <td style="padding: 0.5rem;">—</td>
                     @else
-                        <td style="padding: 0.5rem;">—</td>
-                        <td style="padding: 0.5rem;">—</td>
-                        <td style="padding: 0.5rem;">—</td>
+                        @if ($dia->frequencia !== null && ($dia->frequencia->entrada !== null || $dia->frequencia->saida !== null))
+                            <td style="padding: 0.5rem;">{{ $dia->frequencia->entrada?->format('H:i') ?? '—' }}</td>
+                            <td style="padding: 0.5rem;">{{ $dia->frequencia->saida?->format('H:i') ?? '—' }}</td>
+                            <td style="padding: 0.5rem;">{{ $dia->frequencia->horas !== null ? number_format((float) $dia->frequencia->horas, 2, ',', '') : '—' }}</td>
+                            <td style="padding: 0.5rem;">
+                                @if ($dia->frequencia->saida === null)
+                                    <span class="badge-tre-ac is-entrada">em andamento</span>
+                                @else
+                                    <span class="badge-tre-ac is-completo">batido</span>
+                                @endif
+                            </td>
+                        @else
+                            <td style="padding: 0.5rem;">—</td>
+                            <td style="padding: 0.5rem;">—</td>
+                            <td style="padding: 0.5rem;">—</td>
+                            <td style="padding: 0.5rem;">
+                                <span class="badge-tre-ac is-pendente">não batido</span>
+                            </td>
+                        @endif
                         <td style="padding: 0.5rem;">
-                            <span class="badge-tre-ac is-pendente">não batido</span>
+                            @if ($dia->frequencia?->observacao)
+                                <small style="display: block; margin-bottom: 0.25rem;">{{ $dia->frequencia->observacao }}</small>
+                            @endif
+                            @if ($podeEditarObservacao)
+                                <details>
+                                    <summary style="cursor: pointer; color: var(--color-secondary-07); font-size: 0.85rem;" title="Adicionar/editar observação">
+                                        <i class="fas fa-pen" aria-hidden="true"></i>
+                                    </summary>
+                                    <form method="POST" action="{{ route('frequencia.observacao', ['ano' => $folha->ano, 'mes' => $folha->mes, 'dia' => (int) $dia->data->day]) }}" style="margin-top: 0.4rem;">
+                                        @csrf
+                                        <textarea name="texto" maxlength="500" rows="3" style="width: 100%; padding: 0.3rem; font-size: 0.85rem;">{{ $dia->frequencia?->observacao }}</textarea>
+                                        <button type="submit" class="br-button primary" style="font-size: 0.8rem; padding: 0.25rem 0.6rem;">Salvar</button>
+                                    </form>
+                                </details>
+                            @endif
                         </td>
                     @endif
                 </tr>
@@ -161,7 +178,7 @@
                 <td colspan="4" style="padding: 0.75rem 0.5rem; text-align: right; font-weight: 600;">
                     Total de horas:
                 </td>
-                <td colspan="2" style="padding: 0.75rem 0.5rem; font-weight: 600;">
+                <td colspan="3" style="padding: 0.75rem 0.5rem; font-weight: 600;">
                     {{ number_format($folha->totalHoras, 2, ',', '') }} h
                 </td>
             </tr>

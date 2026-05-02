@@ -4,7 +4,7 @@
 > trabalho. Detalhes longos vivem em `CLAUDE.md`, `REQUISITOS.md`,
 > `SPRINTS.md` e `docs/`.
 
-**Última atualização:** 2026-05-02 (Sprint 5 em curso · H0.3 pipeline local pronto · H16 fechada com upload/download de contrato PDF)
+**Última atualização:** 2026-05-02 (Sprint 5 em curso · H0.3 pipeline local pronto · H16 fechada · H17 fechada com observações por dia)
 
 **Repo:** [`luqalefe/bena`](https://github.com/luqalefe/bena.git) — branch `main` ·
 commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
@@ -39,11 +39,16 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
   e download em `GET /admin/estagiarios/{id}/contrato` com autorização
   inline (admin OR self OR supervisor responsável → 403; 404 sem upload).
   13 testes novos.
-- 📋 **H17** — observações no dia (tooltip + nota no PDF)
+- ✅ **H17** — fechada. `POST /frequencia/{ano}/{mes}/{dia}/observacao`
+  cria/atualiza/remove observação (texto vazio = limpar; se a
+  `Frequencia` era só observação, deleta). Dia útil obrigatório,
+  só estagiário próprio (admin/supervisor 403), 422 após assinatura.
+  Folha mostra observação inline + `<details>` com form de edição;
+  PDF mostra na coluna Observação. 14 testes novos.
 - 📋 **H18** — verificação de integridade da assinatura
 - 📋 **H19** — auditoria de ações
 
-**Suíte:** 180 testes, 410 assertions · cobertura ≥ 80 % (gate `--min=80`)
+**Suíte:** 194 testes, 443 assertions · cobertura ≥ 80 % (gate `--min=80`)
 
 ### Mudanças de modelagem em 2026-05-01 (registradas em REQUISITOS.md)
 Atores refinados: **Supervisor** vira grupo Authelia próprio (`supervisores`),
@@ -104,13 +109,13 @@ clica em "Trocar usuário" no banner.
 ## Próximo passo concreto — Sprint 5 em curso
 
 H0.3 parcial (pipeline local pronto, `.gitlab-ci.yml` aguarda migração
-pro GitLab interno em 2026-05-04). H16 fechada. Próximo na fila: **H17**
-(observações no dia). Sequência:
+pro GitLab interno em 2026-05-04). H16 e H17 fechadas. Próximo na fila:
+**H18** (verificação de integridade da assinatura). Sequência:
 
 1. 🚧 **H0.3** — pipeline local OK; CI no GitLab fica pra 2026-05-04
 2. ✅ **H16** — upload contrato + download autorizado
-3. 🚧 **H17** — observações no dia
-4. **H18** — integridade da assinatura
+3. ✅ **H17** — observações no dia
+4. 🚧 **H18** — integridade da assinatura
 5. **H19** — auditoria de ações
 
 **Decisões tomadas nas últimas sessões:**

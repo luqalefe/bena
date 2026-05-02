@@ -216,7 +216,7 @@ NFRs, não em features novas.
 | 2 | 3 | H8, H9, H5, H6 | Folha mensal | ✅ **Done** |
 | 4 | 4 | H16, H14, H15 | Visão admin (puxada antes da 3) | ✅ **Done** (parciais em H14/H15/H16 — sem coluna assinatura/filtro supervisor/upload contrato) |
 | 3 | 5 | H10, H11, H12, H13, H20 | PDF + assinatura | ✅ **Done** |
-| 5 | 6 | H0.3🚧, H16✅, H17, H18, H19 | CI + fechamento H16 + polimento | 🚧 **Em curso** (H0.3 pipeline local pronto; H16 fechada com upload/download de contrato; H17/H18/H19 pendentes) |
+| 5 | 6 | H0.3🚧, H16✅, H17✅, H18, H19 | CI + fechamento H16 + polimento | 🚧 **Em curso** (H0.3 pipeline local pronto; H16 fechada; H17 fechada com observações por dia; H18/H19 pendentes) |
 | 6 | 7 | (NFRs) | Homologação | 📋 |
 
 ---
@@ -242,3 +242,4 @@ NFRs, não em features novas.
 | 2026-05-01 | Sprints 1, 2, 4, 3 fechados (nessa ordem — Sprint 4 puxada à frente da 3 a pedido). H20 (RH baixa PDF) entrou na Sprint 3. Próxima: Sprint 5 (H17/H18/H19). |
 | 2026-05-02 | Sprint 5 ampliada: começa por **H0.3** (CI pipeline) + **H16-fechamento** (contrato PDF + supervisor_username) antes de H17/H18/H19. Parte da H0.3 fechada — `make ci` valida o pipeline end-to-end (build dev → pint --test → test --coverage --min=80) via `docker-compose.test.yml`. O arquivo de CI propriamente dito fica pra criação como `.gitlab-ci.yml` quando o projeto migrar pro GitLab interno em 2026-05-04 (originalmente cogitado um `.github/workflows/ci.yml`, descartado: PAT do dev não tem escopo `workflow` e o GitHub é só hospedagem temporária). |
 | 2026-05-02 | **H16 fechada** — supervisor_username já estava do trabalho da H13; upload de contrato PDF (`Storage::disk('local')->putFile('contratos', ...)` + `mimes:pdf + mimetypes:application/pdf + max:5120`, novo deleta antigo) e download com autorização inline (admin OR self OR supervisor responsável) implementados. 13 testes novos (180 verde / 410 assertions). Próximo: H17. |
+| 2026-05-02 | **H17 fechada** — `ObservacaoController` em `POST /frequencia/{ano}/{mes}/{dia}/observacao`; coluna `observacao` já existia. Dia útil sem `Frequencia` que recebe observação cria registro só com `observacao` (ausência justificada); texto vazio limpa, e se `Frequencia` era só observação, deleta. Bloqueia fds/feriado (422), admin/supervisor (403), e mês já assinado (422). View show + PDF ganharam coluna `Status` separada de `Observação`. 14 testes novos (194 verde / 443 assertions). Próximo: H18. |

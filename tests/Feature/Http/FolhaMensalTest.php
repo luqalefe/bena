@@ -66,6 +66,32 @@ class FolhaMensalTest extends TestCase
             ->assertDontSee('/frequencia/2026/6', false);
     }
 
+    public function test_view_renderiza_observacao_e_form_de_edicao_em_dia_util(): void
+    {
+        $estagiario = Estagiario::factory()->create([
+            'username' => 'lucas.dev',
+            'email' => 'lucas.dev@example.local',
+            'nome' => 'Lucas Estagiário',
+        ]);
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-06',
+            'entrada' => '09:00:00',
+            'saida' => '13:30:00',
+            'horas' => 4.5,
+            'observacao' => 'Saí mais cedo p/ consulta',
+        ]);
+
+        $response = $this->withHeaders($this->estagiarioHeaders())
+            ->get('/frequencia/2026/04')
+            ->assertStatus(200);
+
+        // Observação é mostrada no corpo da página
+        $response->assertSee('Saí mais cedo p/ consulta');
+        // Form de edição apontando pra rota de observação do dia
+        $response->assertSee('/frequencia/2026/4/6/observacao', false);
+    }
+
     public function test_view_renderiza_dia_batido_feriado_fds_e_total(): void
     {
         // O middleware cria o Estagiário com o username do header. Precisamos

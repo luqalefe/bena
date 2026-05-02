@@ -9,6 +9,7 @@ use App\Http\Controllers\AssinaturaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DevSessionController;
 use App\Http\Controllers\FolhaMensalController;
+use App\Http\Controllers\ObservacaoController;
 use App\Http\Controllers\PontoController;
 use App\Http\Controllers\SupervisorDashboardController;
 use App\Http\Middleware\EnsureNotProduction;
@@ -33,6 +34,9 @@ Route::middleware('configure.session')->group(function () {
     Route::post('/frequencia/{ano}/{mes}/contra-assinar', [AssinaturaController::class, 'contraAssinarComoSupervisor'])
         ->whereNumber(['ano', 'mes'])
         ->name('frequencia.contra-assinar');
+    Route::post('/frequencia/{ano}/{mes}/{dia}/observacao', [ObservacaoController::class, 'salvar'])
+        ->whereNumber(['ano', 'mes', 'dia'])
+        ->name('frequencia.observacao');
 
     Route::get('/supervisor', [SupervisorDashboardController::class, 'index'])->name('supervisor.dashboard');
 
