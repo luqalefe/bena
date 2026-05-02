@@ -80,6 +80,18 @@ class OnboardingTest extends TestCase
             ->assertSee('Entendi');
     }
 
+    public function test_view_inclui_origem_do_nome_bena(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'))
+            ->assertSee('Por que Bena')
+            ->assertSee('Hãtxa Kuĩ')
+            ->assertSee('Huni Kuin')
+            ->assertSee('Xinã Bena');
+    }
+
     public function test_get_bem_vindo_acessivel_mesmo_apos_visto(): void
     {
         // user já viu — pode revisitar livremente

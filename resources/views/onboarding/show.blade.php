@@ -34,7 +34,7 @@
     @endphp
 
     <div style="max-width: 720px; margin: 1rem auto;">
-        <header style="text-align: center; margin-bottom: 2.5rem;">
+        <header style="text-align: center; margin-bottom: 2rem;">
             <img src="{{ asset('img/bena.png') }}" alt="Bena" style="width: 96px; height: 96px; object-fit: contain; margin-bottom: 1rem;">
             <h1 style="color: #003366; font-size: 1.75rem; font-weight: 700; margin: 0 0 0.5rem; letter-spacing: -0.02em;">
                 Bem-vindo ao Bena
@@ -44,6 +44,28 @@
                 Veja em 30 segundos como vai ser o seu dia a dia.
             </p>
         </header>
+
+        <section aria-labelledby="por-que-bena" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 4px solid #d97706; border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08);">
+            <h2 id="por-que-bena" style="color: #78350f; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 0.75rem;">
+                Por que Bena
+            </h2>
+            <p style="color: #422006; font-size: 0.95rem; line-height: 1.65; margin: 0 0 0.75rem;">
+                <strong>Bena</strong> é uma palavra em <em>Hãtxa Kuĩ</em>, língua
+                do povo Huni Kuin, que vive no Acre. Significa <strong>"novo"</strong>.
+                Ela vem da expressão <em>Xinã Bena</em> — "novo tempo" — usada
+                pelos Huni Kuin pra falar do momento atual de renovação cultural.
+                É o nome certo para o sistema que substitui a folha de ponto em
+                papel pelo registro digital.
+            </p>
+            <p style="color: #422006; font-size: 0.95rem; line-height: 1.65; margin: 0;">
+                O Bena nasceu de uma observação simples: se assinar uma folha
+                de ponto exige tanto esforço coletivo todo mês, talvez o
+                problema não seja quem assina — seja a folha. Esse sistema
+                resolve isso de uma vez, pra que estagiários e supervisores
+                possam investir o tempo onde ele rende: no aprendizado e no
+                trabalho que importa.
+            </p>
+        </section>
 
         <ol style="list-style: none; padding: 0; margin: 0 0 2.5rem;">
             @foreach ($passos as $i => $passo)
