@@ -61,8 +61,13 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
   como estagiário invalida automaticamente a contra-assinatura do
   supervisor. Coluna nova `substituida_em`; unique antiga foi
   derrubada (vigente passou a ser garantida pelo service).
+- ✅ **H23** — onboarding no primeiro acesso. Middleware
+  `EnsureOnboarded` redireciona usuário com `tutorial_visto_em IS NULL`
+  pra `/bem-vindo` quando ele entra em rotas home (`/`, `/admin`,
+  `/supervisor`). View renderiza 5 cards explicativos do fluxo. Botão
+  "Entendi" seta o timestamp. Página continua acessível pra revisitar.
 
-**Suíte:** 225 testes, 518 assertions · cobertura ≥ 80 % (gate `--min=80`)
+**Suíte:** 233 testes, 536 assertions · cobertura ≥ 80 % (gate `--min=80`)
 
 ### Mudanças de modelagem em 2026-05-01 (registradas em REQUISITOS.md)
 Atores refinados: **Supervisor** vira grupo Authelia próprio (`supervisores`),

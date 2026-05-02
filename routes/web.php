@@ -10,13 +10,17 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DevSessionController;
 use App\Http\Controllers\FolhaMensalController;
 use App\Http\Controllers\ObservacaoController;
+use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PontoController;
 use App\Http\Controllers\SupervisorDashboardController;
 use App\Http\Middleware\EnsureNotProduction;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('configure.session')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/bem-vindo', [OnboardingController::class, 'show'])->name('onboarding.show');
+    Route::post('/bem-vindo/concluir', [OnboardingController::class, 'concluir'])->name('onboarding.concluir');
+
+    Route::get('/', [DashboardController::class, 'index'])->middleware('onboarded')->name('dashboard');
     Route::post('/ponto/entrada', [PontoController::class, 'entrada'])->name('ponto.entrada');
     Route::post('/ponto/saida', [PontoController::class, 'saida'])->name('ponto.saida');
     Route::get('/ponto/sucesso', [PontoController::class, 'sucesso'])->name('ponto.sucesso');
@@ -45,10 +49,10 @@ Route::middleware('configure.session')->group(function () {
         ->whereNumber(['ano', 'mes', 'dia'])
         ->name('frequencia.observacao');
 
-    Route::get('/supervisor', [SupervisorDashboardController::class, 'index'])->name('supervisor.dashboard');
+    Route::get('/supervisor', [SupervisorDashboardController::class, 'index'])->middleware('onboarded')->name('supervisor.dashboard');
 
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/', [AdminDashboardController::class, 'index'])->middleware('onboarded')->name('dashboard');
 
         Route::get('/feriados', [FeriadoController::class, 'index'])->name('feriados.index');
         Route::get('/feriados/criar', [FeriadoController::class, 'create'])->name('feriados.create');

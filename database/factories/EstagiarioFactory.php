@@ -32,6 +32,9 @@ class EstagiarioFactory extends Factory
             'fim_estagio' => fake()->dateTimeBetween('+6 months', '+1 year')->format('Y-m-d'),
             'horas_diarias' => 5.00,
             'ativo' => true,
+            // Default: tutorial já visto. Testes que envolvem onboarding
+            // chamam ->semOnboarding() para representar primeiro acesso.
+            'tutorial_visto_em' => now(),
         ];
     }
 
@@ -43,5 +46,10 @@ class EstagiarioFactory extends Factory
     public function admin(): static
     {
         return $this->state(['username' => 'admin.'.fake()->userName()]);
+    }
+
+    public function semOnboarding(): static
+    {
+        return $this->state(['tutorial_visto_em' => null]);
     }
 }

@@ -2,6 +2,7 @@
 
 use App\Console\Commands\FecharPontosAbertosCommand;
 use App\Http\Middleware\ConfigureUserSession;
+use App\Http\Middleware\EnsureOnboarded;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -18,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'configure.session' => ConfigureUserSession::class,
+            'onboarded' => EnsureOnboarded::class,
         ]);
 
         $middleware->trustProxies(at: env('TRUSTED_PROXIES', '127.0.0.1'));

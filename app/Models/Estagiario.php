@@ -30,6 +30,7 @@ class Estagiario extends Model implements Authenticatable
         'horas_diarias',
         'contrato_path',
         'ativo',
+        'tutorial_visto_em',
     ];
 
     protected function casts(): array
@@ -39,6 +40,7 @@ class Estagiario extends Model implements Authenticatable
             'fim_estagio' => 'date',
             'horas_diarias' => 'decimal:2',
             'ativo' => 'boolean',
+            'tutorial_visto_em' => 'datetime',
         ];
     }
 

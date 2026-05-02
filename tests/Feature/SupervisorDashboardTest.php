@@ -12,6 +12,17 @@ class SupervisorDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Cria os users que serão simulados nos headers, com
+        // tutorial_visto_em preenchido pra evitar o redirect do
+        // middleware EnsureOnboarded.
+        Estagiario::factory()->create(['username' => 'lucas.supervisor']);
+        Estagiario::factory()->create(['username' => 'rh.admin']);
+        Estagiario::factory()->create(['username' => 'lucas.dev']);
+    }
+
     /** @return array<string, string> */
     private function supervisorHeaders(string $username = 'lucas.supervisor'): array
     {
@@ -67,6 +78,8 @@ class SupervisorDashboardTest extends TestCase
 
     public function test_supervisor_sem_estagiarios_ve_mensagem_amigavel(): void
     {
+        Estagiario::factory()->create(['username' => 'orfão.supervisor']);
+
         $response = $this->withHeaders($this->supervisorHeaders('orfão.supervisor'))
             ->get('/supervisor');
 

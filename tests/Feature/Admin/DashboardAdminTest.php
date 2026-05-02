@@ -15,6 +15,14 @@ class DashboardAdminTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Cria o user-admin com tutorial_visto_em preenchido pra evitar
+        // o redirect do middleware EnsureOnboarded.
+        Estagiario::factory()->create(['username' => 'rh.admin']);
+    }
+
     /** @return array<string, string> */
     private function adminHeaders(): array
     {

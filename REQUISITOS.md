@@ -701,6 +701,35 @@ testes novos** (12 em `ObservacaoControllerTest` + 1 em
 
 ---
 
+## H23 — Tela explicativa no primeiro acesso
+
+> **Como** usuário que abre o sistema pela primeira vez,
+> **eu quero** ver uma página rápida explicando o que cada tela faz e
+> qual o fluxo (bater ponto → folha → assinar → contra-assinar → SEI),
+> **para que** eu não precise de treinamento separado pra usar o Bena.
+
+**Critérios de aceitação:**
+
+1. Ao acessar uma rota "home" pela primeira vez (`/`, `/admin` ou
+   `/supervisor`), usuário com `tutorial_visto_em IS NULL` é redirecionado
+   pra `/bem-vindo`.
+2. View mostra cabeçalho amigável + 5 cards verticais ilustrando: bater
+   ponto, folha mensal, assinatura digital, fluxo supervisor/RH/SEI,
+   auto-fechamento.
+3. Botão "Entendi, vamos começar" envia POST que seta
+   `tutorial_visto_em = now()` e redireciona pro dashboard apropriado.
+4. Acesso a `/bem-vindo` continua disponível depois (rever tutorial).
+5. Middleware NÃO redireciona em rotas não-home (ex: link salvo da folha
+   mensal continua funcionando direto).
+
+**Status:** ✅ Done — Migration `add_tutorial_visto_em_to_estagiarios`,
+middleware `EnsureOnboarded` aplicado nas rotas `dashboard`,
+`admin.dashboard` e `supervisor.dashboard`. `OnboardingController` com
+`show`/`concluir`. View `onboarding/show.blade.php`. Factory `Estagiario`
+ganhou state `->semOnboarding()`. **8 testes novos** em `OnboardingTest`.
+
+---
+
 ## H22 — Re-assinatura da versão atual quando hash divergiu
 
 > **Como** estagiário ou supervisor que assinou por engano (ou fez
