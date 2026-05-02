@@ -701,6 +701,46 @@ testes novos** (12 em `ObservacaoControllerTest` + 1 em
 
 ---
 
+## H22 — Re-assinatura da versão atual quando hash divergiu
+
+> **Como** estagiário ou supervisor que assinou por engano (ou fez
+> alteração necessária após assinar via processo administrativo),
+> **eu quero** poder re-assinar a versão atual da folha,
+> **para que** o registro oficial reflita a folha correta sem perder o
+> histórico da assinatura anterior.
+
+**Critérios de aceitação:**
+
+1. Quando a assinatura vigente do user logado aparece como "⚠ alterada"
+   na seção de Assinaturas, surge botão "Re-assinar versão atual" ao
+   lado do badge.
+2. Botão envia POST pra `frequencia.reassinar` (estagiário) ou
+   `frequencia.re-contra-assinar` (supervisor) com modal de confirmação.
+3. Re-assinatura cria **nova** entrada e marca a anterior como
+   `substituida_em = now()`. Histórico preservado pra auditoria.
+4. `verificar()` e `assinaturaDoMes()` retornam **apenas** a vigente
+   (`substituida_em IS NULL`).
+5. **Re-assinar como estagiário invalida automaticamente a
+   contra-assinatura do supervisor** — folha mudou, supervisor precisa
+   rever. Re-assinar como supervisor não toca na do estagiário.
+6. Re-assinatura falha se a vigente ainda está íntegra (hash bate com
+   atual) → 422 "Re-assinatura desnecessária".
+7. Re-assinatura falha se não há vigente → 422.
+8. Estagiário só re-assina a sua. Supervisor só re-contra-assina dos
+   estagiários sob ele (mesma regra de H13).
+
+**Status:** ✅ Done — `AssinaturaService::reassinar()` +
+`AssinaturaController::{reassinarComoEstagiario,reContraAssinarComoSupervisor}`
++ rotas `frequencia.reassinar`/`frequencia.re-contra-assinar`. Migration
+`add_substituida_em_to_assinaturas` (drop unique antiga + coluna nova
++ índice non-unique). Service filtra `substituida_em IS NULL` em
+`assinaturaDoMes` e `verificar`. View show.blade.php mostra botão
+condicional. **18 testes novos** (7 Unit em `AssinaturaServiceTest`,
+6 Feature em `AssinaturaTest`, 2 Feature de view + outros). **Depende
+de:** H12, H13
+
+---
+
 ## H21 — Fechamento automático de ponto esquecido
 
 > **Como** sistema,

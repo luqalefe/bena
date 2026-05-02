@@ -35,6 +35,12 @@ Route::middleware('configure.session')->group(function () {
     Route::post('/frequencia/{ano}/{mes}/contra-assinar', [AssinaturaController::class, 'contraAssinarComoSupervisor'])
         ->whereNumber(['ano', 'mes'])
         ->name('frequencia.contra-assinar');
+    Route::post('/frequencia/{ano}/{mes}/reassinar', [AssinaturaController::class, 'reassinarComoEstagiario'])
+        ->whereNumber(['ano', 'mes'])
+        ->name('frequencia.reassinar');
+    Route::post('/frequencia/{ano}/{mes}/re-contra-assinar', [AssinaturaController::class, 'reContraAssinarComoSupervisor'])
+        ->whereNumber(['ano', 'mes'])
+        ->name('frequencia.re-contra-assinar');
     Route::post('/frequencia/{ano}/{mes}/{dia}/observacao', [ObservacaoController::class, 'salvar'])
         ->whereNumber(['ano', 'mes', 'dia'])
         ->name('frequencia.observacao');

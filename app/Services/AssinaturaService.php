@@ -90,6 +90,7 @@ class AssinaturaService
             ->where('estagiario_id', $estagiario->id)
             ->where('ano', $ano)
             ->where('mes', $mes)
+            ->whereNull('substituida_em')
             ->orderBy('assinado_em')
             ->get();
 
@@ -109,7 +110,65 @@ class AssinaturaService
             ->where('ano', $ano)
             ->where('mes', $mes)
             ->where('papel', $papel)
+            ->whereNull('substituida_em')
             ->first();
+    }
+
+    /**
+     * Re-assina a versão atual da folha quando a assinatura vigente está
+     * "alterada" (hash divergente). A vigente vira histórico
+     * (substituida_em=now), uma nova é criada com hash da folha atual.
+     *
+     * Quando re-assinatura é como estagiário, a contra-assinatura do
+     * supervisor (se existir) também é invalidada — a folha mudou,
+     * supervisor precisa rever.
+     */
+    public function reassinar(
+        Estagiario $estagiario,
+        int $ano,
+        int $mes,
+        string $papel,
+        string $assinante,
+        ?string $ip = null,
+    ): Assinatura {
+        $this->garantirPapelValido($papel);
+
+        $atual = $this->assinaturaDoMes($estagiario, $ano, $mes, $papel);
+        if ($atual === null) {
+            throw new DomainException('Não há assinatura ativa para re-assinar.');
+        }
+
+        $hashAtual = $this->hash($this->canonicalSnapshot($estagiario, $ano, $mes));
+        if ($atual->hash === $hashAtual) {
+            throw new DomainException('A assinatura atual ainda está íntegra. Re-assinatura desnecessária.');
+        }
+
+        if ($papel === Assinatura::PAPEL_ESTAGIARIO) {
+            // Folha mudou — supervisor precisa rever também.
+            Assinatura::query()
+                ->where('estagiario_id', $estagiario->id)
+                ->where('ano', $ano)
+                ->where('mes', $mes)
+                ->whereNull('substituida_em')
+                ->update(['substituida_em' => CarbonImmutable::now()]);
+        } else {
+            $atual->substituida_em = CarbonImmutable::now();
+            $atual->save();
+        }
+
+        $snapshot = $this->canonicalSnapshot($estagiario, $ano, $mes);
+
+        return Assinatura::create([
+            'estagiario_id' => $estagiario->id,
+            'ano' => $ano,
+            'mes' => $mes,
+            'papel' => $papel,
+            'assinante_username' => $assinante,
+            'snapshot' => json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+            'hash' => $this->hash($snapshot),
+            'assinado_em' => CarbonImmutable::now(),
+            'ip' => $ip,
+        ]);
     }
 
     private function garantirPapelValido(string $papel): void

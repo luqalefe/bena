@@ -221,4 +221,163 @@ class AssinaturaTest extends TestCase
         $response->assertSee(substr($assinatura->hash, 0, 12));
         $response->assertSee('Assinada como estagiário');
     }
+
+    // ─────────────────────────────────────────────────────────────
+    // Re-assinatura
+    // ─────────────────────────────────────────────────────────────
+
+    public function test_estagiario_reassina_propria_folha_alterada(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $lucas = Estagiario::factory()->create(['username' => 'lucas.dev']);
+        $freq = $this->frequenciaSimples($lucas);
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/assinar');
+
+        $hashAntigo = Assinatura::firstOrFail()->hash;
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/reassinar')
+            ->assertRedirect(route('frequencia.show', ['ano' => 2026, 'mes' => 4]))
+            ->assertSessionHas('sucesso');
+
+        $this->assertDatabaseCount('assinaturas', 2);
+        $vigente = Assinatura::whereNull('substituida_em')
+            ->where('papel', Assinatura::PAPEL_ESTAGIARIO)
+            ->firstOrFail();
+        $this->assertNotSame($hashAntigo, $vigente->hash);
+    }
+
+    public function test_estagiario_nao_reassina_de_outro(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        Estagiario::factory()->create(['username' => 'lucas.dev']);
+        Estagiario::factory()->create(['username' => 'outra.pessoa']);
+
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/reassinar?estagiario=outra.pessoa')
+            ->assertStatus(403);
+    }
+
+    public function test_supervisor_re_contra_assina_estagiario_dele(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $lucas = Estagiario::factory()->create([
+            'username' => 'lucas.dev',
+            'supervisor_username' => 'marco.supervisor',
+        ]);
+        Estagiario::factory()->create(['username' => 'marco.supervisor']);
+        $freq = $this->frequenciaSimples($lucas);
+
+        // estagiário assina, supervisor contra-assina, então alteramos a folha
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/assinar');
+        $this->withHeaders($this->supervisorHeaders('marco.supervisor'))
+            ->post('/frequencia/2026/4/contra-assinar?estagiario=lucas.dev');
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $this->withHeaders($this->supervisorHeaders('marco.supervisor'))
+            ->post('/frequencia/2026/4/re-contra-assinar?estagiario=lucas.dev')
+            ->assertRedirect()
+            ->assertSessionHas('sucesso');
+
+        // 3 assinaturas no total: estag (vigente), super substituída, super nova
+        $this->assertSame(1, Assinatura::whereNull('substituida_em')
+            ->where('papel', Assinatura::PAPEL_SUPERVISOR)
+            ->count());
+    }
+
+    public function test_supervisor_nao_re_contra_assina_de_estagiario_de_outro(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $alvo = Estagiario::factory()->create([
+            'username' => 'lucas.dev',
+            'supervisor_username' => 'outro.supervisor',
+        ]);
+        Estagiario::factory()->create(['username' => 'marco.supervisor']);
+        $this->frequenciaSimples($alvo);
+
+        $this->withHeaders($this->supervisorHeaders('marco.supervisor'))
+            ->post('/frequencia/2026/4/re-contra-assinar?estagiario=lucas.dev')
+            ->assertStatus(403);
+    }
+
+    public function test_reassinatura_do_estagiario_invalida_supervisor_e_apaga_da_view(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $lucas = Estagiario::factory()->create([
+            'username' => 'lucas.dev',
+            'supervisor_username' => 'marco.supervisor',
+        ]);
+        Estagiario::factory()->create(['username' => 'marco.supervisor']);
+        $freq = $this->frequenciaSimples($lucas);
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/assinar');
+        $this->withHeaders($this->supervisorHeaders('marco.supervisor'))
+            ->post('/frequencia/2026/4/contra-assinar?estagiario=lucas.dev');
+
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/reassinar');
+
+        // Após re-assinar como estagiário, supervisor não tem mais ativa.
+        $this->assertNull(Assinatura::whereNull('substituida_em')
+            ->where('papel', Assinatura::PAPEL_SUPERVISOR)
+            ->first());
+    }
+
+    public function test_reassinar_falha_se_folha_ainda_integra(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $lucas = Estagiario::factory()->create(['username' => 'lucas.dev']);
+        $this->frequenciaSimples($lucas);
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/assinar');
+
+        // Sem alterar nada; tenta re-assinar
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/reassinar')
+            ->assertSessionHasErrors(['assinatura']);
+    }
+
+    public function test_view_mostra_botao_reassinar_quando_alterada(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $lucas = Estagiario::factory()->create(['username' => 'lucas.dev']);
+        $freq = $this->frequenciaSimples($lucas);
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/assinar');
+
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $response = $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->get('/frequencia/2026/4');
+
+        $response->assertSee('Re-assinar versão atual')
+            ->assertSee(route('frequencia.reassinar', ['ano' => 2026, 'mes' => 4]), false);
+    }
+
+    public function test_view_nao_mostra_botao_reassinar_quando_integra(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $lucas = Estagiario::factory()->create(['username' => 'lucas.dev']);
+        $this->frequenciaSimples($lucas);
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/assinar');
+
+        // Sem alterar — assinatura íntegra
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->get('/frequencia/2026/4')
+            ->assertDontSee('Re-assinar versão atual');
+    }
 }

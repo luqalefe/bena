@@ -72,13 +72,24 @@
         </a>
     </div>
 
-    @php $verificacoes = $verificacoes ?? []; @endphp
+    @php
+        $verificacoes = $verificacoes ?? [];
+        $souProprioEstagiario = $souProprioEstagiario ?? false;
+        $souSupervisorResponsavel = $souSupervisorResponsavel ?? false;
+    @endphp
     @if ($verificacoes)
         <section style="background: var(--color-secondary-01); border: 1px solid var(--color-secondary-04); padding: 1rem 1.25rem; border-radius: 4px; margin-bottom: 1.5rem;">
             <h2 style="font-size: 1rem; color: var(--color-primary-default); margin: 0 0 0.5rem;">Assinaturas eletrônicas</h2>
             @foreach ($verificacoes as $v)
                 @php
                     $rotuloPapel = $v['papel'] === 'supervisor' ? 'Contra-assinada pelo supervisor' : 'Assinada como estagiário';
+                    $podeReassinar = ! $v['integro'] && (
+                        ($v['papel'] === 'estagiario' && $souProprioEstagiario)
+                        || ($v['papel'] === 'supervisor' && $souSupervisorResponsavel)
+                    );
+                    $rotaReassinar = $v['papel'] === 'supervisor'
+                        ? route('frequencia.re-contra-assinar', ['ano' => $folha->ano, 'mes' => $folha->mes, 'estagiario' => $estagiario->username])
+                        : route('frequencia.reassinar', ['ano' => $folha->ano, 'mes' => $folha->mes]);
                 @endphp
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px dashed var(--color-secondary-03); flex-wrap: wrap; gap: 0.5rem;">
                     <div>
@@ -86,12 +97,20 @@
                         — {{ $v['assinatura']->assinante_username }}
                         em {{ $v['assinatura']->assinado_em->format('d/m/Y H:i:s') }}
                     </div>
-                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                         <code style="font-size: 0.8rem;">{{ $v['assinatura']->hash_truncado }}</code>
                         @if ($v['integro'])
                             <span class="badge-tre-ac is-completo">✓ íntegra</span>
                         @else
                             <span class="badge-tre-ac is-pendente" style="background: #fee2e2; color: #991b1b;">⚠ alterada</span>
+                            @if ($podeReassinar)
+                                <form method="POST" action="{{ $rotaReassinar }}" onsubmit="return confirm('A assinatura anterior será marcada como substituída e o histórico será preservado. Confirmar re-assinatura da versão atual?');">
+                                    @csrf
+                                    <button type="submit" class="br-button" style="font-size: 0.8rem; padding: 0.25rem 0.6rem; background: #b45309; color: #fff;">
+                                        <i class="fas fa-redo" aria-hidden="true"></i> Re-assinar versão atual
+                                    </button>
+                                </form>
+                            @endif
                         @endif
                     </div>
                 </div>

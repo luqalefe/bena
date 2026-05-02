@@ -167,4 +167,130 @@ class AssinaturaServiceTest extends TestCase
 
         $this->assertFalse($resultado[0]['integro']);
     }
+
+    // ─────────────────────────────────────────────────────────────
+    // Re-assinatura (correção quando "⚠ alterada")
+    // ─────────────────────────────────────────────────────────────
+
+    public function test_assinatura_do_mes_ignora_substituidas(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+        $svc = app(AssinaturaService::class);
+
+        $velha = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+        $velha->update(['substituida_em' => now()]);
+
+        $this->assertNull($svc->assinaturaDoMes($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO));
+    }
+
+    public function test_verificar_ignora_substituidas(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+        $svc = app(AssinaturaService::class);
+        $a = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+        $a->update(['substituida_em' => now()]);
+
+        $this->assertSame([], $svc->verificar($estagiario, 2026, 4));
+    }
+
+    public function test_reassinar_marca_anterior_como_substituida_e_cria_nova(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        $freq = Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+        $svc = app(AssinaturaService::class);
+        $velha = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+
+        // simula adulteração — hash divergiu
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $nova = $svc->reassinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+
+        $velha->refresh();
+        $this->assertNotNull($velha->substituida_em);
+        $this->assertNotSame($velha->id, $nova->id);
+        $this->assertNotSame($velha->hash, $nova->hash);
+        $this->assertNull($nova->substituida_em);
+    }
+
+    public function test_reassinar_falha_se_ainda_integro(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+        $svc = app(AssinaturaService::class);
+        $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessageMatches('/íntegra|integra/i');
+
+        $svc->reassinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+    }
+
+    public function test_reassinar_falha_se_nao_ha_assinatura_anterior(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        $svc = app(AssinaturaService::class);
+
+        $this->expectException(DomainException::class);
+        $this->expectExceptionMessageMatches('/não há assinatura/i');
+
+        $svc->reassinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+    }
+
+    public function test_reassinar_como_estagiario_invalida_supervisor_tambem(): void
+    {
+        $estagiario = Estagiario::factory()->create(['supervisor_username' => 'marco.supervisor']);
+        $freq = Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+        $svc = app(AssinaturaService::class);
+        $assinatEstag = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+        $assinatSuper = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_SUPERVISOR, 'marco.supervisor');
+
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $svc->reassinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+
+        $this->assertNotNull($assinatEstag->fresh()->substituida_em);
+        $this->assertNotNull(
+            $assinatSuper->fresh()->substituida_em,
+            'Supervisor precisa contra-assinar de novo quando estagiário re-assina'
+        );
+    }
+
+    public function test_reassinar_como_supervisor_nao_invalida_estagiario(): void
+    {
+        $estagiario = Estagiario::factory()->create(['supervisor_username' => 'marco.supervisor']);
+        $freq = Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+        $svc = app(AssinaturaService::class);
+        $assinatEstag = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+        $assinatSuper = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_SUPERVISOR, 'marco.supervisor');
+
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $svc->reassinar($estagiario, 2026, 4, Assinatura::PAPEL_SUPERVISOR, 'marco.supervisor');
+
+        $this->assertNull(
+            $assinatEstag->fresh()->substituida_em,
+            'Estagiário NÃO é invalidado quando só supervisor re-contra-assina'
+        );
+        $this->assertNotNull($assinatSuper->fresh()->substituida_em);
+    }
 }

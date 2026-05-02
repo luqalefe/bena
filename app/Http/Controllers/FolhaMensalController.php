@@ -43,6 +43,8 @@ class FolhaMensalController extends Controller
                 && $this->jaAssinou($verificacoes, 'estagiario')
                 && ! $this->jaAssinou($verificacoes, 'supervisor'),
             'podeEditarObservacao' => $souProprioEstagiario && ! $this->jaAssinou($verificacoes, 'estagiario'),
+            'souProprioEstagiario' => $souProprioEstagiario,
+            'souSupervisorResponsavel' => $souSupervisorResponsavel,
         ]);
     }
 

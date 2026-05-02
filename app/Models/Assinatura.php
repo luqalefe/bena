@@ -26,6 +26,7 @@ class Assinatura extends Model
         'hash',
         'assinado_em',
         'ip',
+        'substituida_em',
     ];
 
     protected function casts(): array
@@ -34,6 +35,7 @@ class Assinatura extends Model
             'ano' => 'integer',
             'mes' => 'integer',
             'assinado_em' => 'datetime',
+            'substituida_em' => 'datetime',
         ];
     }
 
