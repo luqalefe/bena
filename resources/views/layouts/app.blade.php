@@ -61,10 +61,13 @@
             </div>
             <div class="header-bottom">
                 <div class="header-menu">
-                    <div class="header-info">
-                        <div class="header-title">@yield('header-title', 'Controle de Frequência de Estagiários')</div>
-                        <div class="header-subtitle">@yield('header-subtitle', 'Sistema interno')</div>
-                    </div>
+                    <a href="{{ route('dashboard') }}" style="display: flex; align-items: center; gap: 0.75rem; text-decoration: none; color: inherit;">
+                        <img src="{{ asset('img/bena.png') }}" alt="Bena" style="height: 56px; width: auto; background: #fff; border-radius: 4px; padding: 4px;">
+                        <div class="header-info">
+                            <div class="header-title">@yield('header-title', 'Bena')</div>
+                            <div class="header-subtitle">@yield('header-subtitle', 'Controle de Frequência de Estagiários')</div>
+                        </div>
+                    </a>
                     @if (session('grupodeacesso') === '0')
                         <nav aria-label="Navegação administrativa" style="margin-left: auto; display: flex; gap: 1rem; align-items: center;">
                             <a href="{{ route('admin.dashboard') }}" style="color: var(--brand-tre-ac-contrast, #fff); text-decoration: none;">Dashboard</a>
@@ -104,7 +107,7 @@
 
     <footer class="br-footer" style="background: var(--color-primary-darken-01); color: var(--brand-tre-ac-contrast); padding: 1.5rem 0; margin-top: auto;">
         <div class="container-lg" style="text-align: center; font-size: 0.875rem;">
-            Tribunal Regional Eleitoral do Acre · Controle de Frequência · v1.0
+            Tribunal Regional Eleitoral do Acre · Bena — Controle de Frequência · v1.0
         </div>
     </footer>
 

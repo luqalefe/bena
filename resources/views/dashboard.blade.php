@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard — Controle de Frequência')
+@section('title', 'Dashboard — Bena')
 
 @section('content')
     <h1 style="color: var(--color-primary-default); margin-bottom: 0.5rem;">

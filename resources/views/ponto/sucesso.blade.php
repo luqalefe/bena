@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Ponto registrado — Controle de Frequência')
+@section('title', 'Ponto registrado — Bena')
 
 @section('content')
     @php

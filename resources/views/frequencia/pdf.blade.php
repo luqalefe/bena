@@ -9,6 +9,10 @@
         h1 { font-size: 14pt; color: #003366; margin: 0 0 0.5rem; }
         h2 { font-size: 11pt; color: #003366; margin: 1rem 0 0.4rem; }
         .header { border-bottom: 2px solid #003366; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        .header table { width: 100%; border-collapse: collapse; }
+        .header td { vertical-align: middle; }
+        .header td.logo { width: 70px; }
+        .header td.logo img { width: 60px; height: 60px; }
         .header .titulo { font-size: 9pt; color: #555; }
         .meta { width: 100%; border-collapse: collapse; margin-bottom: 1rem; font-size: 9pt; }
         .meta td { padding: 0.2rem 0.4rem; border: 1px solid #d4d4d4; }
@@ -30,8 +34,17 @@
 </head>
 <body>
     <div class="header">
-        <div class="titulo">Tribunal Regional Eleitoral do Acre — Sistema de Controle de Frequência de Estagiários</div>
-        <h1>Folha de Frequência — {{ $folha->tituloExtenso() }}</h1>
+        <table>
+            <tr>
+                <td class="logo">
+                    <img src="{{ public_path('img/bena.png') }}" alt="Bena">
+                </td>
+                <td>
+                    <div class="titulo">Tribunal Regional Eleitoral do Acre — Bena · Controle de Frequência de Estagiários</div>
+                    <h1>Folha de Frequência — {{ $folha->tituloExtenso() }}</h1>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <table class="meta">

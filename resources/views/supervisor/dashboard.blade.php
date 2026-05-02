@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Painel do supervisor — Controle de Frequência')
+@section('title', 'Painel do supervisor — Bena')
 
 @section('content')
     <h1 style="color: var(--color-primary-default); margin: 0 0 1rem;">Estagiários sob sua responsabilidade</h1>

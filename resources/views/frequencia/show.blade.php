@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Folha mensal — Controle de Frequência')
+@section('title', 'Folha mensal — Bena')
 
 @php
     $diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];

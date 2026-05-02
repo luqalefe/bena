@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Feriados — Controle de Frequência')
+@section('title', 'Feriados — Bena')
 
 @section('content')
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">

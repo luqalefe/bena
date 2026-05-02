@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard admin — Controle de Frequência')
+@section('title', 'Dashboard admin — Bena')
 
 @section('content')
     <h1 style="color: var(--color-primary-default); margin: 0 0 0.25rem;">Dashboard administrativo</h1>

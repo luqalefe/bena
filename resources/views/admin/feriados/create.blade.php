@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Novo feriado — Controle de Frequência')
+@section('title', 'Novo feriado — Bena')
 
 @section('content')
     <h1 style="color: var(--color-primary-default); margin-bottom: 1.5rem;">

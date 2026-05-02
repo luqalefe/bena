@@ -1,15 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Início — Controle de Frequência')
+@section('title', 'Início — Bena')
 
 @section('content')
     <h1 style="color: var(--color-primary-default); margin-bottom: 1rem;">
-        Bem-vindo
+        Bem-vindo ao Bena
     </h1>
 
     <p style="color: var(--color-secondary-07); margin-bottom: 2rem;">
-        Sistema de Controle de Frequência de Estagiários — substitui o
-        preenchimento manual da Ficha de Controle de Frequência (FCF).
+        Controle de Frequência de Estagiários do TRE-AC — substitui o
+        preenchimento manual da Ficha de Controle de Frequência (FCF) em
+        papel.
     </p>
 
     {{-- Demo dos cards do dashboard (H4) usando os tokens TRE-AC --}}
