@@ -28,6 +28,7 @@ class Estagiario extends Model implements Authenticatable
         'inicio_estagio',
         'fim_estagio',
         'horas_diarias',
+        'contrato_path',
         'ativo',
     ];
 

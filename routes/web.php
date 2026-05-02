@@ -51,6 +51,12 @@ Route::middleware('configure.session')->group(function () {
         Route::get('/estagiarios/{estagiario}/editar', [EstagiarioController::class, 'edit'])->name('estagiarios.edit');
         Route::put('/estagiarios/{estagiario}', [EstagiarioController::class, 'update'])->name('estagiarios.update');
     });
+
+    // Download de contrato — autorização inline no controller (admin OR self
+    // OR supervisor responsável). Fica fora do prefix admin/group para não
+    // ser barrado pelo $adminOnlyRouteNames do ConfigureUserSession.
+    Route::get('/admin/estagiarios/{estagiario}/contrato', [EstagiarioController::class, 'contrato'])
+        ->name('admin.estagiarios.contrato');
 });
 
 /*

@@ -6,6 +6,8 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Estagiario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class EstagiarioEdicaoTest extends TestCase
@@ -139,6 +141,121 @@ class EstagiarioEdicaoTest extends TestCase
             ->get(route('admin.estagiarios.edit', $alvo))
             ->assertSee('name="supervisor_username"', false)
             ->assertSee('value="lucas.supervisor"', false);
+    }
+
+    public function test_form_de_edicao_aceita_upload_de_contrato_pdf(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo))
+            ->assertSee('enctype="multipart/form-data"', false)
+            ->assertSee('name="contrato"', false)
+            ->assertSee('accept="application/pdf"', false);
+    }
+
+    public function test_admin_faz_upload_de_contrato_e_persiste_caminho(): void
+    {
+        Storage::fake('local');
+        $alvo = Estagiario::factory()->create(['contrato_path' => null]);
+        $pdf = UploadedFile::fake()->create('contrato-original.pdf', 100, 'application/pdf');
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'horas_diarias' => '5',
+                'ativo' => '1',
+                'contrato' => $pdf,
+            ])
+            ->assertRedirect(route('admin.estagiarios.index'));
+
+        $alvo->refresh();
+        $this->assertNotNull($alvo->contrato_path);
+        $this->assertStringStartsWith('contratos/', $alvo->contrato_path);
+        $this->assertStringNotContainsString('contrato-original', $alvo->contrato_path);
+        Storage::disk('local')->assertExists($alvo->contrato_path);
+    }
+
+    public function test_upload_rejeita_arquivo_que_nao_eh_pdf(): void
+    {
+        Storage::fake('local');
+        $alvo = Estagiario::factory()->create(['contrato_path' => null]);
+        $jpeg = UploadedFile::fake()->image('foto.jpg');
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'horas_diarias' => '5',
+                'ativo' => '1',
+                'contrato' => $jpeg,
+            ])
+            ->assertSessionHasErrors(['contrato']);
+
+        $this->assertNull($alvo->fresh()->contrato_path);
+    }
+
+    public function test_upload_rejeita_pdf_acima_de_5mb(): void
+    {
+        Storage::fake('local');
+        $alvo = Estagiario::factory()->create(['contrato_path' => null]);
+        // Tamanho em KB; 5121 KB > 5 MB (max:5120)
+        $pdfGrande = UploadedFile::fake()->create('grande.pdf', 5121, 'application/pdf');
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'horas_diarias' => '5',
+                'ativo' => '1',
+                'contrato' => $pdfGrande,
+            ])
+            ->assertSessionHasErrors(['contrato']);
+
+        $this->assertNull($alvo->fresh()->contrato_path);
+    }
+
+    public function test_novo_upload_deleta_contrato_anterior(): void
+    {
+        $disk = Storage::fake('local');
+        $alvo = Estagiario::factory()->create(['contrato_path' => null]);
+
+        // Primeiro upload
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'horas_diarias' => '5',
+                'ativo' => '1',
+                'contrato' => UploadedFile::fake()->create('original.pdf', 100, 'application/pdf'),
+            ]);
+        $caminhoAntigo = $alvo->fresh()->contrato_path;
+        $this->assertNotNull($caminhoAntigo);
+        $disk->assertExists($caminhoAntigo);
+
+        // Segundo upload — deve deletar o antigo
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'horas_diarias' => '5',
+                'ativo' => '1',
+                'contrato' => UploadedFile::fake()->create('novo.pdf', 100, 'application/pdf'),
+            ]);
+        $caminhoNovo = $alvo->fresh()->contrato_path;
+
+        $this->assertNotSame($caminhoAntigo, $caminhoNovo);
+        $disk->assertMissing($caminhoAntigo);
+        $disk->assertExists($caminhoNovo);
+    }
+
+    public function test_form_mostra_link_de_download_quando_contrato_existe(): void
+    {
+        $alvo = Estagiario::factory()->create(['contrato_path' => 'contratos/abc123.pdf']);
+
+        $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo))
+            ->assertSee(route('admin.estagiarios.contrato', $alvo), false);
+    }
+
+    public function test_form_nao_mostra_link_quando_contrato_inexistente(): void
+    {
+        $alvo = Estagiario::factory()->create(['contrato_path' => null]);
+
+        $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo))
+            ->assertDontSee('Contrato atual:', false);
     }
 
     public function test_admin_pode_inativar_estagiario_omitindo_checkbox_ativo(): void

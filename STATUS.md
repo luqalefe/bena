@@ -4,7 +4,7 @@
 > trabalho. Detalhes longos vivem em `CLAUDE.md`, `REQUISITOS.md`,
 > `SPRINTS.md` e `docs/`.
 
-**Última atualização:** 2026-05-02 (Sprint 5 iniciada · H0.3 pipeline local pronto · `.gitlab-ci.yml` na migração pra GitLab interno em 2026-05-04)
+**Última atualização:** 2026-05-02 (Sprint 5 em curso · H0.3 pipeline local pronto · H16 fechada com upload/download de contrato PDF)
 
 **Repo:** [`luqalefe/bena`](https://github.com/luqalefe/bena.git) — branch `main` ·
 commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
@@ -33,12 +33,17 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
   `.gitlab-ci.yml` quando o projeto migrar pro GitLab interno (2026-05-04);
   gate per-service ≥ 90 % (hoje 100 % na prática mas sem enforcement
   automatizado); branch protection no `main` (config UI).
-- 📋 **H16-fechamento** — upload de contrato PDF + UI `supervisor_username`
+- ✅ **H16** — fechada. Upload de contrato PDF
+  (`Storage::disk('local')->putFile('contratos', ...)` + validação
+  `mimes:pdf + mimetypes:application/pdf + max:5120`, novo deleta antigo)
+  e download em `GET /admin/estagiarios/{id}/contrato` com autorização
+  inline (admin OR self OR supervisor responsável → 403; 404 sem upload).
+  13 testes novos.
 - 📋 **H17** — observações no dia (tooltip + nota no PDF)
 - 📋 **H18** — verificação de integridade da assinatura
 - 📋 **H19** — auditoria de ações
 
-**Suíte:** 167 testes, 377 assertions · cobertura 97.9 % (services 98 %+)
+**Suíte:** 180 testes, 410 assertions · cobertura ≥ 80 % (gate `--min=80`)
 
 ### Mudanças de modelagem em 2026-05-01 (registradas em REQUISITOS.md)
 Atores refinados: **Supervisor** vira grupo Authelia próprio (`supervisores`),
@@ -99,12 +104,12 @@ clica em "Trocar usuário" no banner.
 ## Próximo passo concreto — Sprint 5 em curso
 
 H0.3 parcial (pipeline local pronto, `.gitlab-ci.yml` aguarda migração
-pro GitLab interno em 2026-05-04). Próximo na fila: **H16-fechamento**
-(upload contrato PDF + UI `supervisor_username`). Sequência:
+pro GitLab interno em 2026-05-04). H16 fechada. Próximo na fila: **H17**
+(observações no dia). Sequência:
 
 1. 🚧 **H0.3** — pipeline local OK; CI no GitLab fica pra 2026-05-04
-2. 🚧 **H16-fechamento** — upload PDF + supervisor dropdown
-3. **H17** — observações no dia
+2. ✅ **H16** — upload contrato + download autorizado
+3. 🚧 **H17** — observações no dia
 4. **H18** — integridade da assinatura
 5. **H19** — auditoria de ações
 

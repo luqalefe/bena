@@ -584,12 +584,16 @@ identificando alvo + navegação preserva query. 7 testes em
      admin/RH baixa qualquer; estagiário pode baixar **o seu próprio**;
      supervisor pode baixar dos estagiários sob ele; demais → 403.
 
-**Status:** ✅ Done **(parcial)** — `app/Http/Controllers/Admin/EstagiarioController.php`
-(index/edit/update) + `PontoService::garantirAtivo`. 12 testes Feature/Admin
-+ 2 testes Unit. **Pendente:** critério 4 (parte "não aparece em
-dashboards") espera H14; critérios 5/6 (contrato PDF) e
-`supervisor_username` no critério 2 entram numa **revisão da H16** após
-H14/H15. **Depende de:** H14
+**Status:** ✅ Done — `app/Http/Controllers/Admin/EstagiarioController.php`
+com `index/edit/update/contrato` + `PontoService::garantirAtivo`.
+`supervisor_username` (crit 2) implementado via migration
+`add_supervisor_username_to_estagiarios` + form. Upload de contrato (crit
+5) usa `Storage::disk('local')->putFile('contratos', ...)` com validação
+`mimes:pdf + mimetypes:application/pdf + max:5120`; novo upload deleta
+o anterior. Download (crit 6) em `GET /admin/estagiarios/{id}/contrato`
+com autorização inline (admin OR self OR supervisor responsável → 403
+senão; 404 sem upload). 19 testes Feature (13 em `EstagiarioEdicaoTest`
++ 6 em `ContratoDownloadTest`) + 2 testes Unit. **Depende de:** H14
 
 ---
 

@@ -31,7 +31,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.estagiarios.update', $estagiario) }}" style="display: grid; gap: 1rem; max-width: 640px;">
+    <form method="POST" action="{{ route('admin.estagiarios.update', $estagiario) }}" enctype="multipart/form-data" style="display: grid; gap: 1rem; max-width: 640px;">
         @csrf
         @method('PUT')
 
@@ -80,6 +80,18 @@
         <label style="display: flex; align-items: center; gap: 0.5rem;">
             <input type="checkbox" name="ativo" value="1" @checked(old('ativo', $estagiario->ativo))>
             <span>Estágio ativo</span>
+        </label>
+
+        <label style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <span>Contrato (PDF, máx 5 MB)</span>
+            <input type="file" name="contrato" accept="application/pdf" style="padding: 0.4rem 0.6rem;">
+            @if ($estagiario->contrato_path)
+                <small style="color: var(--color-secondary-07);">
+                    Contrato atual:
+                    <a href="{{ route('admin.estagiarios.contrato', $estagiario) }}">baixar</a>
+                    — enviar novo arquivo substitui o anterior.
+                </small>
+            @endif
         </label>
 
         <div style="display: flex; gap: 0.75rem; margin-top: 0.5rem;">
