@@ -3,7 +3,7 @@
 Sistema web de controle de frequência de estagiários no formato CIEE,
 construído para uso interno em tribunal.
 
-**Stack:** Laravel 11 · PHP 8.2 · Oracle 19c+ · AdminLTE 3 · Authelia (SSO+2FA) · Docker
+**Stack:** Laravel 11 · PHP 8.2 · Oracle 19c+ · gov.br DS v3 (tema TRE-AC) · Authelia (SSO+2FA, em prod) · Docker
 
 > Antes de mexer em código, leia [`CLAUDE.md`](./CLAUDE.md), [`REQUISITOS.md`](./REQUISITOS.md)
 > e [`SPRINTS.md`](./SPRINTS.md). Seguimos **TDD estrito** e XP — não é cosmético.
@@ -99,8 +99,8 @@ Detalhes em [`CLAUDE.md`](./CLAUDE.md).
 │   ├── authelia/        # configuration.yml, users_database.yml
 │   └── traefik/
 ├── docs/
-│   ├── dev-authelia.md  # primeiro login + reset TOTP
-│   └── ...
+│   ├── dev-sessao.md       # como trocar usuário simulado em runtime
+│   └── identidade-visual.md
 ├── docker-compose.yml         # dev (default)
 ├── docker-compose.prod.yml    # overrides para produção
 ├── docker-compose.test.yml    # overrides para CI/testes
@@ -111,5 +111,15 @@ Detalhes em [`CLAUDE.md`](./CLAUDE.md).
 
 ## Status
 
-🚧 **Sprint 0 — Fundação.** Stack Docker subindo, sem Laravel bootstrapado
-ainda. Próximo passo: bootstrap do Laravel 11 + modelagem do banco.
+✅ **Sprints 0–4 fechadas** (Sprint 4 puxada à frente da 3 a pedido). Estagiário
+bate ponto, vê folha do mês, gera PDF e assina. Supervisor contra-assina. RH
+baixa o PDF assinado pra anexar no SEI. Admin cadastra estagiários e feriados.
+
+**Suíte:** 166 testes / 374 assertions, todos verdes (SQLite in-memory).
+
+🚧 **Próxima — Sprint 5 (polimento e auditoria):** H17 (observações no dia),
+H18 (verificação de integridade da assinatura), H19 (auditoria de ações).
+Pendências carregadas: H0.3 (pipeline CI) e parciais da H16 (upload de
+contrato + `supervisor_username`).
+
+Para o estado de handoff entre sessões, ver [`STATUS.md`](./STATUS.md).
