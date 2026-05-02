@@ -58,5 +58,10 @@
                 Frequência do dia concluída
             </span>
         @endif
+
+        <a href="{{ route('frequencia.atual') }}" class="br-button secondary">
+            <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+            Ver folha mensal
+        </a>
     </div>
 @endsection

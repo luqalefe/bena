@@ -61,6 +61,18 @@ class DashboardControllerTest extends TestCase
         $response->assertDontSee('>Bater entrada<', false);
     }
 
+    public function test_dashboard_tem_link_para_folha_mensal_do_mes_corrente(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+
+        $this->withHeaders([
+            'Remote-User' => $estagiario->username,
+            'Remote-Groups' => 'estagiarios',
+        ])->get('/')
+            ->assertSee(route('frequencia.atual'), false)
+            ->assertSee('Ver folha mensal');
+    }
+
     public function test_dashboard_renderiza_horas_e_dias_do_mes(): void
     {
         Carbon::setTestNow('2026-05-15 09:00:00');
