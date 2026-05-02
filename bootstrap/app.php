@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\FecharPontosAbertosCommand;
 use App\Http\Middleware\ConfigureUserSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -11,6 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+    ->withCommands([
+        FecharPontosAbertosCommand::class,
+    ])
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'configure.session' => ConfigureUserSession::class,

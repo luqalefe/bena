@@ -248,4 +248,112 @@ class PontoServiceTest extends TestCase
 
         app(PontoService::class)->baterEntrada($estagiario);
     }
+
+    // ─────────────────────────────────────────────────────────────
+    // Auto-fechamento de pontos abertos (cron diário)
+    // ─────────────────────────────────────────────────────────────
+
+    public function test_fecha_ponto_aberto_de_ontem_usando_horas_diarias_do_estagiario(): void
+    {
+        Carbon::setTestNow('2026-05-05 00:05:00'); // terça
+        $estagiario = Estagiario::factory()->create(['horas_diarias' => 5.00]);
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-05-04',
+            'entrada' => '09:00:00',
+            // sem saida — ponto aberto
+        ]);
+
+        $fechados = app(PontoService::class)->fecharPontosAbertos();
+
+        $this->assertSame(1, $fechados);
+        $f = Frequencia::first();
+        $this->assertSame('14:00:00', $f->saida->format('H:i:s'));
+        $this->assertSame('5.00', (string) $f->horas);
+        $this->assertTrue($f->saida_automatica);
+    }
+
+    public function test_fechamento_respeita_horas_diarias_customizada(): void
+    {
+        Carbon::setTestNow('2026-05-05 00:05:00');
+        $estagiario = Estagiario::factory()->create(['horas_diarias' => 6.50]);
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-05-04',
+            'entrada' => '08:00:00',
+        ]);
+
+        app(PontoService::class)->fecharPontosAbertos();
+
+        $f = Frequencia::first();
+        $this->assertSame('14:30:00', $f->saida->format('H:i:s'));
+        $this->assertSame('6.50', (string) $f->horas);
+    }
+
+    public function test_nao_fecha_ponto_do_dia_atual(): void
+    {
+        Carbon::setTestNow('2026-05-04 23:50:00');
+        $estagiario = Estagiario::factory()->create(['horas_diarias' => 5.00]);
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-05-04',
+            'entrada' => '09:00:00',
+        ]);
+
+        $fechados = app(PontoService::class)->fecharPontosAbertos();
+
+        $this->assertSame(0, $fechados);
+        $this->assertNull(Frequencia::first()->saida);
+    }
+
+    public function test_nao_mexe_em_ponto_ja_com_saida(): void
+    {
+        Carbon::setTestNow('2026-05-05 00:05:00');
+        $estagiario = Estagiario::factory()->create();
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-05-04',
+            'entrada' => '09:00:00',
+            'saida' => '13:00:00',
+            'horas' => 4.00,
+        ]);
+
+        $fechados = app(PontoService::class)->fecharPontosAbertos();
+
+        $this->assertSame(0, $fechados);
+        $f = Frequencia::first();
+        $this->assertSame('13:00:00', $f->saida->format('H:i:s'));
+        $this->assertFalse($f->saida_automatica);
+    }
+
+    public function test_fecha_pontos_abertos_de_estagiarios_diferentes(): void
+    {
+        Carbon::setTestNow('2026-05-05 00:05:00');
+        $a = Estagiario::factory()->create(['horas_diarias' => 5.00]);
+        $b = Estagiario::factory()->create(['horas_diarias' => 4.00]);
+        Frequencia::create(['estagiario_id' => $a->id, 'data' => '2026-05-04', 'entrada' => '09:00:00']);
+        Frequencia::create(['estagiario_id' => $b->id, 'data' => '2026-05-04', 'entrada' => '10:00:00']);
+
+        $fechados = app(PontoService::class)->fecharPontosAbertos();
+
+        $this->assertSame(2, $fechados);
+        $this->assertSame('14:00:00', Frequencia::where('estagiario_id', $a->id)->first()->saida->format('H:i:s'));
+        $this->assertSame('14:00:00', Frequencia::where('estagiario_id', $b->id)->first()->saida->format('H:i:s'));
+    }
+
+    public function test_ignora_frequencia_so_com_observacao_sem_entrada(): void
+    {
+        Carbon::setTestNow('2026-05-05 00:05:00');
+        $estagiario = Estagiario::factory()->create();
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-05-04',
+            'observacao' => 'ausência justificada',
+        ]);
+
+        $fechados = app(PontoService::class)->fecharPontosAbertos();
+
+        $this->assertSame(0, $fechados);
+        $this->assertNull(Frequencia::first()->saida);
+    }
 }

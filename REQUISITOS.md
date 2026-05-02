@@ -701,6 +701,39 @@ testes novos** (12 em `ObservacaoControllerTest` + 1 em
 
 ---
 
+## H21 — Fechamento automático de ponto esquecido
+
+> **Como** sistema,
+> **eu preciso** fechar pontos em que o estagiário bateu entrada e
+> esqueceu de bater saída,
+> **para que** o registro do dia fique consistente e a folha mensal não
+> tenha "buracos" indefinidos por esquecimento.
+
+**Critérios de aceitação:**
+
+1. Cron diário (00:05) fecha registros com `entrada` preenchida e
+   `saida` ainda nula em dias `< hoje`.
+2. `saida = entrada + horas_diarias` (jornada do estagiário; default 5h,
+   customizável via H16).
+3. `horas` é gravada igual a `horas_diarias`.
+4. Coluna nova `saida_automatica` (boolean) marca o registro como
+   auto-fechado, separando dos pontos batidos manualmente.
+5. Idempotente: rodar duas vezes não muda nada (não toca em registros
+   com saida já preenchida).
+6. Não fecha o ponto do dia atual (estagiário ainda pode bater saída).
+7. Folha mensal e PDF indicam visualmente quando saída foi automática
+   (badge "batido (auto)" e marcador `*` no PDF).
+
+**Status:** ✅ Done — `PontoService::fecharPontosAbertos()` + comando
+`ponto:fechar-abertos` (`App\Console\Commands\FecharPontosAbertosCommand`)
+agendado em `routes/console.php` via `Schedule::command(...)->dailyAt('00:05')`.
+Migration `add_saida_automatica_to_frequencias`. View `frequencia/show.blade.php`
+mostra badge `batido (auto)` e tooltip `⚠ auto`; PDF marca saída com `*`. 9
+testes novos (6 Unit em `PontoServiceTest`, 3 Feature em
+`FecharPontosAbertosCommandTest`, 1 em `FolhaMensalTest`). **Depende de:** H3, H16
+
+---
+
 # Requisitos não-funcionais
 
 ## Segurança

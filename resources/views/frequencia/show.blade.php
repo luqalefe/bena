@@ -135,11 +135,18 @@
                     @else
                         @if ($dia->frequencia !== null && ($dia->frequencia->entrada !== null || $dia->frequencia->saida !== null))
                             <td style="padding: 0.5rem;">{{ $dia->frequencia->entrada?->format('H:i') ?? '—' }}</td>
-                            <td style="padding: 0.5rem;">{{ $dia->frequencia->saida?->format('H:i') ?? '—' }}</td>
+                            <td style="padding: 0.5rem;">
+                                {{ $dia->frequencia->saida?->format('H:i') ?? '—' }}
+                                @if ($dia->frequencia->saida_automatica)
+                                    <span title="Saída registrada automaticamente após {{ number_format((float) $dia->frequencia->horas, 2, ',', '') }}h sem batida (cron diário 00:05)" style="font-size: 0.7rem; color: #b45309; margin-left: 0.25rem; cursor: help;">⚠ auto</span>
+                                @endif
+                            </td>
                             <td style="padding: 0.5rem;">{{ $dia->frequencia->horas !== null ? number_format((float) $dia->frequencia->horas, 2, ',', '') : '—' }}</td>
                             <td style="padding: 0.5rem;">
                                 @if ($dia->frequencia->saida === null)
                                     <span class="badge-tre-ac is-entrada">em andamento</span>
+                                @elseif ($dia->frequencia->saida_automatica)
+                                    <span class="badge-tre-ac" style="background: #fef3c7; color: #92400e;">batido (auto)</span>
                                 @else
                                     <span class="badge-tre-ac is-completo">batido</span>
                                 @endif

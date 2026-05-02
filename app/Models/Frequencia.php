@@ -28,6 +28,7 @@ class Frequencia extends Model
         'ip_entrada',
         'ip_saida',
         'observacao',
+        'saida_automatica',
     ];
 
     protected function casts(): array
@@ -35,6 +36,7 @@ class Frequencia extends Model
         return [
             'data' => 'date',
             'horas' => 'decimal:2',
+            'saida_automatica' => 'boolean',
         ];
     }
 

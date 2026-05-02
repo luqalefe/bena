@@ -4,7 +4,7 @@
 > trabalho. Detalhes longos vivem em `CLAUDE.md`, `REQUISITOS.md`,
 > `SPRINTS.md` e `docs/`.
 
-**Última atualização:** 2026-05-02 (Sprint 5 em curso · H0.3 pipeline local pronto · H16 fechada · H17 fechada com observações por dia)
+**Última atualização:** 2026-05-02 (Sprint 5 em curso · H17 fechada · H21 auto-fechamento de ponto esquecido)
 
 **Repo:** [`luqalefe/bena`](https://github.com/luqalefe/bena.git) — branch `main` ·
 commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
@@ -47,8 +47,14 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
   PDF mostra na coluna Observação. 14 testes novos.
 - 📋 **H18** — verificação de integridade da assinatura
 - 📋 **H19** — auditoria de ações
+- ✅ **H21** — auto-fechamento de ponto esquecido (não estava na sprint
+  original; pedido em 2026-05-02). `PontoService::fecharPontosAbertos`
+  + `php artisan ponto:fechar-abertos` agendado `dailyAt('00:05')`.
+  Saída = entrada + `horas_diarias` do estagiário. Coluna nova
+  `saida_automatica` (boolean) + badge `batido (auto)` na folha e
+  marcador `*` no PDF.
 
-**Suíte:** 194 testes, 443 assertions · cobertura ≥ 80 % (gate `--min=80`)
+**Suíte:** 205 testes, 471 assertions · cobertura ≥ 80 % (gate `--min=80`)
 
 ### Mudanças de modelagem em 2026-05-01 (registradas em REQUISITOS.md)
 Atores refinados: **Supervisor** vira grupo Authelia próprio (`supervisores`),

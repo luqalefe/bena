@@ -86,4 +86,34 @@ class PontoService
             throw new DomainException('Estágio inativo. Procure a coordenação.');
         }
     }
+
+    /**
+     * Fecha pontos esquecidos: registros com entrada e sem saida em dias
+     * passados ganham saida = entrada + horas_diarias do estagiário, e
+     * são marcados como saida_automatica=true. Idempotente.
+     */
+    public function fecharPontosAbertos(): int
+    {
+        $hoje = CarbonImmutable::now()->toDateString();
+
+        $abertos = Frequencia::query()
+            ->whereNotNull('entrada')
+            ->whereNull('saida')
+            ->whereDate('data', '<', $hoje)
+            ->with('estagiario')
+            ->get();
+
+        foreach ($abertos as $frequencia) {
+            $jornada = (float) $frequencia->estagiario->horas_diarias;
+            $entrada = CarbonImmutable::createFromFormat('H:i:s', $frequencia->entrada->format('H:i:s'));
+            $saida = $entrada->addMinutes((int) round($jornada * 60));
+
+            $frequencia->saida = $saida->format('H:i:s');
+            $frequencia->horas = $jornada;
+            $frequencia->saida_automatica = true;
+            $frequencia->save();
+        }
+
+        return $abertos->count();
+    }
 }

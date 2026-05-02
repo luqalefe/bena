@@ -92,9 +92,12 @@
                         <td>—</td>
                     @elseif ($dia->frequencia !== null && ($dia->frequencia->entrada !== null || $dia->frequencia->saida !== null))
                         <td>{{ $dia->frequencia->entrada?->format('H:i') ?? '—' }}</td>
-                        <td>{{ $dia->frequencia->saida?->format('H:i') ?? '—' }}</td>
+                        <td>
+                            {{ $dia->frequencia->saida?->format('H:i') ?? '—' }}
+                            @if ($dia->frequencia->saida_automatica) *@endif
+                        </td>
                         <td>{{ $dia->frequencia->horas !== null ? number_format((float) $dia->frequencia->horas, 2, ',', '') : '—' }}</td>
-                        <td>{{ $dia->frequencia->saida === null ? 'em andamento' : 'batido' }}</td>
+                        <td>{{ $dia->frequencia->saida === null ? 'em andamento' : ($dia->frequencia->saida_automatica ? 'batido (auto)' : 'batido') }}</td>
                         <td>{{ $dia->frequencia->observacao ?? '—' }}</td>
                     @elseif ($dia->frequencia?->observacao)
                         <td>—</td><td>—</td><td>—</td><td>justificado</td>
