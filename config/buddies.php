@@ -145,13 +145,13 @@ return [
         ],
         'bortoli' => [
             'emoji' => '👴',
-            'nome' => 'Bortelmo, a Memória Viva',
-            'personalidade' => 'Ancião · História Institucional',
+            'nome' => 'Bortelmo, Mestre do Legado',
+            'personalidade' => 'Veterano do Código Antigo · Pragmatismo Cru',
             'raridade' => 'lendaria',
-            'classe' => 'Arquivista Lendário',
-            'habilidade' => 'Arquivo Vivo — invoca o contexto histórico de qualquer decisão da Justiça Eleitoral, inclusive as não documentadas.',
-            'flavor' => 'Isso aqui já tentamos em 2008. Deixa eu te contar como foi.',
-            'historia' => 'O Bortelmo lembra de cada presidente do tribunal, cada plebiscito, cada urna emprestada de outro estado em ano de pleito difícil. Dizem que basta tocar uma ata antiga pra saber em qual seção foi escrita — e ninguém ainda o pegou em erro. Quando o passado precisa ser consultado, é nele que se busca.',
+            'classe' => 'Mestre do COBOL e do Clipper',
+            'habilidade' => 'Gambiarra Funcional — sustenta sistema legado com solução improvável que dura mais que reescrita planejada. +∞ em código que ninguém mais ousa tocar.',
+            'flavor' => 'Tá feio. Mas funciona desde 1992 — e vai funcionar amanhã também.',
+            'historia' => 'O Bortelmo escreveu rotina em COBOL antes do tribunal ter monitor colorido — e várias delas ainda rodam no canto, gerando relatório que ninguém mais sabe regenerar do zero. Domina Clipper como dialeto materno e faz gambiarras funcionais desde sempre: aquele tipo de solução que devia ser provisória e atravessa três gestões intacta. Quando algo precisa funcionar HOJE e não há tempo de refazer direito, é nele que se busca o jeitinho que segura o pleito — e que, no fim, dura uma década.',
         ],
         'ilis' => [
             'emoji' => '🧘🏽‍♂️',
@@ -1201,7 +1201,7 @@ return [
                 'Quem não esquece, não repete erro.',
             ],
             'boas_vindas' => [
-                'Saudações. Sou o Bortelmo, a Memória Viva. Pergunte — eu lembro. 👴',
+                'Saudações. Sou o Bortelmo. Mexo com COBOL e Clipper desde antes de você nascer — pergunte que eu desencavo a solução. 👴',
             ],
         ],
 
