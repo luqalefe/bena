@@ -25,12 +25,14 @@ class DevPerfisSeeder extends Seeder
                 'nome' => 'Lucas Dev',
                 'email' => 'lucas.dev@example.local',
                 'matricula' => 'EST00001',
-                'lotacao' => 'CTI',
+                'lotacao' => 'STI',
                 'supervisor_nome' => 'Lucas Dev (auto)',
                 'supervisor_username' => 'lucas.dev',
                 'sei' => 'SEI-DEV-00001/2026',
                 'horas_diarias' => 5.00,
                 'ativo' => true,
+                // Em dev, o autor sempre encarna a própria carta lendária.
+                'buddy_tipo' => 'lucas',
             ]
         );
 

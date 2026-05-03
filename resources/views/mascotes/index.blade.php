@@ -71,6 +71,40 @@
         background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
         border-color: rgba(217, 119, 6, 0.18);
     }
+    .bena-mascote--lendaria {
+        position: relative;
+        background:
+            linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+        border: 1px solid rgba(250, 204, 21, 0.35);
+        color: #f5f3ff;
+        box-shadow: 0 4px 14px rgba(76, 29, 149, 0.18),
+                    inset 0 0 0 1px rgba(250, 204, 21, 0.08);
+    }
+    .bena-mascote--lendaria::before {
+        content: 'LENDÁRIA';
+        position: absolute;
+        top: 0.6rem;
+        right: 0.85rem;
+        font-size: 0.6rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        color: #fde68a;
+        background: rgba(0, 0, 0, 0.35);
+        padding: 0.18rem 0.55rem;
+        border-radius: 999px;
+        border: 1px solid rgba(250, 204, 21, 0.4);
+    }
+    .bena-mascote--lendaria:hover {
+        box-shadow: 0 6px 12px rgba(76, 29, 149, 0.25),
+                    0 16px 32px rgba(76, 29, 149, 0.18),
+                    inset 0 0 0 1px rgba(250, 204, 21, 0.18);
+    }
+    /* Reserva espaço para o selo "LENDÁRIA" no topo direito —
+       sem isso, nomes longos como "Kéiton, o Diplomata das Quatro Mãos"
+       passam por baixo do selo. */
+    .bena-mascote--lendaria .bena-mascote__topo {
+        padding-right: 5.5rem;
+    }
 
     .bena-mascote__topo {
         display: flex;
@@ -117,6 +151,38 @@
     }
     .bena-mascote--senior .bena-mascote__historia {
         color: #422006;
+    }
+    .bena-mascote--lendaria .bena-mascote__nome {
+        color: #fde68a;
+    }
+    .bena-mascote--lendaria .bena-mascote__personalidade {
+        color: #c4b5fd;
+    }
+    .bena-mascote--lendaria .bena-mascote__historia {
+        color: #ede9fe;
+    }
+    .bena-mascote__habilidade {
+        font-size: 0.85rem;
+        line-height: 1.55;
+        margin: 0;
+        padding: 0.55rem 0.7rem;
+        background: rgba(0, 0, 0, 0.22);
+        border-left: 2px solid #fde68a;
+        border-radius: 4px;
+        color: #fef3c7;
+    }
+    .bena-mascote__habilidade strong {
+        color: #fde68a;
+        font-weight: 700;
+    }
+    .bena-mascote__flavor {
+        margin: 0;
+        padding-top: 0.55rem;
+        border-top: 1px dashed rgba(253, 230, 138, 0.25);
+        color: #fde68a;
+        font-style: italic;
+        font-size: 0.85rem;
+        line-height: 1.5;
     }
 
     .bena-mascotes__rodape {
@@ -203,6 +269,43 @@
                                 </div>
                             </div>
                             <p class="bena-mascote__historia">{{ $p['historia'] }}</p>
+                        </article>
+                    @endif
+                @endforeach
+            </div>
+        </section>
+
+        <section class="bena-mascotes__secao" aria-labelledby="secao-lendaria">
+            <h2 id="secao-lendaria" class="bena-mascotes__secao-titulo">
+                Cartas Lendárias · STI
+            </h2>
+            <p class="bena-mascotes__secao-sub">
+                Dez cartas únicas inspiradas em personagens da Secretaria de
+                Tecnologia da Informação. Sorteadas exclusivamente no pool
+                dos estagiários da STI.
+            </p>
+
+            <div class="bena-mascotes__grid">
+                @foreach ($tiposLendarios as $tipo)
+                    @php($p = $perfis[$tipo] ?? null)
+                    @if ($p)
+                        <article class="bena-mascote bena-mascote--lendaria">
+                            <div class="bena-mascote__topo">
+                                <span class="bena-mascote__avatar" aria-hidden="true">{{ $p['emoji'] }}</span>
+                                <div class="bena-mascote__identidade">
+                                    <span class="bena-mascote__nome">{{ $p['nome'] }}</span>
+                                    <span class="bena-mascote__personalidade">{{ $p['personalidade'] }}</span>
+                                </div>
+                            </div>
+                            <p class="bena-mascote__historia">{{ $p['historia'] }}</p>
+                            @if (! empty($p['habilidade']))
+                                <p class="bena-mascote__habilidade">
+                                    <strong>Habilidade.</strong> {{ $p['habilidade'] }}
+                                </p>
+                            @endif
+                            @if (! empty($p['flavor']))
+                                <p class="bena-mascote__flavor">"{{ $p['flavor'] }}"</p>
+                            @endif
                         </article>
                     @endif
                 @endforeach

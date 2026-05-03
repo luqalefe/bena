@@ -138,4 +138,54 @@ class BuddyServiceTest extends TestCase
             config('buddies.tipos'),
         );
     }
+
+    public function test_garantir_buddy_estagiario_sti_sorteia_carta_lendaria(): void
+    {
+        $estagiario = Estagiario::factory()->create([
+            'username' => 'novo.estagiario',
+            'lotacao' => 'STI',
+            'buddy_tipo' => null,
+        ]);
+
+        app(BuddyService::class)->garantirBuddy($estagiario, 'E');
+
+        $this->assertContains(
+            $estagiario->fresh()->buddy_tipo,
+            config('buddies.tipos_lendarios'),
+        );
+    }
+
+    public function test_garantir_buddy_servidor_sti_usa_pool_senior_e_nao_lendaria(): void
+    {
+        // Servidores e admin da STI não recebem cartas lendárias — elas
+        // são exclusivas do sorteio dos estagiários da STI.
+        $estagiario = Estagiario::factory()->create([
+            'username' => 'servidor.sti',
+            'lotacao' => 'STI',
+            'buddy_tipo' => null,
+        ]);
+
+        app(BuddyService::class)->garantirBuddy($estagiario, 'S');
+
+        $this->assertContains(
+            $estagiario->fresh()->buddy_tipo,
+            config('buddies.tipos_supervisores'),
+        );
+    }
+
+    public function test_garantir_buddy_estagiario_fora_da_sti_usa_pool_padrao(): void
+    {
+        $estagiario = Estagiario::factory()->create([
+            'username' => 'estagiario.cogep',
+            'lotacao' => 'COGEP',
+            'buddy_tipo' => null,
+        ]);
+
+        app(BuddyService::class)->garantirBuddy($estagiario, 'E');
+
+        $this->assertContains(
+            $estagiario->fresh()->buddy_tipo,
+            config('buddies.tipos'),
+        );
+    }
 }

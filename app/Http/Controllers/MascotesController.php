@@ -13,6 +13,7 @@ class MascotesController extends Controller
         return view('mascotes.index', [
             'tiposPadrao' => (array) config('buddies.tipos', []),
             'tiposSenior' => (array) config('buddies.tipos_supervisores', []),
+            'tiposLendarios' => (array) config('buddies.tipos_lendarios', []),
             'perfis' => (array) config('buddies.perfis', []),
         ]);
     }

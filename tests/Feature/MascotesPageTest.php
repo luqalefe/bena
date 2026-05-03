@@ -89,6 +89,33 @@ class MascotesPageTest extends TestCase
         $response->assertSee(substr($coruja['historia'], 0, 30));
     }
 
+    public function test_pagina_mascotes_exibe_pool_lendario(): void
+    {
+        Estagiario::factory()->create(['username' => 'lucas.dev']);
+
+        $response = $this->withHeaders($this->estagiarioHeaders())
+            ->get(route('mascotes.index'));
+
+        $response->assertStatus(200);
+        foreach (config('buddies.tipos_lendarios') as $tipo) {
+            $perfil = config("buddies.perfis.{$tipo}");
+            $response->assertSee($perfil['emoji'], false);
+            $response->assertSee($perfil['nome']);
+            $response->assertSee(substr($perfil['flavor'], 0, 20));
+        }
+    }
+
+    public function test_pagina_mascotes_exibe_titulo_da_secao_lendaria(): void
+    {
+        Estagiario::factory()->create(['username' => 'lucas.dev']);
+
+        $response = $this->withHeaders($this->estagiarioHeaders())
+            ->get(route('mascotes.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Lendárias');
+    }
+
     public function test_botao_mascotes_aparece_no_onboarding(): void
     {
         $estagiario = Estagiario::factory()

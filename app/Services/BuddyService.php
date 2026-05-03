@@ -15,7 +15,7 @@ class BuddyService
             return;
         }
 
-        $tipos = $this->poolPara($grupo);
+        $tipos = $this->poolPara($estagiario, $grupo);
         if ($tipos === []) {
             return;
         }
@@ -27,8 +27,15 @@ class BuddyService
     /**
      * @return array<int, string>
      */
-    private function poolPara(?string $grupo): array
+    private function poolPara(Estagiario $estagiario, ?string $grupo): array
     {
+        // Estagiários da STI têm seu próprio pool — as cartas lendárias,
+        // inspiradas em personagens da casa. Servidores e admin da STI
+        // continuam no pool sênior comum.
+        if ($grupo === 'E' && $estagiario->lotacao === 'STI') {
+            return (array) config('buddies.tipos_lendarios', []);
+        }
+
         $key = match ($grupo) {
             '0', 'S' => 'tipos_supervisores',
             default => 'tipos',

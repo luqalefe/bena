@@ -27,6 +27,14 @@ return [
         'aguia', 'leao', 'elefante', 'urso',
     ],
 
+    // Pool lendário: dez cartas únicas inspiradas em personagens da casa.
+    // Sorteadas exclusivamente pra estagiários lotados na STI — servidores
+    // e admin da STI continuam no pool sênior comum.
+    'tipos_lendarios' => [
+        'edcley', 'lucir', 'lucas', 'bortoli', 'ilis',
+        'felipe', 'thallys', 'jonatan', 'jair', 'keith',
+    ],
+
     'perfis' => [
         'coruja' => [
             'emoji' => '🦉',
@@ -99,6 +107,111 @@ return [
             'nome' => 'Urso',
             'personalidade' => 'Protetor, paciente',
             'historia' => 'O Urso vigiou a primeira urna eletrônica que chegou em uma comunidade indígena no Acre. Sentou na porta do galpão e ninguém passou sem ele acompanhar. Sereno, presente, paciente. Em Bena, cuida da equipe como cuidou daquele galpão.',
+        ],
+
+        // ─── Cartas lendárias da STI ─────────────────────────────────────
+        // Cada uma representa um amigo real da STI. Atribuídas por username,
+        // não sorteadas. Inspiradas nos agradecimentos da página /sobre.
+
+        'edcley' => [
+            'emoji' => '👨‍🔧',
+            'nome' => 'Edcleu, o Forjador de Raiz',
+            'personalidade' => 'Engenheiro · Construção',
+            'raridade' => 'lendaria',
+            'classe' => 'Engenheiro de Núcleo',
+            'habilidade' => 'Do Zero ao Núcleo — ignora todo framework opcional. Sistemas forjados sob sua tutela ganham +2 em longevidade e nunca dependem de plugin de terceiros.',
+            'flavor' => 'Não sou um visionário, sou um engenheiro.',
+            'historia' => 'Mestre engenheiro da STI, daqueles que preferem construir tudo do zero. No estilo Linus Torvalds — menos plano de cinco anos, mais código rodando. Acreditou no estagiário e entregou os projetos desafiadores que fizeram o Bena nascer.',
+        ],
+        'lucir' => [
+            'emoji' => '🧙',
+            'nome' => 'Lucírio, o Alquimista',
+            'personalidade' => 'Visionário · Imaginação',
+            'raridade' => 'lendaria',
+            'classe' => 'Pioneiro Alquimista',
+            'habilidade' => 'Ideia Maluca — uma vez por sprint, propõe um experimento que parece absurdo. 70% de chance de virar MVP funcional.',
+            'flavor' => 'Louco é quem me diz e não é feliz.',
+            'historia' => 'Um dos primeiros analistas de TI do tribunal. Tem fama de ideias malucas — mas foi numa dessas que nasceu o sistema de cadastro de magistrados, irmão mais velho do Bena. No fim das contas, pra ser engenheiro de software também é preciso ter um certo grau de loucura.',
+        ],
+        'keith' => [
+            'emoji' => '👨‍🏫',
+            'nome' => 'Kéiton, o Diplomata das Quatro Mãos',
+            'personalidade' => 'Sábio do Domínio · Compreensão',
+            'raridade' => 'lendaria',
+            'classe' => 'Analista Veterano',
+            'habilidade' => 'Pareamento Profundo — ao parear, dobra a clareza dos requisitos e revela uma regra de negócio escondida por sessão.',
+            'flavor' => 'Antes da primeira linha, escute a casa inteira.',
+            'historia' => 'Um dos servidores mais antigos da casa. Conduziu a quatro mãos a análise de requisitos do cadastro de magistrados, e ensinou a entender o domínio do começo ao fim. Quando ele entra no pareamento, o requisito vira código limpo.',
+        ],
+        'bortoli' => [
+            'emoji' => '👴',
+            'nome' => 'Bortelmo, a Memória Viva',
+            'personalidade' => 'Ancião · História Institucional',
+            'raridade' => 'lendaria',
+            'classe' => 'Arquivista Lendário',
+            'habilidade' => 'Arquivo Vivo — invoca o contexto histórico de qualquer decisão da Justiça Eleitoral, inclusive as não documentadas.',
+            'flavor' => 'Isso aqui já tentamos em 2008. Deixa eu te contar como foi.',
+            'historia' => 'Talvez o amigo com mais anos de TI em toda a Justiça Eleitoral. Referência viva — sabe por que cada coisa é como é, lembra de cada decisão, cada presidente, cada mudança de regime. Quando o passado precisa ser consultado, é nele que se busca.',
+        ],
+        'ilis' => [
+            'emoji' => '🧘🏽‍♂️',
+            'nome' => 'Ilíseo, o Domador de Plone',
+            'personalidade' => 'Mestre Paciente · Resiliência',
+            'raridade' => 'lendaria',
+            'classe' => 'Sussurrador de CMS',
+            'habilidade' => 'Sussurrador de CMS — domestica qualquer sistema legado sem perder o tom calmo. +3 em paciência diante de tecnologia descontinuada.',
+            'flavor' => 'Calma. Vai funcionar. Só precisa de paciência.',
+            'historia' => 'A paciência em pessoa. Insistiu em ensinar Plone, mesmo quando o aprendiz claramente preferia outras coisas. Hoje, sempre que o CMS precisa de uma mão, é a primeira referência. Aprender com quem domina vale mais do que gostar.',
+        ],
+        'felipe' => [
+            'emoji' => '🙆🏿‍♂️',
+            'nome' => 'Felippo, a Calmaria',
+            'personalidade' => 'Resolutor Sereno · Equilíbrio',
+            'raridade' => 'lendaria',
+            'classe' => 'Resolvedor Tranquilo',
+            'habilidade' => 'Águas Calmas — reduz o pânico do time em 50% durante incidentes. Bugs resolvidos sob sua liderança não voltam estressados.',
+            'flavor' => 'Respira. A gente resolve.',
+            'historia' => 'Da nova geração da STI, parceiro do AGRECOM. Resolve os problemas na tranquilidade — quando o resto do time tá em pânico, ele tá no mesmo bug, com o mesmo café, no mesmo tom. E sempre sai do incêndio com algo entregue.',
+        ],
+        'thallys' => [
+            'emoji' => '🕵️‍♂️',
+            'nome' => 'Thallion, o Estrategista',
+            'personalidade' => 'Calculista · Análise',
+            'raridade' => 'lendaria',
+            'classe' => 'Mestre da Análise',
+            'habilidade' => 'Estudo Profundo — dedica três turnos à análise antes de codar. Entregas suas levam 90% menos refator no PR.',
+            'flavor' => 'Mede duas vezes, corta uma.',
+            'historia' => 'Geração nova do AGRECOM, mas estuda como veterano. Antes da primeira linha, mapeia o problema inteiro — caminhos, atalhos, armadilhas. Quando finalmente codifica, o código sai como se já existisse antes.',
+        ],
+        'jonatan' => [
+            'emoji' => '🧑‍🚒',
+            'nome' => 'Jonatão, o Guardião da Infra',
+            'personalidade' => 'Bombeiro de Plantão · Operação',
+            'raridade' => 'lendaria',
+            'classe' => 'Guardião de Plantão',
+            'habilidade' => 'Apaga Incêndio — detecta e neutraliza B.O.s de produção antes que o time perceba. Uptime sob sua guarda: 99,97%.',
+            'flavor' => 'Tá no ar. Pode rodar.',
+            'historia' => 'Trabalha na infra e resolve B.O. Quando algo cai, ele já tá olhando o log — quase sempre antes de alguém abrir chamado. A produção segue de pé porque ele segue de plantão.',
+        ],
+        'jair' => [
+            'emoji' => '🧑‍🔬',
+            'nome' => 'Jairón, o Mestre dos Dados',
+            'personalidade' => 'Sênior do Dado · Conhecimento Bruto',
+            'raridade' => 'lendaria',
+            'classe' => 'Sênior dos Dados',
+            'habilidade' => 'Pipeline Limpo — extrai padrão de qualquer dataset caótico. Relatórios sob sua orientação nascem auditáveis.',
+            'flavor' => 'Dado sujo conta meia história. A outra metade é onde mora a verdade.',
+            'historia' => 'O mais sênior do quarteto AGRECOM, atua na área de dados — mestre absoluto em Python, transforma scripts soltos em pipelines elegantes. Trata o dado com o mesmo rigor que um juiz trata a prova: nunca aceita um número sem entender de onde veio. Por isso, todo relatório que passa por ele sai auditável.',
+        ],
+        'lucas' => [
+            'emoji' => '🧙‍♂️',
+            'nome' => 'Lucander, o Improvisador',
+            'personalidade' => 'Bardo-Mago · Improviso',
+            'raridade' => 'lendaria',
+            'classe' => 'Bardo-Mago',
+            'habilidade' => 'Solo de Guitarra — invoca soluções fora do manual. Uma vez por dia, pode trocar uma reunião por um commit que resolve o ticket.',
+            'flavor' => 'Se não funciona com regra, funciona com riff.',
+            'historia' => 'Estagiário da SDBD, autor do Bena. Vive entre Laravel, Docker e linha de comando — gosta de TDD, refactor pequeno e código que fala português. A guitarra fica pras horas vagas, mas o improviso vem dela: quando a regra não cabe, encontra um caminho que cabe. Forjou esta carta e este sistema como agradecimento em código.',
         ],
     ],
 
@@ -825,6 +938,111 @@ return [
             ],
             'boas_vindas' => [
                 'Olá. Sou o Elefon, seu mascote sênior. Acompanhei cada eleição do TRE-AC desde a fundação — me lembro de cada juiz, cada presidente, cada plebiscito. Será um prazer guardá-lo(a) também na minha memória. 🐘',
+            ],
+        ],
+
+        // ─── Frases das cartas lendárias (STI) ───────────────────────────
+        // Por enquanto só genérica + boas-vindas; o BuddyService cai pra
+        // genérica quando não encontra o par dia/status. Frases do dia
+        // podem ser preenchidas depois sem mudar o serviço.
+
+        'edcley' => [
+            'generica' => [
+                'Construa do zero. Plugin é dívida. 👨‍🔧',
+                'Engenheiro não promete: entrega rodando.',
+            ],
+            'boas_vindas' => [
+                'Bem-vindo. Sou o Edcleu, o Forjador de Raiz. Vamos construir. 👨‍🔧',
+            ],
+        ],
+
+        'lucir' => [
+            'generica' => [
+                'Tive uma ideia. Pode parecer maluca. Vai funcionar. 🧙',
+                'Louco é quem não tenta.',
+            ],
+            'boas_vindas' => [
+                'E aí. Sou o Lucírio, o Alquimista. Bora destilar uma ideia maluca? 🧙',
+            ],
+        ],
+
+        'keith' => [
+            'generica' => [
+                'Antes da primeira linha, escute a casa inteira. 👨‍🏫',
+                'Requisito mal entendido vira código jogado fora.',
+            ],
+            'boas_vindas' => [
+                'Olá. Sou o Kéiton, o Diplomata das Quatro Mãos. Vamos parear esse domínio. 👨‍🏫',
+            ],
+        ],
+
+        'bortoli' => [
+            'generica' => [
+                'Isso aqui já tentamos. Deixa eu te contar como foi. 👴',
+                'Quem não esquece, não repete erro.',
+            ],
+            'boas_vindas' => [
+                'Saudações. Sou o Bortelmo, a Memória Viva. Pergunte — eu lembro. 👴',
+            ],
+        ],
+
+        'ilis' => [
+            'generica' => [
+                'Calma. Vai funcionar. Só precisa de paciência. 🧘🏽‍♂️',
+                'Aprender com quem domina vale mais que gostar.',
+            ],
+            'boas_vindas' => [
+                'Olá. Sou o Ilíseo, o Domador de Plone. Sem pressa — a gente desbrava junto. 🧘🏽‍♂️',
+            ],
+        ],
+
+        'felipe' => [
+            'generica' => [
+                'Respira. A gente resolve. 🙆🏿‍♂️',
+                'Pânico não compila. Calma sim.',
+            ],
+            'boas_vindas' => [
+                'E aí. Sou o Felippo, a Calmaria. Tá tudo sob controle. 🙆🏿‍♂️',
+            ],
+        ],
+
+        'thallys' => [
+            'generica' => [
+                'Mede duas vezes, corta uma. 🕵️‍♂️',
+                'Antes de codar, entender. Sempre.',
+            ],
+            'boas_vindas' => [
+                'Olá. Sou o Thallion, o Estrategista. Vamos estudar antes de mover a peça. 🕵️‍♂️',
+            ],
+        ],
+
+        'jonatan' => [
+            'generica' => [
+                'Tá no ar. Pode rodar. 🧑‍🚒',
+                'Se quebrou, eu vejo. Se não quebrou, eu vejo também.',
+            ],
+            'boas_vindas' => [
+                'Salve. Sou o Jonatão, o Guardião da Infra. Pode trampar tranquilo — tô de plantão. 🧑‍🚒',
+            ],
+        ],
+
+        'jair' => [
+            'generica' => [
+                'Dado sujo conta meia história. 🧑‍🔬',
+                'Relatório bom é o que aguenta auditoria.',
+            ],
+            'boas_vindas' => [
+                'Olá. Sou o Jairón, o Mestre dos Dados. Bora limpar essa pipeline. 🧑‍🔬',
+            ],
+        ],
+
+        'lucas' => [
+            'generica' => [
+                'Stack: Laravel, Docker e improviso. 🧙‍♂️',
+                'Quando o manual falha, o terminal resolve.',
+            ],
+            'boas_vindas' => [
+                'E aí. Sou o Lucander, o Improvisador — autor desse Bena aqui. Bem-vindo ao seu próprio sistema. 🧙‍♂️',
             ],
         ],
 
