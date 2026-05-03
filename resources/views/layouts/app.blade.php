@@ -739,6 +739,7 @@
                     @if ($grupo === '0')
                         <a href="{{ route('admin.dashboard') }}">Dashboard</a>
                         <a href="{{ route('admin.estagiarios.index') }}">Estagiários</a>
+                        <a href="{{ route('admin.auditoria.index') }}" title="Log de ações sensíveis">Auditoria</a>
                     @elseif ($grupo === 'S')
                         <a href="{{ route('supervisor.dashboard') }}">Meus estagiários</a>
                     @endif

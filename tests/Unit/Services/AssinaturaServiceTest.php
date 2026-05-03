@@ -293,4 +293,88 @@ class AssinaturaServiceTest extends TestCase
         );
         $this->assertNotNull($assinatSuper->fresh()->substituida_em);
     }
+
+    public function test_diff_retorna_vazio_quando_assinatura_eh_integra(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+
+        $svc = app(AssinaturaService::class);
+        $assinatura = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+
+        $this->assertSame([], $svc->diff($assinatura));
+    }
+
+    public function test_diff_detecta_campo_alterado_no_dia(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        $freq = Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+
+        $svc = app(AssinaturaService::class);
+        $assinatura = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $diff = $svc->diff($assinatura);
+
+        $this->assertCount(2, $diff, 'Espera duas mudanças (saida e horas) no dia 10');
+        $campos = array_column($diff, 'campo');
+        $this->assertContains('saida', $campos);
+        $this->assertContains('horas', $campos);
+        $this->assertSame('2026-04-10', $diff[0]['data']);
+        $this->assertSame('campo_alterado', $diff[0]['tipo']);
+    }
+
+    public function test_diff_detecta_dia_adicionado_apos_assinatura(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+
+        $svc = app(AssinaturaService::class);
+        $assinatura = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-15', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+
+        $diff = $svc->diff($assinatura);
+
+        $this->assertCount(1, $diff);
+        $this->assertSame('2026-04-15', $diff[0]['data']);
+        $this->assertSame('dia_adicionado', $diff[0]['tipo']);
+    }
+
+    public function test_diff_detecta_dia_removido_apos_assinatura(): void
+    {
+        $estagiario = Estagiario::factory()->create();
+        $freq1 = Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-10', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+        Frequencia::create([
+            'estagiario_id' => $estagiario->id,
+            'data' => '2026-04-15', 'entrada' => '09:00:00', 'saida' => '14:00:00', 'horas' => 5.00,
+        ]);
+
+        $svc = app(AssinaturaService::class);
+        $assinatura = $svc->assinar($estagiario, 2026, 4, Assinatura::PAPEL_ESTAGIARIO, 'lucas.dev');
+
+        $freq1->delete();
+
+        $diff = $svc->diff($assinatura);
+
+        $this->assertCount(1, $diff);
+        $this->assertSame('2026-04-10', $diff[0]['data']);
+        $this->assertSame('dia_removido', $diff[0]['tipo']);
+    }
 }

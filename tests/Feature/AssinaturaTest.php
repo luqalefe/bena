@@ -380,4 +380,38 @@ class AssinaturaTest extends TestCase
             ->get('/frequencia/2026/4')
             ->assertDontSee('Re-assinar versão atual');
     }
+
+    public function test_view_mostra_diff_quando_assinatura_alterada(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $lucas = Estagiario::factory()->create(['username' => 'lucas.dev']);
+        $freq = $this->frequenciaSimples($lucas);
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/assinar');
+
+        $freq->update(['saida' => '15:00:00', 'horas' => 6.00]);
+
+        $response = $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->get('/frequencia/2026/4');
+
+        $response
+            ->assertSee('Ver o que mudou desde a assinatura')
+            ->assertSee('saida')
+            ->assertSee('horas');
+    }
+
+    public function test_view_nao_mostra_diff_quando_assinatura_integra(): void
+    {
+        Carbon::setTestNow('2026-05-10 10:00:00');
+
+        $lucas = Estagiario::factory()->create(['username' => 'lucas.dev']);
+        $this->frequenciaSimples($lucas);
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->post('/frequencia/2026/4/assinar');
+
+        $this->withHeaders($this->estagiarioHeaders('lucas.dev'))
+            ->get('/frequencia/2026/4')
+            ->assertDontSee('Ver o que mudou desde a assinatura');
+    }
 }

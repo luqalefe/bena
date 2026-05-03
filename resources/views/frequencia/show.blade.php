@@ -91,28 +91,56 @@
                         ? route('frequencia.re-contra-assinar', ['ano' => $folha->ano, 'mes' => $folha->mes, 'estagiario' => $estagiario->username])
                         : route('frequencia.reassinar', ['ano' => $folha->ano, 'mes' => $folha->mes]);
                 @endphp
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px dashed var(--color-secondary-03); flex-wrap: wrap; gap: 0.5rem;">
-                    <div>
-                        <strong>{{ $rotuloPapel }}</strong>
-                        — {{ $v['assinatura']->assinante_username }}
-                        em {{ $v['assinatura']->assinado_em->format('d/m/Y H:i:s') }}
-                    </div>
-                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
-                        <code style="font-size: 0.8rem;">{{ $v['assinatura']->hash_truncado }}</code>
-                        @if ($v['integro'])
-                            <span class="badge-tre-ac is-completo">✓ íntegra</span>
-                        @else
-                            <span class="badge-tre-ac is-pendente" style="background: #fee2e2; color: #991b1b;">⚠ alterada</span>
-                            @if ($podeReassinar)
-                                <form method="POST" action="{{ $rotaReassinar }}" onsubmit="return confirm('A assinatura anterior será marcada como substituída e o histórico será preservado. Confirmar re-assinatura da versão atual?');">
-                                    @csrf
-                                    <button type="submit" class="br-button" style="font-size: 0.8rem; padding: 0.25rem 0.6rem; background: #b45309; color: #fff;">
-                                        <i class="fas fa-redo" aria-hidden="true"></i> Re-assinar versão atual
-                                    </button>
-                                </form>
+                <div style="padding: 0.4rem 0; border-bottom: 1px dashed var(--color-secondary-03);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                        <div>
+                            <strong>{{ $rotuloPapel }}</strong>
+                            — {{ $v['assinatura']->assinante_username }}
+                            em {{ $v['assinatura']->assinado_em->format('d/m/Y H:i:s') }}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                            <code style="font-size: 0.8rem;">{{ $v['assinatura']->hash_truncado }}</code>
+                            @if ($v['integro'])
+                                <span class="badge-tre-ac is-completo">✓ íntegra</span>
+                            @else
+                                <span class="badge-tre-ac is-pendente" style="background: #fee2e2; color: #991b1b;">⚠ alterada</span>
+                                @if ($podeReassinar)
+                                    <form method="POST" action="{{ $rotaReassinar }}" onsubmit="return confirm('A assinatura anterior será marcada como substituída e o histórico será preservado. Confirmar re-assinatura da versão atual?');">
+                                        @csrf
+                                        <button type="submit" class="br-button" style="font-size: 0.8rem; padding: 0.25rem 0.6rem; background: #b45309; color: #fff;">
+                                            <i class="fas fa-redo" aria-hidden="true"></i> Re-assinar versão atual
+                                        </button>
+                                    </form>
+                                @endif
                             @endif
-                        @endif
+                        </div>
                     </div>
+
+                    @if (! $v['integro'] && ! empty($v['diff']))
+                        <details style="margin-top: 0.5rem; background: #fef2f2; border-left: 3px solid #dc2626; border-radius: 6px; padding: 0.6rem 0.85rem;">
+                            <summary style="cursor: pointer; font-size: 0.875rem; color: #991b1b; font-weight: 600;">
+                                Ver o que mudou desde a assinatura ({{ count($v['diff']) }})
+                            </summary>
+                            <ul style="margin: 0.6rem 0 0; padding-left: 1.25rem; font-size: 0.875rem; color: #7f1d1d; line-height: 1.55;">
+                                @foreach ($v['diff'] as $m)
+                                    @php
+                                        $diaFmt = \Carbon\Carbon::parse($m['data'])->format('d/m/Y');
+                                    @endphp
+                                    @if ($m['tipo'] === 'dia_adicionado')
+                                        <li><strong>{{ $diaFmt }}</strong> — dia novo registrado após a assinatura.</li>
+                                    @elseif ($m['tipo'] === 'dia_removido')
+                                        <li><strong>{{ $diaFmt }}</strong> — registro removido após a assinatura.</li>
+                                    @else
+                                        <li>
+                                            <strong>{{ $diaFmt }}</strong> — campo <code>{{ $m['campo'] }}</code>:
+                                            de <code>{{ $m['antes'] ?? '∅' }}</code>
+                                            para <code>{{ $m['depois'] ?? '∅' }}</code>.
+                                        </li>
+                                    @endif
+                                @endforeach
+                            </ul>
+                        </details>
+                    @endif
                 </div>
             @endforeach
         </section>

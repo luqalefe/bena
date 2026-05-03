@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Estagiario;
+use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class EstagiarioController extends Controller
 {
+    public function __construct(private readonly AuditoriaService $auditoria) {}
+
     public function index(Request $request): View
     {
         $lotacao = $request->query('lotacao');
@@ -79,6 +82,18 @@ class EstagiarioController extends Controller
         }
 
         $estagiario->save();
+
+        $this->auditoria->registrar(
+            usuario: (string) $request->session()->get('user.username', ''),
+            acao: 'estagiario.editar',
+            entidade: 'estagiario',
+            entidadeId: (string) $estagiario->id,
+            payload: [
+                'username' => $estagiario->username,
+                'campos_atualizados' => array_keys($dados),
+            ],
+            ip: $request->ip(),
+        );
 
         return redirect()
             ->route('admin.estagiarios.index')

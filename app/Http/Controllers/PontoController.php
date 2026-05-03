@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Estagiario;
+use App\Services\AuditoriaService;
 use App\Services\PontoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -13,7 +14,10 @@ use Illuminate\View\View;
 
 class PontoController extends Controller
 {
-    public function __construct(private readonly PontoService $ponto) {}
+    public function __construct(
+        private readonly PontoService $ponto,
+        private readonly AuditoriaService $auditoria,
+    ) {}
 
     public function entrada(Request $request): JsonResponse|RedirectResponse
     {
@@ -21,6 +25,18 @@ class PontoController extends Controller
         $estagiario = $request->user();
 
         $frequencia = $this->ponto->baterEntrada($estagiario, $request->ip());
+
+        $this->auditoria->registrar(
+            usuario: $estagiario->username,
+            acao: 'frequencia.entrada',
+            entidade: 'frequencia',
+            entidadeId: (string) $frequencia->id,
+            payload: [
+                'data' => $frequencia->data->format('Y-m-d'),
+                'entrada' => $frequencia->entrada->format('H:i:s'),
+            ],
+            ip: $request->ip(),
+        );
 
         if ($request->wantsJson()) {
             return response()->json($frequencia, 201);
@@ -38,6 +54,19 @@ class PontoController extends Controller
         $estagiario = $request->user();
 
         $frequencia = $this->ponto->baterSaida($estagiario, $request->ip());
+
+        $this->auditoria->registrar(
+            usuario: $estagiario->username,
+            acao: 'frequencia.saida',
+            entidade: 'frequencia',
+            entidadeId: (string) $frequencia->id,
+            payload: [
+                'data' => $frequencia->data->format('Y-m-d'),
+                'saida' => $frequencia->saida->format('H:i:s'),
+                'horas' => (string) $frequencia->horas,
+            ],
+            ip: $request->ip(),
+        );
 
         if ($request->wantsJson()) {
             return response()->json($frequencia);

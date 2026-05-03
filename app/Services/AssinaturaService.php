@@ -103,6 +103,73 @@ class AssinaturaService
         ])->values()->all();
     }
 
+    /**
+     * Compara o snapshot gravado no momento da assinatura com o snapshot
+     * canônico atual e retorna a lista de mudanças. Cada entrada tem
+     * `data` (Y-m-d), `tipo` ('campo_alterado'|'dia_adicionado'|'dia_removido')
+     * e — quando 'campo_alterado' — `campo`, `antes` e `depois`.
+     *
+     * Retorna [] quando a folha está íntegra.
+     *
+     * @return list<array{data: string, tipo: string, campo?: string, antes?: mixed, depois?: mixed}>
+     */
+    public function diff(Assinatura $assinatura): array
+    {
+        $snapshotGravado = json_decode((string) $assinatura->snapshot, true, 512, JSON_THROW_ON_ERROR);
+        $snapshotAtual = $this->canonicalSnapshot($assinatura->estagiario, $assinatura->ano, $assinatura->mes);
+
+        $diasGravados = $this->indexarPorData($snapshotGravado['dias'] ?? []);
+        $diasAtuais = $this->indexarPorData($snapshotAtual['dias'] ?? []);
+
+        $todasDatas = array_unique(array_merge(array_keys($diasGravados), array_keys($diasAtuais)));
+        sort($todasDatas);
+
+        $mudancas = [];
+        foreach ($todasDatas as $data) {
+            $gravado = $diasGravados[$data] ?? null;
+            $atual = $diasAtuais[$data] ?? null;
+
+            if ($gravado === null && $atual !== null) {
+                $mudancas[] = ['data' => $data, 'tipo' => 'dia_adicionado'];
+
+                continue;
+            }
+            if ($gravado !== null && $atual === null) {
+                $mudancas[] = ['data' => $data, 'tipo' => 'dia_removido'];
+
+                continue;
+            }
+
+            foreach (['entrada', 'saida', 'horas', 'observacao'] as $campo) {
+                if (($gravado[$campo] ?? null) !== ($atual[$campo] ?? null)) {
+                    $mudancas[] = [
+                        'data' => $data,
+                        'tipo' => 'campo_alterado',
+                        'campo' => $campo,
+                        'antes' => $gravado[$campo] ?? null,
+                        'depois' => $atual[$campo] ?? null,
+                    ];
+                }
+            }
+        }
+
+        return $mudancas;
+    }
+
+    /**
+     * @param  list<array{data: string, entrada: ?string, saida: ?string, horas: ?string, observacao: ?string}>  $dias
+     * @return array<string, array{data: string, entrada: ?string, saida: ?string, horas: ?string, observacao: ?string}>
+     */
+    private function indexarPorData(array $dias): array
+    {
+        $indexed = [];
+        foreach ($dias as $dia) {
+            $indexed[$dia['data']] = $dia;
+        }
+
+        return $indexed;
+    }
+
     public function assinaturaDoMes(Estagiario $estagiario, int $ano, int $mes, string $papel): ?Assinatura
     {
         return Assinatura::query()

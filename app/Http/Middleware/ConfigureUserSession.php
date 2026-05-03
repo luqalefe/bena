@@ -30,6 +30,7 @@ class ConfigureUserSession
         'admin.estagiarios.index',
         'admin.estagiarios.edit',
         'admin.estagiarios.update',
+        'admin.auditoria.index',
     ];
 
     public function handle(Request $request, Closure $next): Response

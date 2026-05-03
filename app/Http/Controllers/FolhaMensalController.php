@@ -28,6 +28,14 @@ class FolhaMensalController extends Controller
         $folha = $service->montar($alvo, $ano, $mes);
         $verificacoes = $assinaturas->verificar($alvo, $ano, $mes);
 
+        // H18: anexa diff sob demanda (apenas pras assinaturas alteradas).
+        // Custo trivial pra uma folha; não roda em listagens grandes.
+        $verificacoes = array_map(function (array $v) use ($assinaturas) {
+            $v['diff'] = $v['integro'] ? [] : $assinaturas->diff($v['assinatura']);
+
+            return $v;
+        }, $verificacoes);
+
         $grupo = session('grupodeacesso');
         $souProprioEstagiario = $grupo === 'E' && $alvo->id === $usuario->id;
         $souSupervisorResponsavel = $grupo === 'S' && $alvo->supervisor_username === $usuario->username;

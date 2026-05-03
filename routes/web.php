@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\AuditoriaController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EstagiarioController;
 use App\Http\Controllers\Admin\FeriadoController;
@@ -73,6 +74,8 @@ Route::middleware('configure.session')->group(function () {
         Route::get('/estagiarios', [EstagiarioController::class, 'index'])->name('estagiarios.index');
         Route::get('/estagiarios/{estagiario}/editar', [EstagiarioController::class, 'edit'])->name('estagiarios.edit');
         Route::put('/estagiarios/{estagiario}', [EstagiarioController::class, 'update'])->name('estagiarios.update');
+
+        Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
     });
 
     // Download de contrato — autorização inline no controller (admin OR self

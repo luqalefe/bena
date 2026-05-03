@@ -7,12 +7,15 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Assinatura;
 use App\Models\Feriado;
+use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class FeriadoController extends Controller
 {
+    public function __construct(private readonly AuditoriaService $auditoria) {}
+
     public function create(): View
     {
         return view('admin.feriados.create');
@@ -22,7 +25,16 @@ class FeriadoController extends Controller
     {
         $dados = $this->validar($request);
 
-        Feriado::create($this->payload($dados));
+        $feriado = Feriado::create($this->payload($dados));
+
+        $this->auditoria->registrar(
+            usuario: (string) $request->session()->get('user.username', ''),
+            acao: 'feriado.criar',
+            entidade: 'feriado',
+            entidadeId: (string) $feriado->id,
+            payload: $this->payload($dados),
+            ip: $request->ip(),
+        );
 
         $redirectTo = $request->input('redirect_to');
         // Whitelist: aceita /calendario exato OU /calendario seguido de /
@@ -45,7 +57,17 @@ class FeriadoController extends Controller
     {
         $dados = $this->validar($request, ignorarFeriadoId: $feriado->id);
 
+        $antes = $feriado->only(['data', 'descricao', 'tipo', 'uf', 'recorrente']);
         $feriado->update($this->payload($dados));
+
+        $this->auditoria->registrar(
+            usuario: (string) $request->session()->get('user.username', ''),
+            acao: 'feriado.editar',
+            entidade: 'feriado',
+            entidadeId: (string) $feriado->id,
+            payload: ['antes' => $antes, 'depois' => $this->payload($dados)],
+            ip: $request->ip(),
+        );
 
         return redirect()
             ->route('calendario.mes', [
@@ -63,9 +85,20 @@ class FeriadoController extends Controller
         ]);
     }
 
-    public function destroy(Feriado $feriado): RedirectResponse
+    public function destroy(Feriado $feriado, Request $request): RedirectResponse
     {
+        $snapshot = $feriado->only(['data', 'descricao', 'tipo', 'uf', 'recorrente']);
+        $id = $feriado->id;
         $feriado->delete();
+
+        $this->auditoria->registrar(
+            usuario: (string) $request->session()->get('user.username', ''),
+            acao: 'feriado.remover',
+            entidade: 'feriado',
+            entidadeId: (string) $id,
+            payload: $snapshot,
+            ip: $request->ip(),
+        );
 
         return redirect()
             ->route('calendario.index')

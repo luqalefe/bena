@@ -8,6 +8,7 @@ use App\Models\Assinatura;
 use App\Models\Estagiario;
 use App\Models\Frequencia;
 use App\Services\AssinaturaService;
+use App\Services\AuditoriaService;
 use App\Services\CalendarioService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
@@ -18,6 +19,7 @@ class ObservacaoController extends Controller
     public function __construct(
         private readonly CalendarioService $calendario,
         private readonly AssinaturaService $assinaturas,
+        private readonly AuditoriaService $auditoria,
     ) {}
 
     public function salvar(int $ano, int $mes, int $dia, Request $request): RedirectResponse
@@ -77,6 +79,18 @@ class ObservacaoController extends Controller
             $frequencia->observacao = $texto;
             $frequencia->save();
         }
+
+        $this->auditoria->registrar(
+            usuario: $usuario->username,
+            acao: 'frequencia.observacao',
+            entidade: 'frequencia',
+            entidadeId: $frequencia?->id !== null ? (string) $frequencia->id : null,
+            payload: [
+                'data' => $data->format('Y-m-d'),
+                'texto' => $texto,
+            ],
+            ip: $request->ip(),
+        );
 
         return redirect()->route('frequencia.show', ['ano' => $ano, 'mes' => $mes]);
     }

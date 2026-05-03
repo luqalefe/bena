@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Assinatura;
 use App\Models\Estagiario;
 use App\Services\AssinaturaService;
+use App\Services\AuditoriaService;
 use Carbon\CarbonImmutable;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,10 @@ use Illuminate\Validation\ValidationException;
 
 class AssinaturaController extends Controller
 {
-    public function __construct(private readonly AssinaturaService $service) {}
+    public function __construct(
+        private readonly AssinaturaService $service,
+        private readonly AuditoriaService $auditoria,
+    ) {}
 
     public function assinarComoEstagiario(int $ano, int $mes, Request $request): RedirectResponse
     {
@@ -36,7 +40,7 @@ class AssinaturaController extends Controller
         $this->validarMesNaoFuturo($ano, $mes);
 
         try {
-            $this->service->assinar(
+            $assinatura = $this->service->assinar(
                 $usuario,
                 $ano,
                 $mes,
@@ -47,6 +51,15 @@ class AssinaturaController extends Controller
         } catch (DomainException $e) {
             throw ValidationException::withMessages(['assinatura' => $e->getMessage()]);
         }
+
+        $this->auditoria->registrar(
+            usuario: $usuario->username,
+            acao: 'assinatura.assinar',
+            entidade: 'assinatura',
+            entidadeId: (string) $assinatura->id,
+            payload: ['papel' => 'estagiario', 'ano' => $ano, 'mes' => $mes, 'estagiario_id' => $usuario->id],
+            ip: $request->ip(),
+        );
 
         return redirect()
             ->route('frequencia.show', ['ano' => $ano, 'mes' => $mes])
@@ -80,7 +93,7 @@ class AssinaturaController extends Controller
         $this->validarMesNaoFuturo($ano, $mes);
 
         try {
-            $this->service->assinar(
+            $assinatura = $this->service->assinar(
                 $alvo,
                 $ano,
                 $mes,
@@ -91,6 +104,15 @@ class AssinaturaController extends Controller
         } catch (DomainException $e) {
             throw ValidationException::withMessages(['assinatura' => $e->getMessage()]);
         }
+
+        $this->auditoria->registrar(
+            usuario: $usuario->username,
+            acao: 'assinatura.contra-assinar',
+            entidade: 'assinatura',
+            entidadeId: (string) $assinatura->id,
+            payload: ['papel' => 'supervisor', 'ano' => $ano, 'mes' => $mes, 'estagiario_id' => $alvo->id],
+            ip: $request->ip(),
+        );
 
         return redirect()
             ->route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $alvo->username])
@@ -114,7 +136,7 @@ class AssinaturaController extends Controller
         }
 
         try {
-            $this->service->reassinar(
+            $assinatura = $this->service->reassinar(
                 $usuario,
                 $ano,
                 $mes,
@@ -125,6 +147,15 @@ class AssinaturaController extends Controller
         } catch (DomainException $e) {
             throw ValidationException::withMessages(['assinatura' => $e->getMessage()]);
         }
+
+        $this->auditoria->registrar(
+            usuario: $usuario->username,
+            acao: 'assinatura.reassinar',
+            entidade: 'assinatura',
+            entidadeId: (string) $assinatura->id,
+            payload: ['papel' => 'estagiario', 'ano' => $ano, 'mes' => $mes, 'estagiario_id' => $usuario->id],
+            ip: $request->ip(),
+        );
 
         return redirect()
             ->route('frequencia.show', ['ano' => $ano, 'mes' => $mes])
@@ -156,7 +187,7 @@ class AssinaturaController extends Controller
         }
 
         try {
-            $this->service->reassinar(
+            $assinatura = $this->service->reassinar(
                 $alvo,
                 $ano,
                 $mes,
@@ -167,6 +198,15 @@ class AssinaturaController extends Controller
         } catch (DomainException $e) {
             throw ValidationException::withMessages(['assinatura' => $e->getMessage()]);
         }
+
+        $this->auditoria->registrar(
+            usuario: $usuario->username,
+            acao: 'assinatura.re-contra-assinar',
+            entidade: 'assinatura',
+            entidadeId: (string) $assinatura->id,
+            payload: ['papel' => 'supervisor', 'ano' => $ano, 'mes' => $mes, 'estagiario_id' => $alvo->id],
+            ip: $request->ip(),
+        );
 
         return redirect()
             ->route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $alvo->username])
