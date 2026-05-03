@@ -676,7 +676,13 @@ testes novos** (12 em `ObservacaoControllerTest` + 1 em
 2. Ao clicar em "⚠ alterada", mostra diff: o que mudou desde a assinatura.
 3. Verificação roda sob demanda (não em listagens grandes, pra performance).
 
-**Status:** 📋 Backlog · **Depende de:** H13
+**Status:** ✅ Done — `AssinaturaService::diff(Assinatura)` compara
+snapshot gravado vs canônico atual e retorna lista de mudanças
+(`campo_alterado`/`dia_adicionado`/`dia_removido`). View
+`frequencia/show.blade.php` mostra `<details>` com diff renderizado
+ao lado do badge "⚠ alterada". Verificação roda só em show de folha
+(1 estagiário/mês), não em listagens. **6 testes novos** (4 unit em
+`AssinaturaServiceTest::diff*`, 2 feature em `AssinaturaTest`).
 
 ---
 
@@ -697,7 +703,17 @@ testes novos** (12 em `ObservacaoControllerTest` + 1 em
    datas.
 4. Logs são append-only (sem update/delete na app — só insert).
 
-**Status:** 📋 Backlog · **Depende de:** H16
+**Status:** ✅ Done — Migration `create_auditoria_table` (Oracle compat,
+identifiers ≤ 30 chars, índices em usuario/acao/entidade/created_at).
+Model `Auditoria` append-only (sem update/delete por convenção).
+`AuditoriaService::registrar(usuario, acao, entidade, ?id, payload, ?ip)`
+serializa payload em JSON. Hooks em `PontoController` (entrada/saida),
+`ObservacaoController`, `AssinaturaController` (assinar/contra-assinar/
+re-assinar/re-contra-assinar), `FeriadoController` (criar/editar/remover),
+`EstagiarioController` (editar). Tela `/admin/auditoria` com filtros
+(usuario, acao, intervalo de datas), limite de 500 linhas/consulta,
+admin-only via `adminOnlyRouteNames`. Link "Auditoria" na nav admin.
+**10 testes novos** (3 unit + 7 feature).
 
 ---
 

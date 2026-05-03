@@ -187,11 +187,13 @@ Diagrama detalhado, modelos do domínio e decisões em
 PDF e assina. Supervisor contra-assina. RH baixa o PDF assinado pra
 anexar no SEI. Admin cadastra estagiários e gerencia feriados.
 
-✅ **Sprint 5 quase fechada.** H16 (upload contrato + `supervisor_username`),
-H17 (observações por dia), H21 (auto-fechamento de ponto esquecido), H22
-(re-assinatura quando hash diverge), H23 (onboarding no primeiro acesso).
-Pendentes: H0.3 (pipeline CI no GitLab interno) e H18 (verificação de
-integridade da assinatura)/H19 (auditoria de ações).
+✅ **Sprint 5 fechada.** H16 (upload contrato + `supervisor_username`),
+H17 (observações por dia), H18 (verificação de integridade da
+assinatura — diff inline na folha quando hash diverge), H19 (auditoria
+de ações com tabela append-only e tela `/admin/auditoria`),
+H21 (auto-fechamento de ponto esquecido), H22 (re-assinatura quando
+hash diverge), H23 (onboarding no primeiro acesso). Único pendente:
+H0.3 (`.gitlab-ci.yml`) aguarda migração pro GitLab interno.
 
 ✅ **Sprint 7a/7b/7c fechadas (UI/UX).**
 - **H24/H25** — Auto-submit nos filtros admin + busca client-side com
@@ -207,13 +209,12 @@ integridade da assinatura)/H19 (auditoria de ações).
   `/mascotes` com galeria e história de cada um ligada à Justiça
   Eleitoral do Acre.
 
-**Suíte:** 262 testes / 638 assertions, todos verdes (SQLite in-memory) ·
+**Suíte:** 278 testes / 671 assertions, todos verdes (SQLite in-memory) ·
 gate de cobertura ≥ 80 %.
 
-🚧 **Próximas:**
-- **H18 + H19** (Sprint 5) — verificação automática de integridade na
-  visualização da folha + tabela de auditoria de ações sensíveis.
-- **Sprint 6 (Hardening)** — NFRs de segurança (NF1–NF7), deploy via
-  Swarm/K8s, smoke tests E2E, backup automatizado, doc operacional.
+🚧 **Próxima — Sprint 6 (Hardening)** — NFRs de segurança (NF1–NF7),
+deploy via Swarm/K8s, smoke tests E2E, backup automatizado, doc
+operacional. Não é desenvolvimento de features novas; é preparação
+pra entrar em homologação no tribunal.
 
 Para o estado de handoff entre sessões, ver [`STATUS.md`](./STATUS.md).

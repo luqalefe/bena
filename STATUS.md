@@ -4,7 +4,7 @@
 > trabalho. Detalhes longos vivem em `CLAUDE.md`, `REQUISITOS.md`,
 > `SPRINTS.md` e `docs/`.
 
-**Última atualização:** 2026-05-03 (Sprint 7c · página /mascotes + frases eleitorais + review)
+**Última atualização:** 2026-05-03 (Sprint 5 fechada · H18 integridade + H19 auditoria)
 
 **Repo:** [`luqalefe/bena`](https://github.com/luqalefe/bena.git) — branch `main` ·
 commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
@@ -45,8 +45,21 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
   só estagiário próprio (admin/supervisor 403), 422 após assinatura.
   Folha mostra observação inline + `<details>` com form de edição;
   PDF mostra na coluna Observação. 14 testes novos.
-- 📋 **H18** — verificação de integridade da assinatura
-- 📋 **H19** — auditoria de ações
+- ✅ **H18** — `AssinaturaService::diff(Assinatura)` compara snapshot
+  gravado vs canônico atual e retorna lista de mudanças
+  (`campo_alterado`/`dia_adicionado`/`dia_removido`). View
+  `frequencia/show.blade.php` mostra `<details>` com diff ao lado do
+  badge "⚠ alterada". Verificação só roda em show de folha individual.
+  6 testes novos.
+- ✅ **H19** — Migration `create_auditoria_table` (Oracle-safe).
+  Model `Auditoria` append-only por convenção (sem update/delete).
+  `AuditoriaService::registrar(usuario, acao, entidade, ?id, payload, ?ip)`
+  serializa payload JSON. Hooks em PontoController (entrada/saida),
+  ObservacaoController, AssinaturaController (assinar/contra-assinar/
+  re-assinar/re-contra-assinar), FeriadoController (criar/editar/remover),
+  EstagiarioController (editar). Tela `/admin/auditoria` com filtros
+  por usuário, ação e intervalo de datas; limite 500 linhas; admin-only.
+  Link "Auditoria" na nav admin. 10 testes novos (3 unit + 7 feature).
 - ✅ **H21** — auto-fechamento de ponto esquecido (não estava na sprint
   original; pedido em 2026-05-02). `PontoService::fecharPontosAbertos`
   + `php artisan ponto:fechar-abertos` agendado `dailyAt('00:05')`.
@@ -151,7 +164,7 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
 - ✅ 5 testes feature em `MascotesPageTest` iteram sobre o config
   (resilientes a edição/expansão de mascotes futuros).
 
-**Suíte:** 262 testes, 638 assertions · cobertura ≥ 80 % (gate `--min=80`)
+**Suíte:** 278 testes, 671 assertions · cobertura ≥ 80 % (gate `--min=80`)
 
 ### Mudanças de modelagem em 2026-05-01 (registradas em REQUISITOS.md)
 Atores refinados: **Supervisor** vira grupo Authelia próprio (`supervisores`),
@@ -209,18 +222,19 @@ clica em "Trocar usuário" no banner.
 
 ---
 
-## Próximo passo concreto — Sprint 5 ainda em curso
+## Próximo passo concreto — Sprint 5 ✅ fechada · próxima Sprint 6 (Hardening)
 
-Sprints 7a/7b foram fechadas em paralelo (UI/UX, independentes da
-Sprint 5). H0.3 parcial (pipeline local pronto, `.gitlab-ci.yml` aguarda
-migração pro GitLab interno em 2026-05-04). H16 e H17 fechadas. Próximo
-na fila: **H18** (verificação de integridade da assinatura). Sequência:
+Todas as histórias de produto da Sprint 5 fecharam (H0.3 parcial fica
+como pendência de infra do GitLab interno). Próxima fronteira:
+**Sprint 6 (Hardening / Homologação)** — NFRs de segurança (NF1-NF7),
+deploy via Swarm/K8s, smoke tests E2E, backup automatizado, doc
+operacional. Não é desenvolvimento de features, é preparação pra entrar
+em homologação no tribunal.
 
-1. 🚧 **H0.3** — pipeline local OK; CI no GitLab fica pra 2026-05-04
-2. ✅ **H16** — upload contrato + download autorizado
-3. ✅ **H17** — observações no dia
-4. 🚧 **H18** — integridade da assinatura
-5. **H19** — auditoria de ações
+Pendente da Sprint 5 (por dependência de infra externa):
+
+1. 🚧 **H0.3** — `.gitlab-ci.yml` aguarda migração pro GitLab interno
+   do tribunal. Pipeline local (`make ci`) pronto e validado.
 
 **Decisões tomadas nas últimas sessões:**
 - **H7 descartada** (virada meia-noite) — domínio garante turno até 19h.

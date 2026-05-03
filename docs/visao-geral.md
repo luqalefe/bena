@@ -354,8 +354,8 @@ Aqui um resumo do que está em produção do ponto de vista do usuário.
 | H12–H13 | Assinatura e contra-assinatura | ✅ |
 | H14–H16 | Visão admin (dashboard + cadastros) | ✅ |
 | H17 | Observações por dia | ✅ |
-| H18 | Verificação de integridade da assinatura | 🚧 pendente |
-| H19 | Auditoria de ações | 🚧 pendente |
+| H18 | Verificação de integridade da assinatura (diff inline) | ✅ |
+| H19 | Auditoria de ações (tabela append-only + tela /admin/auditoria) | ✅ |
 | H20 | RH baixa o PDF assinado | ✅ |
 | H21 | Auto-fechamento de ponto esquecido | ✅ |
 | H22 | Re-assinatura da versão atual | ✅ |
@@ -729,7 +729,7 @@ Decisões já tomadas. Mudanças aqui exigem justificativa explícita no PR.
 
 ### Cobertura de testes
 
-- **262 testes / 638 asserções**, todos verdes.
+- **278 testes / 671 asserções**, todos verdes.
 - Razão **teste/produção ≈ 2,8 : 1** — coerente com TDD estrito.
 - Suíte roda em ~60s (SQLite in-memory).
 - Gate de cobertura: ≥ 80% global (`--min=80`).
@@ -740,8 +740,9 @@ Decisões já tomadas. Mudanças aqui exigem justificativa explícita no PR.
 
 ### Sprints abertas
 
-- **Sprint 5** (em curso): pendentes H18 (verificação de integridade
-  da assinatura) e H19 (auditoria de ações).
+- **Sprint 5** ✅ fechada — todas as histórias de produto entregues.
+  Único pendente é o `.gitlab-ci.yml` (H0.3), que depende da migração
+  do projeto pro GitLab interno do tribunal.
 - **Sprint 6** (Hardening / Homologação): NFRs de segurança, deploy
   via Swarm/K8s, smoke tests E2E, backup automatizado, doc operacional.
 
