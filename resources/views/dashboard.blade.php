@@ -10,6 +10,16 @@
         {{ $resumo->mesAnoExtenso }}
     </p>
 
+    @isset($buddy)
+        <div class="bena-buddy-card" role="status">
+            <div class="bena-buddy-card__avatar" aria-hidden="true">{{ $buddy->emoji }}</div>
+            <div class="bena-buddy-card__content">
+                <span class="bena-buddy-card__name">{{ $buddy->nome }}</span>
+                <p class="bena-buddy-card__frase">{{ $buddy->frase }}</p>
+            </div>
+        </div>
+    @endisset
+
     {{-- Cards principais --}}
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
         <div class="tre-ac-card">
@@ -62,6 +72,11 @@
         <a href="{{ route('frequencia.atual') }}" class="br-button secondary">
             <i class="fas fa-calendar-alt" aria-hidden="true"></i>
             Ver folha mensal
+        </a>
+
+        <a href="{{ route('calendario.index') }}" class="br-button secondary">
+            <i class="fas fa-calendar" aria-hidden="true"></i>
+            Calendário · feriados
         </a>
     </div>
 @endsection

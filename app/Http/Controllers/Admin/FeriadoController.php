@@ -7,26 +7,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Assinatura;
 use App\Models\Feriado;
-use App\Services\CalendarioService;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class FeriadoController extends Controller
 {
-    public function index(Request $request, CalendarioService $calendario): View
-    {
-        $ano = (int) $request->query('ano', (string) Carbon::now()->year);
-        $tipo = $request->query('tipo');
-
-        return view('admin.feriados.index', [
-            'feriados' => $calendario->feriadosDoAno($ano, $tipo),
-            'ano' => $ano,
-            'tipo' => $tipo,
-        ]);
-    }
-
     public function create(): View
     {
         return view('admin.feriados.create');
@@ -38,8 +24,15 @@ class FeriadoController extends Controller
 
         Feriado::create($this->payload($dados));
 
+        $redirectTo = $request->input('redirect_to');
+        // Whitelist: aceita /calendario exato OU /calendario seguido de /
+        // ou ?. Rejeita /calendariofake, //evil.com, javascript:, etc.
+        if (is_string($redirectTo) && preg_match('#^/calendario(/|\?|$)#', $redirectTo) === 1) {
+            return redirect($redirectTo)->with('sucesso', 'Feriado cadastrado com sucesso.');
+        }
+
         return redirect()
-            ->route('admin.feriados.index')
+            ->route('calendario.index')
             ->with('sucesso', 'Feriado cadastrado com sucesso.');
     }
 
@@ -55,7 +48,10 @@ class FeriadoController extends Controller
         $feriado->update($this->payload($dados));
 
         return redirect()
-            ->route('admin.feriados.index')
+            ->route('calendario.mes', [
+                'ano' => $feriado->data->year,
+                'mes' => $feriado->data->month,
+            ])
             ->with('sucesso', 'Feriado atualizado com sucesso.');
     }
 
@@ -72,7 +68,7 @@ class FeriadoController extends Controller
         $feriado->delete();
 
         return redirect()
-            ->route('admin.feriados.index')
+            ->route('calendario.index')
             ->with('sucesso', 'Feriado removido. Folhas afetadas terão o hash invalidado na próxima verificação.');
     }
 

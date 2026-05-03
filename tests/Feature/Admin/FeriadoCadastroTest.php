@@ -72,7 +72,7 @@ class FeriadoCadastroTest extends TestCase
                 'recorrente' => '1',
             ]);
 
-        $response->assertRedirect(route('admin.feriados.index'));
+        $response->assertRedirect(route('calendario.index'));
         $response->assertSessionHas('sucesso');
 
         $feriado = Feriado::firstWhere('descricao', 'Independência do Brasil');
@@ -143,7 +143,7 @@ class FeriadoCadastroTest extends TestCase
                 'tipo' => 'nacional',
                 'uf' => '',
             ])
-            ->assertRedirect(route('admin.feriados.index'));
+            ->assertRedirect(route('calendario.index'));
 
         $this->assertDatabaseCount('feriados', 1);
     }
@@ -170,7 +170,7 @@ class FeriadoCadastroTest extends TestCase
         $this->assertDatabaseCount('feriados', 1);
     }
 
-    public function test_feriado_recem_criado_aparece_imediatamente_na_listagem(): void
+    public function test_feriado_recem_criado_aparece_no_calendario_do_mes(): void
     {
         $this->withHeaders($this->adminHeaders())
             ->post('/admin/feriados', [
@@ -180,8 +180,46 @@ class FeriadoCadastroTest extends TestCase
             ]);
 
         $this->withHeaders($this->adminHeaders())
-            ->get('/admin/feriados?ano=2026')
-            ->assertSee('Independência')
-            ->assertSee('07/09/2026');
+            ->get(route('calendario.mes', ['ano' => 2026, 'mes' => 9]))
+            ->assertSee('Independência');
+    }
+
+    public function test_redirect_to_para_calendario_e_honrado_no_store(): void
+    {
+        $this->withHeaders($this->adminHeaders())
+            ->post('/admin/feriados', [
+                'data' => '2026-09-07',
+                'descricao' => 'Independência',
+                'tipo' => 'nacional',
+                'redirect_to' => '/calendario/2026/9',
+            ])
+            ->assertRedirect('/calendario/2026/9');
+    }
+
+    public function test_redirect_to_externo_eh_ignorado_no_store(): void
+    {
+        $this->withHeaders($this->adminHeaders())
+            ->post('/admin/feriados', [
+                'data' => '2026-09-07',
+                'descricao' => 'Independência',
+                'tipo' => 'nacional',
+                'redirect_to' => 'https://evil.example.com',
+            ])
+            ->assertRedirect(route('calendario.index'));
+    }
+
+    public function test_redirect_to_com_prefixo_falsificado_eh_ignorado(): void
+    {
+        // Strings que começam com "/calendario" mas não são rotas legítimas
+        // (ex.: "/calendariofake") devem cair no fallback, não passar pela
+        // whitelist. Defesa contra confusão de prefixo.
+        $this->withHeaders($this->adminHeaders())
+            ->post('/admin/feriados', [
+                'data' => '2026-09-08',
+                'descricao' => 'Dia X',
+                'tipo' => 'nacional',
+                'redirect_to' => '/calendariofake',
+            ])
+            ->assertRedirect(route('calendario.index'));
     }
 }

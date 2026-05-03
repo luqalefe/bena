@@ -21,7 +21,6 @@ class ConfigureUserSession
      */
     protected array $adminOnlyRouteNames = [
         'admin.dashboard',
-        'admin.feriados.index',
         'admin.feriados.create',
         'admin.feriados.store',
         'admin.feriados.edit',

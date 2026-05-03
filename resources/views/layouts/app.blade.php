@@ -155,6 +155,13 @@
             background: rgba(0, 51, 102, 0.06);
             color: #003366;
         }
+        .bena-nav a.bena-nav__about {
+            color: #64748b;
+        }
+        .bena-nav a.bena-nav__about i {
+            margin-right: 0.35rem;
+            font-size: 0.95rem;
+        }
 
         /* Bloco do usuário (avatar + nome + cargo) */
         .bena-user {
@@ -229,6 +236,457 @@
                 padding: 0.3rem;
             }
         }
+
+        /* ─────────────────────────────────────────────────────────────
+           Páginas de formulário e edição (admin) — namespace .bena-form-*
+           Cards brancos, inputs modernos, focus ring navy. Mantém o
+           gov.br DS para botões (.br-button primary) e adiciona estados
+           visuais consistentes.
+           ───────────────────────────────────────────────────────────── */
+
+        .bena-page-header {
+            margin-bottom: 1.5rem;
+        }
+        .bena-page-header__back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.35rem 0.65rem;
+            margin-left: -0.65rem;
+            border-radius: 6px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .bena-page-header__back:hover {
+            background: rgba(0, 51, 102, 0.06);
+            color: #003366;
+        }
+        .bena-page-header__back i {
+            font-size: 0.7rem;
+        }
+        .bena-page-header__title {
+            color: #003366;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            margin: 0.6rem 0 0.25rem;
+        }
+        .bena-page-header__subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .bena-card {
+            background: #ffffff;
+            border: 1px solid rgba(15, 23, 42, 0.06);
+            border-radius: 12px;
+            padding: 1.75rem 2rem;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04),
+                        0 4px 14px rgba(0, 51, 102, 0.04);
+            max-width: 720px;
+        }
+        @media (max-width: 600px) {
+            .bena-card {
+                padding: 1.25rem 1.1rem;
+                border-radius: 10px;
+            }
+        }
+
+        .bena-readonly-info {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 3px solid #94a3b8;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            max-width: 720px;
+        }
+        .bena-readonly-info__title {
+            color: #475569;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 0 0 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .bena-readonly-info__list {
+            margin: 0;
+            display: grid;
+            grid-template-columns: max-content 1fr;
+            gap: 0.35rem 1rem;
+            font-size: 0.9rem;
+        }
+        .bena-readonly-info__list dt {
+            color: #64748b;
+            font-weight: 500;
+        }
+        .bena-readonly-info__list dd {
+            color: #0f172a;
+            margin: 0;
+        }
+        .bena-readonly-info__list code {
+            background: rgba(15, 23, 42, 0.05);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+
+        .bena-error-summary {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 3px solid #dc2626;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            color: #991b1b;
+            max-width: 720px;
+        }
+        .bena-error-summary__title {
+            font-weight: 700;
+            font-size: 0.875rem;
+            margin: 0 0 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .bena-error-summary__list {
+            margin: 0;
+            padding-left: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .bena-form {
+            display: grid;
+            gap: 1.1rem;
+        }
+        .bena-form__row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.1rem;
+        }
+        @media (max-width: 600px) {
+            .bena-form__row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .bena-form__field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .bena-form__label {
+            color: #334155;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .bena-form__label .required {
+            color: #dc2626;
+            margin-left: 0.2rem;
+        }
+
+        .bena-form__input,
+        .bena-form__select,
+        .bena-form__textarea {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 0.6rem 0.8rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: #0f172a;
+            line-height: 1.4;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+        }
+        .bena-form__input:hover,
+        .bena-form__select:hover,
+        .bena-form__textarea:hover {
+            border-color: #94a3b8;
+        }
+        .bena-form__input:focus,
+        .bena-form__select:focus,
+        .bena-form__textarea:focus {
+            outline: none;
+            border-color: #003366;
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.12);
+        }
+        .bena-form__input::placeholder {
+            color: #94a3b8;
+        }
+        .bena-form__select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748b' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.85rem center;
+            padding-right: 2rem;
+        }
+        .bena-form__input[type="date"] {
+            padding-right: 0.5rem;
+        }
+
+        .bena-form__help {
+            color: #64748b;
+            font-size: 0.825rem;
+            line-height: 1.5;
+        }
+        .bena-form__help a {
+            color: #0066cc;
+            font-weight: 500;
+        }
+
+        .bena-form__checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.4rem 0;
+            cursor: pointer;
+            user-select: none;
+        }
+        .bena-form__checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #003366;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin: 0;
+        }
+        .bena-form__checkbox span {
+            color: #334155;
+            font-size: 0.95rem;
+        }
+
+        .bena-form__file {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 0.7rem 0.85rem;
+            font-size: 0.9rem;
+            color: #475569;
+            cursor: pointer;
+            transition: border-color 0.2s ease, background 0.2s ease;
+            width: 100%;
+        }
+        .bena-form__file:hover {
+            border-color: #003366;
+            background: #f0f9ff;
+        }
+        .bena-form__file:focus {
+            outline: 2px solid #003366;
+            outline-offset: 2px;
+        }
+
+        .bena-form__actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid rgba(15, 23, 42, 0.06);
+        }
+        .bena-form__actions--has-extra {
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bena-form__actions__primary {
+            display: flex;
+            gap: 0.75rem;
+        }
+        @media (max-width: 600px) {
+            .bena-form__actions,
+            .bena-form__actions--has-extra,
+            .bena-form__actions__primary {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+            .bena-form__actions .br-button {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .br-button.danger {
+            background: #dc2626;
+            color: #ffffff;
+            border-color: #dc2626;
+        }
+        .br-button.danger:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+        .br-button.danger:focus-visible {
+            outline: 2px solid #fca5a5;
+            outline-offset: 2px;
+        }
+        .bena-link-danger {
+            color: #b91c1c;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+        .bena-link-danger:hover {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .bena-warning-card {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left: 4px solid #d97706;
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(217, 119, 6, 0.06);
+            max-width: 720px;
+        }
+        .bena-warning-card__title {
+            color: #78350f;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 0 0 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .bena-warning-card p {
+            color: #422006;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin: 0 0 0.75rem;
+        }
+        .bena-warning-card p:last-child {
+            margin-bottom: 0;
+        }
+        .bena-warning-card__highlight {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 0.7rem 0.9rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            margin-top: 0.75rem;
+        }
+        .bena-warning-card__highlight i {
+            margin-top: 0.15rem;
+            flex-shrink: 0;
+        }
+
+        /* ─────────────────────────────────────────────────────────────
+           Buddy / mascote do estagiário (H28)
+           Card exibido na dashboard quando o usuário é do grupo 'E'.
+           ───────────────────────────────────────────────────────────── */
+
+        .bena-buddy-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid rgba(0, 51, 102, 0.08);
+            border-left: 4px solid #003366;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 51, 102, 0.04),
+                        0 4px 14px rgba(0, 51, 102, 0.05);
+            animation: bena-buddy-enter 0.5s ease-out both;
+        }
+        @keyframes bena-buddy-enter {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .bena-buddy-card__avatar {
+            font-size: 2.5rem;
+            line-height: 1;
+            flex-shrink: 0;
+            animation: bena-buddy-bounce 2.4s ease-in-out infinite;
+            transform-origin: 50% 90%;
+        }
+        @keyframes bena-buddy-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .bena-buddy-card__content {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .bena-buddy-card__name {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #003366;
+        }
+        .bena-buddy-card__frase {
+            margin: 0.25rem 0 0;
+            color: #334155;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .bena-buddy-card,
+            .bena-buddy-card__avatar {
+                animation: none;
+            }
+        }
+        @media (max-width: 600px) {
+            .bena-buddy-card {
+                padding: 0.85rem 1rem;
+            }
+            .bena-buddy-card__avatar {
+                font-size: 2rem;
+            }
+            .bena-buddy-card__frase {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Variante "apresentação" — usada no onboarding (mascote maior + rodapé) */
+        .bena-buddy-card--apresentacao {
+            margin-bottom: 2rem;
+            padding: 1.4rem 1.5rem;
+            gap: 1.25rem;
+        }
+        .bena-buddy-card__avatar--grande {
+            font-size: 3.5rem;
+        }
+        .bena-buddy-card__rodape {
+            margin: 0.6rem 0 0;
+            color: #64748b;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+        @media (max-width: 600px) {
+            .bena-buddy-card--apresentacao {
+                flex-direction: column;
+                text-align: center;
+            }
+            .bena-buddy-card__avatar--grande {
+                font-size: 2.75rem;
+            }
+        }
     </style>
 
     @stack('styles')
@@ -277,19 +735,20 @@
                     $grupo = session('grupodeacesso');
                 @endphp
 
-                @if ($grupo === '0')
-                    <nav class="bena-nav" aria-label="Navegação administrativa">
+                <nav class="bena-nav" aria-label="Navegação principal">
+                    @if ($grupo === '0')
                         <a href="{{ route('admin.dashboard') }}">Dashboard</a>
                         <a href="{{ route('admin.estagiarios.index') }}">Estagiários</a>
-                        <a href="{{ route('admin.feriados.index') }}">Feriados</a>
-                    </nav>
-                @elseif ($grupo === 'S')
-                    <nav class="bena-nav" aria-label="Navegação supervisor">
+                    @elseif ($grupo === 'S')
                         <a href="{{ route('supervisor.dashboard') }}">Meus estagiários</a>
-                    </nav>
-                @else
-                    <div style="margin-left: auto;"></div>
-                @endif
+                    @endif
+                    <a href="{{ route('calendario.index') }}" title="Calendário · feriados">
+                        <i class="fas fa-calendar" aria-hidden="true"></i> Calendário
+                    </a>
+                    <a href="{{ route('onboarding.show') }}" class="bena-nav__about" title="Tutorial e história do sistema">
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>Sobre
+                    </a>
+                </nav>
 
                 @php
                     $nomeCompleto = auth()->user()->nome ?? auth()->user()->username;

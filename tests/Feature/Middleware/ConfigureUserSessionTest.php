@@ -30,7 +30,7 @@ class ConfigureUserSessionTest extends TestCase
 
         Route::middleware([StartSession::class, ConfigureUserSession::class])
             ->get('/_test/admin-only', fn () => ['ok' => true])
-            ->name('admin.feriados.index');
+            ->name('admin.feriados.create');
     }
 
     public function test_sem_remote_user_retorna_401(): void

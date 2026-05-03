@@ -31,6 +31,7 @@ class Estagiario extends Model implements Authenticatable
         'contrato_path',
         'ativo',
         'tutorial_visto_em',
+        'buddy_tipo',
     ];
 
     protected function casts(): array

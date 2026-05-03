@@ -68,7 +68,7 @@ class FeriadoEdicaoTest extends TestCase
                 'recorrente' => '1',
             ]);
 
-        $response->assertRedirect(route('admin.feriados.index'));
+        $response->assertRedirect(route('calendario.mes', ['ano' => 2026, 'mes' => 9]));
         $response->assertSessionHas('sucesso');
         $this->assertSame('Independência do Brasil', $f->fresh()->descricao);
         $this->assertTrue($f->fresh()->recorrente);
@@ -81,7 +81,7 @@ class FeriadoEdicaoTest extends TestCase
         $response = $this->withHeaders($this->adminHeaders())
             ->delete(route('admin.feriados.destroy', $f));
 
-        $response->assertRedirect(route('admin.feriados.index'));
+        $response->assertRedirect(route('calendario.index'));
         $response->assertSessionHas('sucesso');
         $this->assertNull(Feriado::find($f->id));
     }

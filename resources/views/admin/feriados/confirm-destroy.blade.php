@@ -3,31 +3,57 @@
 @section('title', "Remover feriado — {$feriado->descricao}")
 
 @section('content')
-    <div style="margin-bottom: 1rem;">
-        <a href="{{ route('admin.feriados.index') }}" style="color: var(--color-secondary-07); text-decoration: none;">← Voltar</a>
-        <h1 style="color: var(--color-primary-default); margin: 0.5rem 0 0;">Remover feriado</h1>
+    <div class="bena-page-header">
+        <a href="{{ route('calendario.mes', ['ano' => $feriado->data->year, 'mes' => $feriado->data->month]) }}" class="bena-page-header__back">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            Voltar para o calendário
+        </a>
+        <h1 class="bena-page-header__title">Remover feriado</h1>
+        <p class="bena-page-header__subtitle">
+            Confirme a remoção. Esta ação afeta a classificação retroativa da folha mensal.
+        </p>
     </div>
 
-    <div style="background: #fff7ed; border: 1px solid #fdba74; padding: 1rem 1.25rem; border-radius: 4px; margin-bottom: 1rem;">
+    <div class="bena-warning-card">
+        <h2 class="bena-warning-card__title">
+            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+            Atenção
+        </h2>
         <p>Você está prestes a remover o feriado:</p>
-        <p><strong>{{ $feriado->descricao }}</strong> — {{ $feriado->data->format('d/m/Y') }} ({{ $feriado->tipo }})</p>
-        <p>Após a remoção, dias que eram "feriado" voltam a ser "dia útil sem registro" na classificação retroativa da folha mensal.</p>
+        <p>
+            <strong>{{ $feriado->descricao }}</strong>
+            · {{ $feriado->data->format('d/m/Y') }}
+            · <em>{{ ucfirst($feriado->tipo) }}</em>
+        </p>
+        <p>
+            Após a remoção, dias que eram "feriado" voltam a ser "dia útil sem registro"
+            na classificação retroativa da folha mensal.
+        </p>
 
         @if ($assinaturasImpactadas > 0)
-            <p style="background: #fee2e2; color: #991b1b; padding: 0.5rem; border-radius: 4px;">
-                ⚠ <strong>{{ $assinaturasImpactadas }} folhas</strong> assinadas no mês deste feriado terão seu
-                hash <strong>invalidado</strong> na próxima verificação. As folhas continuam visíveis,
-                mas mostrarão "⚠ alterada".
-            </p>
+            <div class="bena-warning-card__highlight">
+                <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                <span>
+                    <strong>{{ $assinaturasImpactadas }} folhas</strong>
+                    assinadas no mês deste feriado terão o hash <strong>invalidado</strong>
+                    na próxima verificação. As folhas continuam visíveis, mas mostrarão
+                    "alterada".
+                </span>
+            </div>
         @endif
     </div>
 
-    <form method="POST" action="{{ route('admin.feriados.destroy', $feriado) }}">
-        @csrf
-        @method('DELETE')
-        <div style="display: flex; gap: 0.5rem;">
-            <button type="submit" class="br-button" style="background: #b91c1c; color: white;">Confirmar remoção</button>
-            <a href="{{ route('admin.feriados.index') }}" class="br-button secondary">Cancelar</a>
-        </div>
-    </form>
+    <div class="bena-card">
+        <form method="POST" action="{{ route('admin.feriados.destroy', $feriado) }}" class="bena-form">
+            @csrf
+            @method('DELETE')
+            <div class="bena-form__actions">
+                <a href="{{ route('calendario.mes', ['ano' => $feriado->data->year, 'mes' => $feriado->data->month]) }}" class="br-button secondary">Cancelar</a>
+                <button type="submit" class="br-button danger">
+                    <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                    Confirmar remoção
+                </button>
+            </div>
+        </form>
+    </div>
 @endsection

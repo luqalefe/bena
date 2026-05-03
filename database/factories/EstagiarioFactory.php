@@ -52,4 +52,9 @@ class EstagiarioFactory extends Factory
     {
         return $this->state(['tutorial_visto_em' => null]);
     }
+
+    public function comBuddy(string $tipo = 'coruja'): static
+    {
+        return $this->state(['buddy_tipo' => $tipo]);
+    }
 }

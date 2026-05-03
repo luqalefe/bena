@@ -6,9 +6,11 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EstagiarioController;
 use App\Http\Controllers\Admin\FeriadoController;
 use App\Http\Controllers\AssinaturaController;
+use App\Http\Controllers\CalendarioAnualController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DevSessionController;
 use App\Http\Controllers\FolhaMensalController;
+use App\Http\Controllers\MascotesController;
 use App\Http\Controllers\ObservacaoController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\PontoController;
@@ -51,10 +53,16 @@ Route::middleware('configure.session')->group(function () {
 
     Route::get('/supervisor', [SupervisorDashboardController::class, 'index'])->middleware('onboarded')->name('supervisor.dashboard');
 
+    Route::get('/calendario', [CalendarioAnualController::class, 'index'])->name('calendario.index');
+    Route::get('/calendario/{ano}/{mes}', [CalendarioAnualController::class, 'mes'])
+        ->whereNumber(['ano', 'mes'])
+        ->name('calendario.mes');
+
+    Route::get('/mascotes', [MascotesController::class, 'index'])->name('mascotes.index');
+
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminDashboardController::class, 'index'])->middleware('onboarded')->name('dashboard');
 
-        Route::get('/feriados', [FeriadoController::class, 'index'])->name('feriados.index');
         Route::get('/feriados/criar', [FeriadoController::class, 'create'])->name('feriados.create');
         Route::post('/feriados', [FeriadoController::class, 'store'])->name('feriados.store');
         Route::get('/feriados/{feriado}/editar', [FeriadoController::class, 'edit'])->name('feriados.edit');
