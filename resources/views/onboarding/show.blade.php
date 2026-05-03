@@ -28,7 +28,7 @@
             [
                 'icone' => 'fa-magic',
                 'titulo' => 'Esqueceu de bater saída?',
-                'texto' => 'O sistema fecha automaticamente após sua jornada (5h por padrão). Aparece marcado como "auto" pra você saber que foi auto-fechamento.',
+                'texto' => 'O sistema fecha automaticamente após sua jornada (5h por padrão). Aparece marcado como "auto" para você saber que foi auto-fechamento.',
             ],
         ];
     @endphp
@@ -53,17 +53,18 @@
                 <strong>Bena</strong> é uma palavra em <em>Hãtxa Kuĩ</em>, língua
                 do povo Huni Kuin, que vive no Acre. Significa <strong>"novo"</strong>.
                 Ela vem da expressão <em>Xinã Bena</em> — "novo tempo" — usada
-                pelos Huni Kuin pra falar do momento atual de renovação cultural.
+                pelos Huni Kuin para falar do momento atual de renovação cultural.
                 É o nome certo para o sistema que substitui a folha de ponto em
                 papel pelo registro digital.
             </p>
             <p style="color: #422006; font-size: 0.95rem; line-height: 1.65; margin: 0;">
-                O Bena nasceu de uma observação simples: se assinar uma folha
-                de ponto exige tanto esforço coletivo todo mês, talvez o
-                problema não seja quem assina — seja a folha. Esse sistema
-                resolve isso de uma vez, pra que estagiários e supervisores
-                possam investir o tempo onde ele rende: no aprendizado e no
-                trabalho que importa.
+                O Bena nasceu de uma observação simples: se a entrega da folha
+                de ponto vira uma pequena novela mensal — com adiamento,
+                promessa de oração e reza pelo bom senso de quem vai entregar
+                por último — talvez o problema não seja quem assina. Seja a
+                folha. Esse sistema resolve isso de uma vez, para que
+                estagiários e supervisores possam investir o tempo onde ele
+                rende: no aprendizado e no trabalho que importa.
             </p>
         </section>
 
