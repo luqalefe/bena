@@ -57,7 +57,7 @@
                 É o nome certo para o sistema que substitui a folha de ponto em
                 papel pelo registro digital.
             </p>
-            <p style="color: #422006; font-size: 0.95rem; line-height: 1.65; margin: 0;">
+            <p style="color: #422006; font-size: 0.95rem; line-height: 1.65; margin: 0 0 1.25rem;">
                 O Bena nasceu de uma observação simples: se a entrega da folha
                 de ponto vira uma pequena novela mensal — com adiamento,
                 promessa de oração e reza pelo bom senso de quem vai entregar
@@ -66,6 +66,16 @@
                 estagiários e supervisores possam investir o tempo onde ele
                 rende: no aprendizado e no trabalho que importa.
             </p>
+
+            <div style="border-top: 1px dashed rgba(217, 119, 6, 0.35); padding-top: 1rem; margin-top: 1rem;">
+                <p style="color: #422006; font-size: 0.92rem; line-height: 1.6; font-style: italic; margin: 0 0 0.5rem;">
+                    Esta é a marca que quero deixar neste tribunal: um sistema
+                    feito por um estagiário, para estagiários.
+                </p>
+                <p style="color: #78350f; font-size: 0.88rem; font-weight: 700; margin: 0; letter-spacing: 0.02em;">
+                    — Lucas Alefe
+                </p>
+            </div>
         </section>
 
         <ol style="list-style: none; padding: 0; margin: 0 0 2.5rem;">
