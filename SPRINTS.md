@@ -185,6 +185,80 @@ pós-assinatura.
 
 ---
 
+## Sprint 7a — Filtros inteligentes (UI/UX)
+
+**Objetivo:** Eliminar fricção nas listagens admin (auto-submit ao trocar
+select) e adicionar busca client-side por texto nas tabelas. Pequeno e
+independente — não bloqueia H18/H19.
+
+| História | Resumo |
+|----------|--------|
+| **H24** | Auto-submit nos selects de lotação/tipo/mês (3 views admin) — botão "Filtrar" passa a `<noscript>` (fallback sem JS) |
+| **H25** | Busca client-side em `admin/estagiarios/index` e `admin/dashboard` — input usa `.bena-form__input`, normaliza NFD para busca sem acentos, JS vanilla puro em `@push('scripts')` |
+
+**DoD:**
+- Os 3 forms (estagiarios/index, feriados/index, admin/dashboard) submetem
+  ao trocar select. Checkbox "liberadas" também auto-submete.
+- Busca rápida funciona case-insensitive e sem acentos nas duas tabelas.
+- 234 testes verdes (suíte preexistente; nada quebrou).
+
+---
+
+## Sprint 7b — Calendário anual visual (UI/UX)
+
+**Objetivo:** Visão anual com mapa de calor temático por mês, feriados
+destacados e link de acesso na nav. Reaproveita `CalendarioService::feriadosDoAno()`.
+
+| História | Resumo |
+|----------|--------|
+| **H26** | Rota `GET /calendario?ano=YYYY` com 12 mini-calendários em grid responsivo (`auto-fill, minmax(260px, 1fr)`), paleta RGB temática por mês, fim de semana azul `#dbeafe`, feriado âmbar `#fef3c7` com dot dourado, hoje com border navy. Click em feriado abre `admin.feriados.edit` apenas para admin |
+| **H27** | Link "Calendário" na `.bena-nav` (visível para todos os grupos) e botão "Calendário anual" na dashboard do estagiário |
+
+**DoD:**
+- `CalendarioAnualController` + view `calendario/index.blade.php` + rota
+  dentro do grupo `configure.session`.
+- 5 testes novos (`CalendarioAnualTest`): 200 para admin/supervisor/
+  estagiário, parâmetro `ano`, exibe feriado cadastrado, exibe recorrente
+  no ano solicitado, link edit apenas para admin.
+- 239 verde / 553 asserções.
+
+---
+
+## Sprint 7c — Buddy / mascote (UI/UX + domínio leve)
+
+**Objetivo:** Cada estagiário ganha um mascote pessoal (estilo Tamagotchi) que
+aparece na dashboard com frases contextuais. Vínculo emocional com o sistema
+sem custo de banco — a config das frases vive em `config/buddies.php`, só o
+tipo do buddy é persistido.
+
+| História | Resumo |
+|----------|--------|
+| **H28** | 8 buddies (coruja, gato, cachorro, capivara, papagaio, tartaruga, pinguim, sapo) cada um com personalidade. Atribuído aleatoriamente no primeiro acesso à dashboard, persistido em `estagiarios.buddy_tipo`. Frase escolhida deterministicamente por `(dia da semana, status do ponto, dia do mês)` — varia ao longo da semana mas estável dentro de um bloco do dia. Card com gradient navy + animação de bounce no avatar. Não aparece para admin/supervisor |
+
+**DoD:**
+- Migration `add_buddy_tipo_to_estagiarios` (string(20) nullable após
+  `tutorial_visto_em`).
+- `BuddyService::garantirBuddy(Estagiario, ?string $grupo = null)` é
+  idempotente — só atribui se ainda não tem. Roteia por grupo:
+  `'0'`/`'S'` → pool `tipos_supervisores` (águia, leão, elefante, urso),
+  resto → pool `tipos` (8 originais).
+- `BuddyService::montar()` retorna `BuddyData` (DTO readonly: tipo,
+  emoji, nome, frase) usando seleção determinística por
+  `(dia-do-mês + bloco de 12h)` — frase estável dentro do bloco.
+- `BuddyService::boasVindas()` retorna BuddyData com frase de
+  apresentação, usado na tela `/bem-vindo` para todos os grupos.
+- Frases organizadas em `config/buddies.php` por
+  `(buddy, dia_semana, status_ponto)` + `boas_vindas` + `generica`.
+- Card visível: na dashboard só para grupo `'E'`; no `/bem-vindo` para
+  todos os grupos (apresentação faz parte da onboarding).
+- Variantes CSS `bena-buddy-card` (default) e
+  `bena-buddy-card--apresentacao` (avatar maior, com rodapé explicativo).
+- 9 testes unit + 7 testes feature cobrem atribuição, persistência,
+  montagem, determinismo, fallback, pools por grupo, e visibilidade
+  por contexto. Total: 257 verde / 604 asserções.
+
+---
+
 ## Sprint 6 — Hardening e homologação (semana 7)
 
 **Objetivo:** preparar pra entrar em homologação no tribunal. Foco em
@@ -217,6 +291,9 @@ NFRs, não em features novas.
 | 4 | 4 | H16, H14, H15 | Visão admin (puxada antes da 3) | ✅ **Done** (parciais em H14/H15/H16 — sem coluna assinatura/filtro supervisor/upload contrato) |
 | 3 | 5 | H10, H11, H12, H13, H20 | PDF + assinatura | ✅ **Done** |
 | 5 | 6 | H0.3🚧, H16✅, H17✅, H18, H19 | CI + fechamento H16 + polimento | 🚧 **Em curso** (H0.3 pipeline local pronto; H16 fechada; H17 fechada com observações por dia; H18/H19 pendentes) |
+| 7a | — | H24, H25 | Filtros inteligentes (UI/UX) | ✅ **Done** |
+| 7b | — | H26, H27 | Calendário anual visual (UI/UX) | ✅ **Done** |
+| 7c | — | H28 | Buddy / mascote do estagiário | ✅ **Done** |
 | 6 | 7 | (NFRs) | Homologação | 📋 |
 
 ---
@@ -243,3 +320,10 @@ NFRs, não em features novas.
 | 2026-05-02 | Sprint 5 ampliada: começa por **H0.3** (CI pipeline) + **H16-fechamento** (contrato PDF + supervisor_username) antes de H17/H18/H19. Parte da H0.3 fechada — `make ci` valida o pipeline end-to-end (build dev → pint --test → test --coverage --min=80) via `docker-compose.test.yml`. O arquivo de CI propriamente dito fica pra criação como `.gitlab-ci.yml` quando o projeto migrar pro GitLab interno em 2026-05-04 (originalmente cogitado um `.github/workflows/ci.yml`, descartado: PAT do dev não tem escopo `workflow` e o GitHub é só hospedagem temporária). |
 | 2026-05-02 | **H16 fechada** — supervisor_username já estava do trabalho da H13; upload de contrato PDF (`Storage::disk('local')->putFile('contratos', ...)` + `mimes:pdf + mimetypes:application/pdf + max:5120`, novo deleta antigo) e download com autorização inline (admin OR self OR supervisor responsável) implementados. 13 testes novos (180 verde / 410 assertions). Próximo: H17. |
 | 2026-05-02 | **H17 fechada** — `ObservacaoController` em `POST /frequencia/{ano}/{mes}/{dia}/observacao`; coluna `observacao` já existia. Dia útil sem `Frequencia` que recebe observação cria registro só com `observacao` (ausência justificada); texto vazio limpa, e se `Frequencia` era só observação, deleta. Bloqueia fds/feriado (422), admin/supervisor (403), e mês já assinado (422). View show + PDF ganharam coluna `Status` separada de `Observação`. 14 testes novos (194 verde / 443 assertions). Próximo: H18. |
+| 2026-05-03 | **Sprint 7a/7b fechadas (UI/UX)** — H24 (auto-submit nos selects de filtro em 3 views admin; botão "Filtrar" virou `<noscript>`) + H25 (busca client-side com NFD-normalize em estagiarios/index e admin/dashboard) + H26 (calendário anual `/calendario?ano=YYYY` com 12 mini-calendários, mapa de calor temático por mês, feriado âmbar com dot e link de edição apenas para admin) + H27 (link "Calendário" na nav e botão na dashboard estagiário). 5 testes novos (`CalendarioAnualTest`). Suíte: 239 verde / 553 asserções. Sprints independentes; H18/H19 da Sprint 5 seguem pendentes. |
+| 2026-05-03 | **Refluxo do calendário** — `/calendario` passou a renderizar o **mês atual** por padrão (não mais grade anual de 12 meses). Adicionada view mensal `calendario.mes` para `/calendario/{ano}/{mes}`, com hover-tooltip CSS na descrição do feriado. Para admin: clique em dia vazio abre `<dialog>` com form de criar feriado (POST honra `redirect_to=/calendario/...` whitelistado por prefix). Removidas: view `admin/feriados/index.blade.php`, rota `admin.feriados.index`, `FeriadoController::index()`. Inserir/editar/excluir continuam admin-only via `ConfigureUserSession::adminOnlyRouteNames`. Visualização do calendário liberada para todos os grupos auth. Link "Feriados" sai da nav (Calendário cobre). Suíte: 240 verde / 559 asserções. |
+| 2026-05-03 | **Sprint 7c fechada (buddy/mascote)** — H28: 8 buddies (coruja, gato, cachorro, capivara, papagaio, tartaruga, pinguim, sapo) com personalidades distintas. Atribuído aleatoriamente no primeiro acesso à dashboard do estagiário, persistido em `estagiarios.buddy_tipo` (migration nova). `BuddyService::garantirBuddy` (idempotente) + `montar()` retorna `BuddyData` (DTO readonly). Frases organizadas em `config/buddies.php` por `(buddy, dia da semana, status do ponto)` + `generica` fallback — seleção determinística por `(dia do mês + bloco de 12h)`. Card com gradient navy + animação de bounce, escondido para admin/supervisor. 9 testes novos (5 unit + 4 feature). Suíte: 249 verde / 583 asserções. |
+| 2026-05-03 | **Buddy no `/bem-vindo` + pool sênior** — A apresentação do mascote passou a aparecer também na tela de boas-vindas (não só na dashboard), antes do tutorial. Variante CSS `bena-buddy-card--apresentacao` (avatar maior + rodapé explicativo). Adicionado pool sênior de buddies para supervisor/admin: 4 mascotes mais maduros (águia 🦅, leão 🦁, elefante 🐘, urso 🐻) com tom de mentoria. `BuddyService::garantirBuddy` ganhou parâmetro `?string $grupo` e roteia: `'0'`/`'S'` → `tipos_supervisores`, default → `tipos` (8 originais). `OnboardingController` injeta `BuddyService` e passa o grupo da sessão. 7 testes novos (4 sobre boas-vindas, 3 sobre pools). Suíte: 256 verde / 602 asserções. |
+| 2026-05-03 | **Code review pré-commit** — Endurecida a whitelist do `redirect_to` em `FeriadoController::store`: trocado `str_starts_with($path, '/calendario')` por regex `^/calendario(/|\?|$)` que rejeita strings ambíguas como `/calendariofake` (cair no fallback). Comentário do `BuddyService::montar` reescrito pra refletir a regra real ("blocos de 12h" ao invés de "ímpar/par"). Teste novo `test_redirect_to_com_prefixo_falsificado_eh_ignorado`. Suíte: 257 verde / 604 asserções. |
+| 2026-05-03 | **Página `/mascotes` + histórias eleitorais** — Página listando todos os 12 buddies (8 do pool padrão + 4 do sênior) com **personalidade** + **história curta** ligada à Justiça Eleitoral do Acre. Cada perfil em `config/buddies.php` ganhou as chaves `personalidade` e `historia` (ex.: Coruinha viu a chegada da urna eletrônica em 1996, Águia voou sobre as zonas remotas acompanhando transporte aéreo de urnas, Urso vigiou a primeira urna em comunidade indígena, etc.). Botão "Conhecer todos os mascotes" no `/bem-vindo`. `MascotesController` magrinho (lê do config). 5 testes feature em `MascotesPageTest` que iteram sobre o config — adicionar/editar mascote no futuro não quebra os testes. Suíte: 262 verde / 638 asserções. |
+| 2026-05-03 | **Frases dos buddies reescritas com tema eleitoral** — As ~150 frases (12 buddies × 5 dias × 3 status + boas_vindas + generica) em `config/buddies.php` foram reescritas mantendo a personalidade de cada um, mas costuradas com vocabulário/metáforas da Justiça Eleitoral: urna, ata, apuração, pleito, mesa receptora, mesário, BU, recurso, diplomação, fiscalização, ciclo eleitoral, pleito municipal/estadual, etc. Testes não quebraram porque verificam estrutura, não strings específicas. Suíte: 262 verde / 638 asserções. |

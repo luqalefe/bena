@@ -4,7 +4,7 @@
 > trabalho. Detalhes longos vivem em `CLAUDE.md`, `REQUISITOS.md`,
 > `SPRINTS.md` e `docs/`.
 
-**Última atualização:** 2026-05-02 (Sprint 5 em curso · H17 fechada · H21 auto-fechamento · H22 re-assinatura)
+**Última atualização:** 2026-05-03 (Sprint 7c · página /mascotes + frases eleitorais + review)
 
 **Repo:** [`luqalefe/bena`](https://github.com/luqalefe/bena.git) — branch `main` ·
 commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
@@ -67,7 +67,91 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
   `/supervisor`). View renderiza 5 cards explicativos do fluxo. Botão
   "Entendi" seta o timestamp. Página continua acessível pra revisitar.
 
-**Suíte:** 233 testes, 536 assertions · cobertura ≥ 80 % (gate `--min=80`)
+✅ **Sprint 7a — Filtros inteligentes (UI/UX)** — fechada
+- ✅ **H24** — `onchange="this.form.submit()"` nos selects (lotação,
+  tipo, mês) e checkbox `liberadas` em `admin/estagiarios/index`,
+  `admin/feriados/index` e `admin/dashboard`. Botão "Filtrar" passou
+  pra `<noscript>` como fallback. Inputs de ano continuam manuais.
+- ✅ **H25** — input de busca em `admin/estagiarios/index` e
+  `admin/dashboard` com classe `bena-form__input`. JS vanilla puro
+  em `@push('scripts')` normaliza NFD (`/[̀-ͯ]/g`) pra
+  busca case-insensitive e sem acentos. Filtra `<tr>` em tempo real.
+
+✅ **Sprint 7b — Calendário visual (UI/UX)** — fechada (refluxo posterior)
+- ✅ **H26** — `GET /calendario` agora renderiza o **mês atual** por
+  padrão. `GET /calendario/{ano}/{mes}` mostra mês específico. Todos
+  os grupos auth podem visualizar. Paleta RGB temática por mês via
+  `--cal-theme`, fim de semana azul, feriado âmbar com dot e tooltip
+  CSS de hover (descrição). Hoje com border navy. Para admin: click
+  em dia vazio abre `<dialog>` com form de criar feriado (POST honra
+  `redirect_to=/calendario/...` whitelistado).
+- ✅ **H27** — link "Calendário" na `.bena-nav` (visível para todos,
+  antes do "Sobre") e botão "Calendário · feriados" na dashboard do
+  estagiário ao lado do "Ver folha mensal".
+
+✅ **Refluxo de feriados (admin)** — fechada
+- View `/admin/feriados` (listing) **removida**. Adição de feriado vira
+  fluxo do calendário (admin clica num dia vazio → modal). Edit/destroy
+  continuam acessíveis pelos próprios feriados clicáveis no calendário.
+- `FeriadoController::index()` removido. Rota `admin.feriados.index`
+  removida. Adição/edição/exclusão admin-only via
+  `ConfigureUserSession::adminOnlyRouteNames`.
+- Redirects de mutação: `store` sem `redirect_to` → `calendario.index`;
+  com `redirect_to=/calendario/...` (whitelist) → respeita; `update` →
+  `calendario.mes` do mês do feriado; `destroy` → `calendario.index`.
+
+✅ **Sprint 7c — Buddy / mascote (H28)** — fechada
+- ✅ **H28** — 8 buddies do **pool padrão** (coruja🦉, gato🐱, cachorro🐶,
+  capivara🦫, papagaio🦜, tartaruga🐢, pinguim🐧, sapo🐸) com
+  personalidades distintas, atribuído ao grupo `'E'`. Persistido em
+  `estagiarios.buddy_tipo` (string(20) nullable, migration nova após
+  `tutorial_visto_em`).
+- ✅ **Pool sênior (`tipos_supervisores`)** para grupos `'0'` (admin) e
+  `'S'` (supervisor): 4 mascotes mais maduros (águia 🦅, leão 🦁,
+  elefante 🐘, urso 🐻) em tom de mentoria.
+  `BuddyService::garantirBuddy(Estagiario, ?string $grupo)` roteia
+  para o pool certo na primeira atribuição.
+- ✅ `BuddyService::montar(Estagiario, statusPonto)` retorna `BuddyData`
+  (DTO readonly: tipo, emoji, nome, frase) por
+  `(dia, status, dia + bloco de 12h)` — frase estável dentro do bloco.
+- ✅ `BuddyService::boasVindas(Estagiario)` retorna BuddyData com frase
+  de apresentação, usado na onboarding.
+- ✅ Card visível: na **dashboard** só para grupo `'E'` (estagiário);
+  na tela `/bem-vindo` para **todos os grupos** (apresentação faz parte
+  do onboarding). Variante CSS `bena-buddy-card--apresentacao` com
+  avatar 3.5rem e rodapé explicativo.
+- ✅ Animação respeita `prefers-reduced-motion`.
+
+✅ **Code review pré-commit** — segurança e consistência
+- 🔒 `FeriadoController::store`: regex `^/calendario(/|\?|$)` substituiu
+  `str_starts_with('/calendario')` — bloqueia ambiguidades como
+  `/calendariofake`, `//evil.com`, `javascript:`. Teste novo cobre o
+  caso. Não havia open redirect explorável (Laravel resolve no host
+  atual), mas é boa prática defensiva.
+- 📝 `BuddyService::montar` comentário reescrito (era "ímpar/par",
+  passou a "blocos de 12h" — reflete a lógica real).
+
+✅ **Página `/mascotes` + frases com tema eleitoral**
+- ✅ Rota `GET /mascotes` (`MascotesController::index`) acessível para
+  todos os grupos auth. Lista os 12 mascotes com avatar, nome,
+  personalidade e história curta ligada à Justiça Eleitoral do Acre.
+  Pool padrão em cards brancos, pool sênior em cards âmbar.
+- ✅ Cada perfil em `config/buddies.php` ganhou as chaves
+  `personalidade` (string curta) e `historia` (parágrafo conectando
+  à JE do Acre — chegada da urna eletrônica em 1996, transporte
+  aéreo das urnas pela Amazônia, primeira urna em comunidade
+  indígena, etc.).
+- ✅ Botão **"Conhecer todos os mascotes"** no `/bem-vindo`, logo
+  abaixo do card de apresentação do buddy.
+- ✅ As ~150 frases dos buddies em `config/buddies.php` (12 × 5 × 3
+  + boas_vindas + generica) foram **reescritas com tema eleitoral**:
+  urna, ata, apuração, pleito, BU (boletim de urna), mesário, mesa
+  receptora, recurso, diplomação, ciclo eleitoral, etc., **mantendo
+  a personalidade** de cada buddy.
+- ✅ 5 testes feature em `MascotesPageTest` iteram sobre o config
+  (resilientes a edição/expansão de mascotes futuros).
+
+**Suíte:** 262 testes, 638 assertions · cobertura ≥ 80 % (gate `--min=80`)
 
 ### Mudanças de modelagem em 2026-05-01 (registradas em REQUISITOS.md)
 Atores refinados: **Supervisor** vira grupo Authelia próprio (`supervisores`),
@@ -125,11 +209,12 @@ clica em "Trocar usuário" no banner.
 
 ---
 
-## Próximo passo concreto — Sprint 5 em curso
+## Próximo passo concreto — Sprint 5 ainda em curso
 
-H0.3 parcial (pipeline local pronto, `.gitlab-ci.yml` aguarda migração
-pro GitLab interno em 2026-05-04). H16 e H17 fechadas. Próximo na fila:
-**H18** (verificação de integridade da assinatura). Sequência:
+Sprints 7a/7b foram fechadas em paralelo (UI/UX, independentes da
+Sprint 5). H0.3 parcial (pipeline local pronto, `.gitlab-ci.yml` aguarda
+migração pro GitLab interno em 2026-05-04). H16 e H17 fechadas. Próximo
+na fila: **H18** (verificação de integridade da assinatura). Sequência:
 
 1. 🚧 **H0.3** — pipeline local OK; CI no GitLab fica pra 2026-05-04
 2. ✅ **H16** — upload contrato + download autorizado
