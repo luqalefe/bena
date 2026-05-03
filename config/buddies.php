@@ -121,7 +121,7 @@ return [
             'classe' => 'Engenheiro de Núcleo',
             'habilidade' => 'Do Zero ao Núcleo — ignora todo framework opcional. Sistemas forjados sob sua tutela ganham +2 em longevidade e nunca dependem de plugin de terceiros.',
             'flavor' => 'Não sou um visionário, sou um engenheiro.',
-            'historia' => 'Mestre engenheiro da STI, daqueles que preferem construir tudo do zero. No estilo Linus Torvalds — menos plano de cinco anos, mais código rodando. Acreditou no estagiário e entregou os projetos desafiadores que fizeram o Bena nascer.',
+            'historia' => 'Reza a lenda que o Edcleu forjou os primeiros lacres das urnas eletrônicas que chegaram ao Acre. Não confiava em peça pronta — cada selo saía da bancada dele, do zero, e ninguém jamais conseguiu violar um pleito sob sua guarda. Quando perguntam o segredo, responde curto: "se não posso forjar, não posso garantir".',
         ],
         'lucir' => [
             'emoji' => '🧙',
@@ -131,7 +131,7 @@ return [
             'classe' => 'Pioneiro Alquimista',
             'habilidade' => 'Ideia Maluca — uma vez por sprint, propõe um experimento que parece absurdo. 70% de chance de virar MVP funcional.',
             'flavor' => 'Louco é quem me diz e não é feliz.',
-            'historia' => 'Um dos primeiros analistas de TI do tribunal. Tem fama de ideias malucas — mas foi numa dessas que nasceu o sistema de cadastro de magistrados, irmão mais velho do Bena. No fim das contas, pra ser engenheiro de software também é preciso ter um certo grau de loucura.',
+            'historia' => 'O Lucírio aparece quando uma eleição precisa de algo que ainda não existe. Foi visto pela primeira vez numa apuração noturna de 1992, transformando uma planilha manuscrita num mapa que indicava com precisão onde cada urna estaria no dia seguinte — ninguém soube explicar como. Tem fama de propor soluções absurdas que insistem em funcionar.',
         ],
         'keith' => [
             'emoji' => '👨‍🏫',
@@ -141,7 +141,7 @@ return [
             'classe' => 'Analista Veterano',
             'habilidade' => 'Pareamento Profundo — ao parear, dobra a clareza dos requisitos e revela uma regra de negócio escondida por sessão.',
             'flavor' => 'Antes da primeira linha, escute a casa inteira.',
-            'historia' => 'Um dos servidores mais antigos da casa. Conduziu a quatro mãos a análise de requisitos do cadastro de magistrados, e ensinou a entender o domínio do começo ao fim. Quando ele entra no pareamento, o requisito vira código limpo.',
+            'historia' => 'O Kéiton ouve juiz, mesário, servidor e estagiário com a mesma atenção — e traduz tudo numa ata clara que vira a base de qualquer novo sistema do tribunal. Conduziu, lado a lado com outro servidor, a análise da primeira urna eletrônica que chegou ao Acre. Onde houver dúvida sobre regra, ele estará sentado na ponta da mesa.',
         ],
         'bortoli' => [
             'emoji' => '👴',
@@ -151,7 +151,7 @@ return [
             'classe' => 'Arquivista Lendário',
             'habilidade' => 'Arquivo Vivo — invoca o contexto histórico de qualquer decisão da Justiça Eleitoral, inclusive as não documentadas.',
             'flavor' => 'Isso aqui já tentamos em 2008. Deixa eu te contar como foi.',
-            'historia' => 'Talvez o amigo com mais anos de TI em toda a Justiça Eleitoral. Referência viva — sabe por que cada coisa é como é, lembra de cada decisão, cada presidente, cada mudança de regime. Quando o passado precisa ser consultado, é nele que se busca.',
+            'historia' => 'O Bortelmo lembra de cada presidente do tribunal, cada plebiscito, cada urna emprestada de outro estado em ano de pleito difícil. Dizem que basta tocar uma ata antiga pra saber em qual seção foi escrita — e ninguém ainda o pegou em erro. Quando o passado precisa ser consultado, é nele que se busca.',
         ],
         'ilis' => [
             'emoji' => '🧘🏽‍♂️',
@@ -161,7 +161,7 @@ return [
             'classe' => 'Sussurrador de CMS',
             'habilidade' => 'Sussurrador de CMS — domestica qualquer sistema legado sem perder o tom calmo. +3 em paciência diante de tecnologia descontinuada.',
             'flavor' => 'Calma. Vai funcionar. Só precisa de paciência.',
-            'historia' => 'A paciência em pessoa. Insistiu em ensinar Plone, mesmo quando o aprendiz claramente preferia outras coisas. Hoje, sempre que o CMS precisa de uma mão, é a primeira referência. Aprender com quem domina vale mais do que gostar.',
+            'historia' => 'O Ilíseo catalogou, durante três pleitos seguidos, todos os boletins de urna de uma comarca inteira do interior — sem perder uma classificação sequer. Calmo, paciente, jamais se exaltou nem com prazo curto nem com sistema travado. Hoje, quando alguma ferramenta antiga reclama, basta ele chegar perto que volta a funcionar.',
         ],
         'felipe' => [
             'emoji' => '🙆🏿‍♂️',
@@ -171,7 +171,7 @@ return [
             'classe' => 'Resolvedor Tranquilo',
             'habilidade' => 'Águas Calmas — reduz o pânico do time em 50% durante incidentes. Bugs resolvidos sob sua liderança não voltam estressados.',
             'flavor' => 'Respira. A gente resolve.',
-            'historia' => 'Da nova geração da STI, parceiro do AGRECOM. Resolve os problemas na tranquilidade — quando o resto do time tá em pânico, ele tá no mesmo bug, com o mesmo café, no mesmo tom. E sempre sai do incêndio com algo entregue.',
+            'historia' => 'O Felippo acompanhou a apuração mais tensa do interior em 2008, quando uma chuva forte derrubou o gerador e quatro urnas pararam de uma vez. Enquanto todos corriam, ele apenas reorganizou os fios e religou tudo, no mesmo tom de voz do começo do dia. Desde então, "respira, a gente resolve" virou bordão de plenário em pleito complicado.',
         ],
         'thallys' => [
             'emoji' => '🕵️‍♂️',
@@ -181,7 +181,7 @@ return [
             'classe' => 'Mestre da Análise',
             'habilidade' => 'Estudo Profundo — dedica três turnos à análise antes de codar. Entregas suas levam 90% menos refator no PR.',
             'flavor' => 'Mede duas vezes, corta uma.',
-            'historia' => 'Geração nova do AGRECOM, mas estuda como veterano. Antes da primeira linha, mapeia o problema inteiro — caminhos, atalhos, armadilhas. Quando finalmente codifica, o código sai como se já existisse antes.',
+            'historia' => 'Antes de qualquer pleito, o Thallion mapeia rota das urnas, horário das mesas e até a previsão do clima do dia. Ninguém o vê apressado — porque já planejou tudo dois meses antes. Reza a lenda que, num pleito de 2010, previu com três semanas de antecedência qual seção precisaria de mesário reserva. Acertou.',
         ],
         'jonatan' => [
             'emoji' => '🧑‍🚒',
@@ -191,7 +191,7 @@ return [
             'classe' => 'Guardião de Plantão',
             'habilidade' => 'Apaga Incêndio — detecta e neutraliza B.O.s de produção antes que o time perceba. Uptime sob sua guarda: 99,97%.',
             'flavor' => 'Tá no ar. Pode rodar.',
-            'historia' => 'Trabalha na infra e resolve B.O. Quando algo cai, ele já tá olhando o log — quase sempre antes de alguém abrir chamado. A produção segue de pé porque ele segue de plantão.',
+            'historia' => 'O Jonatão vigia em silêncio cada cabo, cada nobreak, cada link do tribunal. Quando algo está prestes a cair, ele já está com a peça de troca na mão. Conta-se que, durante uma apuração nacional, evitou três quedas seguidas sem que ninguém no plenário sequer percebesse. A urna chega no ar porque ele chegou primeiro.',
         ],
         'jair' => [
             'emoji' => '🧑‍🔬',
@@ -201,7 +201,7 @@ return [
             'classe' => 'Sênior dos Dados',
             'habilidade' => 'Pipeline Limpo — extrai padrão de qualquer dataset caótico. Relatórios sob sua orientação nascem auditáveis.',
             'flavor' => 'Dado sujo conta meia história. A outra metade é onde mora a verdade.',
-            'historia' => 'O mais sênior do quarteto AGRECOM, atua na área de dados — mestre absoluto em Python, transforma scripts soltos em pipelines elegantes. Trata o dado com o mesmo rigor que um juiz trata a prova: nunca aceita um número sem entender de onde veio. Por isso, todo relatório que passa por ele sai auditável.',
+            'historia' => 'O Jairón recolhe os dados de cada apuração e os organiza em arquivos auditáveis até o último voto. Trata cada número como prova judicial: não aceita um valor sem saber de onde veio. Conta-se que reconstruiu, numa única madrugada, o histórico inteiro de uma zona cujos arquivos haviam se perdido — e cada linha bateu certinho com a ata original.',
         ],
         'lucas' => [
             'emoji' => '🧙‍♂️',
@@ -211,7 +211,7 @@ return [
             'classe' => 'Bardo-Mago',
             'habilidade' => 'Solo de Guitarra — invoca soluções fora do manual. Uma vez por dia, pode trocar uma reunião por um commit que resolve o ticket.',
             'flavor' => 'Se não funciona com regra, funciona com riff.',
-            'historia' => 'Estagiário da SDBD, autor do Bena. Vive entre Laravel, Docker e linha de comando — gosta de TDD, refactor pequeno e código que fala português. A guitarra fica pras horas vagas, mas o improviso vem dela: quando a regra não cabe, encontra um caminho que cabe. Forjou esta carta e este sistema como agradecimento em código.',
+            'historia' => 'Estagiário ainda aprendendo as manhas da casa. Quando um sistema trava num momento ruim, vai testando caminhos até achar um que passe — nem sempre o do manual, mas um que serve. Anota o atalho num caderno pra não esquecer e pra quem vier depois aproveitar.',
         ],
     ],
 
@@ -942,11 +942,65 @@ return [
         ],
 
         // ─── Frases das cartas lendárias (STI) ───────────────────────────
-        // Por enquanto só genérica + boas-vindas; o BuddyService cai pra
-        // genérica quando não encontra o par dia/status. Frases do dia
-        // podem ser preenchidas depois sem mudar o serviço.
+        // Mesmo padrão dos animais: 5 dias × 3 status, mais genérica e
+        // boas-vindas. Cada personagem com voz própria.
 
         'edcley' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Segunda. Nova semana, nova bancada. Bata o ponto e bora forjar. 👨‍🔧',
+                ],
+                'em_andamento' => [
+                    'Em construção. Cada linha é um lacre — feita do zero, sem peça pronta.',
+                ],
+                'concluido' => [
+                    'Forjado e entregue. Mais uma segunda lacrada.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Plugin de terceiro é dívida. Bata o ponto e siga firme.',
+                ],
+                'em_andamento' => [
+                    'Engenheiro não promete: entrega rodando. Continue.',
+                ],
+                'concluido' => [
+                    'Dia encerrado em produção. A bancada agradece.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Bom momento pra revisar a têmpera do código. Bata o ponto.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Tudo construído à mão, nada importado.',
+                ],
+                'concluido' => [
+                    'Quarta lacrada. Próxima começa onde essa parou.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. A reta final exige a mesma raiz do começo.',
+                ],
+                'em_andamento' => [
+                    'Em forja. Não tem atalho que substitua trabalho honesto.',
+                ],
+                'concluido' => [
+                    'Encerrada com solidez, como urna lacrada.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Hora de fechar a semana com o mesmo cuidado da segunda.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Ferro quente bate até o fim do expediente.',
+                ],
+                'concluido' => [
+                    'Sexta lacrada. Bom descanso — a bancada espera segunda.',
+                ],
+            ],
             'generica' => [
                 'Construa do zero. Plugin é dívida. 👨‍🔧',
                 'Engenheiro não promete: entrega rodando.',
@@ -957,6 +1011,61 @@ return [
         ],
 
         'lucir' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Segunda. Tive uma fórmula no domingo. Bata o ponto e te conto. 🧙',
+                ],
+                'em_andamento' => [
+                    'Em destilação. Toda boa apuração começa numa ideia que parecia maluca.',
+                ],
+                'concluido' => [
+                    'Segunda transmutada. A semana inteira respira a poção certa.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Hoje ouso uma combinação inédita — você comigo?',
+                ],
+                'em_andamento' => [
+                    'Tô misturando, tô vendo, tô convergindo. Continua aí.',
+                ],
+                'concluido' => [
+                    'Encerrada. O experimento deu certo (de novo, pra surpresa de ninguém).',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Hora boa pra um plano absurdo virar plano real.',
+                ],
+                'em_andamento' => [
+                    'Em pleno transbordo criativo. Calma, vai dar liga.',
+                ],
+                'concluido' => [
+                    'Quarta lacrada com riso e ata. Bom descanso.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Acho que descobri um atalho que ninguém viu.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Loucura é não tentar — e a urna não vota sozinha.',
+                ],
+                'concluido' => [
+                    'Encerrada. O improvável virou regra. Anota aí.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Que tal terminar a semana com um experimento ousado?',
+                ],
+                'em_andamento' => [
+                    'Última destilação. Vai sair coisa boa.',
+                ],
+                'concluido' => [
+                    'Sextou alquímico. Final de semana é pausa pra fermentar a próxima ideia.',
+                ],
+            ],
             'generica' => [
                 'Tive uma ideia. Pode parecer maluca. Vai funcionar. 🧙',
                 'Louco é quem não tenta.',
@@ -967,6 +1076,61 @@ return [
         ],
 
         'keith' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Bom dia. Antes de qualquer linha, vamos ouvir a casa. Bata o ponto. 👨‍🏫',
+                ],
+                'em_andamento' => [
+                    'Em pareamento. Requisito mal entendido vira código jogado fora.',
+                ],
+                'concluido' => [
+                    'Encerrada. Ata clara, rumo claro.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Hoje sentamos na ponta da mesa e escutamos o juiz.',
+                ],
+                'em_andamento' => [
+                    'Em diálogo. A diplomacia também fecha boletins.',
+                ],
+                'concluido' => [
+                    'Bom dia. Mais um requisito traduzido.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Hora de validar entendimento com quem usa o sistema.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Quatro mãos enxergam o que duas não veem.',
+                ],
+                'concluido' => [
+                    'Encerrada. Ata anotada, próximo encontro marcado.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Reta final exige alinhamento — bata o ponto.',
+                ],
+                'em_andamento' => [
+                    'Em sintonia. Hoje não se decide nada sem ouvir mesário e juiz.',
+                ],
+                'concluido' => [
+                    'Bom dia. Quinta encerrada com o domínio entendido.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Termine como começou: ouvindo antes de codar.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Diplomacia também fecha pleito.',
+                ],
+                'concluido' => [
+                    'Semana encerrada. Próxima segunda, novo requisito.',
+                ],
+            ],
             'generica' => [
                 'Antes da primeira linha, escute a casa inteira. 👨‍🏫',
                 'Requisito mal entendido vira código jogado fora.',
@@ -977,6 +1141,61 @@ return [
         ],
 
         'bortoli' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Segunda. Lembro de uma muito parecida em 1998 — bata o ponto, conto depois. 👴',
+                ],
+                'em_andamento' => [
+                    'Em curso. Já vi essa novela: termina bem se seguir o regimento.',
+                ],
+                'concluido' => [
+                    'Encerrada. Mais uma segunda pro arquivo.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Em 2004 teve uma terça assim — chuva, urna, ata atrasada. Bata o ponto.',
+                ],
+                'em_andamento' => [
+                    'Tô lembrando: é igualzinho ao pleito municipal. Vai dar certo.',
+                ],
+                'concluido' => [
+                    'Boa terça. Anotada na coleção.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Toda quarta tem um pouco da quarta anterior. Como toda eleição.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Quem não esquece, não repete erro.',
+                ],
+                'concluido' => [
+                    'Encerrada. O acervo cresceu mais uma página.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Em 2010 já tínhamos resolvido isso — pergunta antes de duplicar.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Pelo menos três presidentes do tribunal já viram esse caso.',
+                ],
+                'concluido' => [
+                    'Bom dia. Mais um capítulo lacrado.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Termine bem — o passado julga o presente, sempre.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Eu já vi sextas se desfazerem por descuido. Cuide da sua.',
+                ],
+                'concluido' => [
+                    'Semana arquivada. Boa pousada — segunda de novo no acervo.',
+                ],
+            ],
             'generica' => [
                 'Isso aqui já tentamos. Deixa eu te contar como foi. 👴',
                 'Quem não esquece, não repete erro.',
@@ -987,6 +1206,61 @@ return [
         ],
 
         'ilis' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Segunda chegou. Calma. Bata o ponto sem afobação. 🧘🏽‍♂️',
+                ],
+                'em_andamento' => [
+                    'Sem pressa. Boletim por boletim, ata por ata.',
+                ],
+                'concluido' => [
+                    'Encerrada. Paciência hoje é descanso amanhã.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Tudo no seu tempo — inclusive o sistema antigo.',
+                ],
+                'em_andamento' => [
+                    'Em curso, com calma. Cada coisa no seu lugar.',
+                ],
+                'concluido' => [
+                    'Dia cumprido. Sereno, como sempre.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Respira fundo e bata o ponto.',
+                ],
+                'em_andamento' => [
+                    'Tô aqui. Sem alvoroço. A apuração também não tem.',
+                ],
+                'concluido' => [
+                    'Encerrada. Mais uma quarta classificada.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Quem domina a ferramenta não tem pressa.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Calma é só uma forma de competência.',
+                ],
+                'concluido' => [
+                    'Bom dia. Quinta sem turbulência.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. O fim da semana pede a mesma calma do começo.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Vai funcionar — só precisa de paciência.',
+                ],
+                'concluido' => [
+                    'Sextou em paz. Bom descanso.',
+                ],
+            ],
             'generica' => [
                 'Calma. Vai funcionar. Só precisa de paciência. 🧘🏽‍♂️',
                 'Aprender com quem domina vale mais que gostar.',
@@ -997,6 +1271,61 @@ return [
         ],
 
         'felipe' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Bom dia. Segunda é só segunda. Respira, bata o ponto, a gente resolve. 🙆🏿‍♂️',
+                ],
+                'em_andamento' => [
+                    'Em curso. Pânico não compila. Calma sim.',
+                ],
+                'concluido' => [
+                    'Encerrada sem pressa, sem drama.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Hoje fica tudo no seu lugar — eu garanto.',
+                ],
+                'em_andamento' => [
+                    'Tô no mesmo bug, mesmo café, mesmo tom. A gente resolve.',
+                ],
+                'concluido' => [
+                    'Boa terça. Saiu redondinho.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Bata o ponto e relaxa — não tem incêndio que dure até sexta.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Sereno como gerador estável.',
+                ],
+                'concluido' => [
+                    'Quarta encerrada sem sobressalto.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Quase sexta. E mesmo se a chuva cair, religamos os fios.',
+                ],
+                'em_andamento' => [
+                    'Tô aqui. Todo gerador tem horário de descanso — você também.',
+                ],
+                'concluido' => [
+                    'Encerrada. Mais um dia sem virar incêndio.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Termine no mesmo tom do começo — não tem porque acelerar.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Respira, a gente resolve, e fim de semana chega.',
+                ],
+                'concluido' => [
+                    'Sextou. Tudo certo, tudo no lugar.',
+                ],
+            ],
             'generica' => [
                 'Respira. A gente resolve. 🙆🏿‍♂️',
                 'Pânico não compila. Calma sim.',
@@ -1007,6 +1336,61 @@ return [
         ],
 
         'thallys' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Segunda. Eu já tinha mapeado essa semana semana passada. Bata o ponto. 🕵️‍♂️',
+                ],
+                'em_andamento' => [
+                    'Em curso. Cada movimento foi previsto há duas semanas.',
+                ],
+                'concluido' => [
+                    'Encerrada conforme cronograma. Próxima jogada já desenhada.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Estudei o problema todo no fim de semana — sem surpresa hoje.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Mede duas vezes, corta uma. Tô medindo.',
+                ],
+                'concluido' => [
+                    'Bom dia. Saiu como o esquema previa.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Eu mapeei essa quarta quando você ainda nem tinha pensado nela.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Plano A funcionou. Plano B já tava pronto, só por precaução.',
+                ],
+                'concluido' => [
+                    'Quarta encerrada. Anotado no quadro.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Reta final — planejada com três semanas de antecedência.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Prever é também economizar reunião.',
+                ],
+                'concluido' => [
+                    'Bom dia. Quinta lacrada. Sexta já está no roteiro.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Antecipei até o cansaço dela — bata o ponto e tudo flui.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. O plano da próxima semana já está pronto.',
+                ],
+                'concluido' => [
+                    'Sextou conforme cronograma. Bom descanso.',
+                ],
+            ],
             'generica' => [
                 'Mede duas vezes, corta uma. 🕵️‍♂️',
                 'Antes de codar, entender. Sempre.',
@@ -1017,6 +1401,61 @@ return [
         ],
 
         'jonatan' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Salve. Segunda começou — link ok, banco ok, nobreak ok. Pode bater o ponto. 🧑‍🚒',
+                ],
+                'em_andamento' => [
+                    'Tô vendo o log. Nada cai enquanto eu tô aqui.',
+                ],
+                'concluido' => [
+                    'Segunda encerrada com uptime 100%.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Já checkei tudo de manhã. Tá redondo. Bata o ponto.',
+                ],
+                'em_andamento' => [
+                    'Em pleno plantão. Se quebrar, eu vejo. Se não quebrar, eu vejo também.',
+                ],
+                'concluido' => [
+                    'Bom dia. Terça sem chamado, terça boa.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Meio do log — tá tranquilo.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Peça de troca já tá na bancada.',
+                ],
+                'concluido' => [
+                    'Quarta lacrada com produção de pé.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Já antecipei o B.O. dessa quinta. Pode bater o ponto.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Nobreak segura, link segura, eu seguro o resto.',
+                ],
+                'concluido' => [
+                    'Bom dia. Mais uma quinta sem que ninguém percebesse.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Hoje ainda fico no plantão até o fim do expediente.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Final de semana sem cair, é compromisso.',
+                ],
+                'concluido' => [
+                    'Sextou. Tá no ar. Pode rodar.',
+                ],
+            ],
             'generica' => [
                 'Tá no ar. Pode rodar. 🧑‍🚒',
                 'Se quebrou, eu vejo. Se não quebrou, eu vejo também.',
@@ -1027,6 +1466,61 @@ return [
         ],
 
         'jair' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Segunda. Bata o ponto — registro limpo facilita a auditoria. 🧑‍🔬',
+                ],
+                'em_andamento' => [
+                    'Em curso. Cada linha conta — não confunda total com média.',
+                ],
+                'concluido' => [
+                    'Encerrada. Registro fechado, dado limpo.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Antes de rodar relatório, valide a fonte.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Dado sujo conta meia história. Nunca aceito meio.',
+                ],
+                'concluido' => [
+                    'Boa terça. Pipeline auditada, pronto pro próximo dia.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Hora boa pra rodar consistência.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Onde tem número, tem rastro. Eu sigo o rastro.',
+                ],
+                'concluido' => [
+                    'Quarta lacrada. Tudo bate com a ata.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Reta final — confira o cabeçalho antes do total.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Relatório bom é o que aguenta auditoria.',
+                ],
+                'concluido' => [
+                    'Bom dia. Quinta encerrada, dado certo.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Não fecha o pleito sem reconciliar a planilha. Bata o ponto.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Pipeline limpo é pleito tranquilo.',
+                ],
+                'concluido' => [
+                    'Sextou. Bom descanso — segunda tem dado novo pra apurar.',
+                ],
+            ],
             'generica' => [
                 'Dado sujo conta meia história. 🧑‍🔬',
                 'Relatório bom é o que aguenta auditoria.',
@@ -1037,6 +1531,61 @@ return [
         ],
 
         'lucas' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'E aí. Segunda começa com o terminal aberto. Bata o ponto. 🧙‍♂️',
+                ],
+                'em_andamento' => [
+                    'Em curso. Quando o manual falha, o terminal resolve.',
+                ],
+                'concluido' => [
+                    'Segunda encerrada. Improviso anotado pro próximo pleito.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Hoje a regra trava, mas a gente acha um caminho.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Se não funciona com regra, funciona com riff.',
+                ],
+                'concluido' => [
+                    'Terça encerrada. Foi de improviso, mas funcionou.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Hora boa pra refator improvisado virar arquitetura.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Stack: Laravel, Docker e improviso.',
+                ],
+                'concluido' => [
+                    'Quarta encerrada. Bug resolvido sem manual.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Reta final do pleito — improviso afinado é solo de quinta.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Quem improvisa não erra: ajusta no próximo compasso.',
+                ],
+                'concluido' => [
+                    'Bom dia. Quinta lacrada à mão.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Termina a semana no improviso — e na próxima, vira regra.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Riff final.',
+                ],
+                'concluido' => [
+                    'Sextou. Próximo pleito tem improviso garantido.',
+                ],
+            ],
             'generica' => [
                 'Stack: Laravel, Docker e improviso. 🧙‍♂️',
                 'Quando o manual falha, o terminal resolve.',
