@@ -308,15 +308,30 @@ class EstagiarioEdicaoTest extends TestCase
             ->assertSessionHasErrors(['horas_diarias']);
     }
 
-    public function test_validacao_horas_diarias_max_24(): void
+    public function test_validacao_horas_diarias_acima_de_8_e_rejeitada(): void
+    {
+        // Lei 11.788, art. 10, III — jornada máxima 8h/dia.
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'horas_diarias' => '8.5',
+            ])
+            ->assertSessionHasErrors(['horas_diarias']);
+    }
+
+    public function test_validacao_horas_diarias_aceita_8_horas_exatas(): void
     {
         $alvo = Estagiario::factory()->create();
 
         $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
-                'horas_diarias' => '25',
+                'inicio_estagio' => '2026-04-01',
+                'fim_estagio' => '2026-09-30',
+                'horas_diarias' => '8',
+                'ativo' => '1',
             ])
-            ->assertSessionHasErrors(['horas_diarias']);
+            ->assertSessionDoesntHaveErrors(['horas_diarias']);
     }
 
     public function test_validacao_fim_estagio_posterior_a_inicio(): void
@@ -330,6 +345,34 @@ class EstagiarioEdicaoTest extends TestCase
                 'horas_diarias' => '5',
             ])
             ->assertSessionHasErrors(['fim_estagio']);
+    }
+
+    public function test_validacao_duracao_maxima_de_2_anos(): void
+    {
+        // Lei 11.788, art. 11 — duração máxima 2 anos na mesma parte concedente.
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'inicio_estagio' => '2026-01-01',
+                'fim_estagio' => '2028-01-02', // 2 anos + 1 dia
+                'horas_diarias' => '5',
+            ])
+            ->assertSessionHasErrors(['fim_estagio']);
+    }
+
+    public function test_validacao_duracao_exatamente_2_anos_e_aceita(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'inicio_estagio' => '2026-01-01',
+                'fim_estagio' => '2028-01-01',
+                'horas_diarias' => '5',
+                'ativo' => '1',
+            ])
+            ->assertSessionDoesntHaveErrors(['fim_estagio']);
     }
 
     public function test_estagiario_comum_em_put_de_update_recebe_403(): void

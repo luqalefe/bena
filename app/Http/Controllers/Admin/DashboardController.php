@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Estagiario;
+use App\Services\ConformidadeService;
 use App\Services\DashboardAdminService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
@@ -13,7 +14,10 @@ use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __construct(private readonly DashboardAdminService $service) {}
+    public function __construct(
+        private readonly DashboardAdminService $service,
+        private readonly ConformidadeService $conformidade,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -22,8 +26,10 @@ class DashboardController extends Controller
         $mes = (int) $request->query('mes', (string) $hoje->month);
         $lotacao = $request->query('lotacao');
         $apenasLiberadas = $request->boolean('liberadas');
+        $alerta = $request->query('alerta');
+        $alerta = is_string($alerta) && $alerta !== '' ? $alerta : null;
 
-        $linhas = $this->service->montar($ano, $mes, $lotacao, $apenasLiberadas);
+        $linhas = $this->service->montar($ano, $mes, $lotacao, $apenasLiberadas, $alerta);
 
         $lotacoes = Estagiario::query()
             ->where('ativo', true)
@@ -39,6 +45,8 @@ class DashboardController extends Controller
             'ano' => $ano,
             'mes' => $mes,
             'apenasLiberadas' => $apenasLiberadas,
+            'alerta' => $alerta,
+            'descricaoAlerta' => fn (string $codigo) => $this->conformidade->descricao($codigo),
             'mesAnoExtenso' => CarbonImmutable::create($ano, $mes, 1)->translatedFormat('F / Y'),
         ]);
     }

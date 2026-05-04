@@ -9,6 +9,7 @@
         'sabado' => 'background: #f3f4f6;',
         'domingo' => 'background: #f3f4f6;',
         'feriado' => 'background: #fef9c3;',
+        'recesso' => 'background: #e0f2fe;',
     ];
 @endphp
 
@@ -177,6 +178,12 @@
                         <td colspan="3" style="padding: 0.5rem; color: var(--color-secondary-07);">—</td>
                         <td style="padding: 0.5rem;">
                             <span class="badge-tre-ac">{{ $rotuloFimDeSemana[$dia->tipo] }}</span>
+                        </td>
+                        <td style="padding: 0.5rem;">—</td>
+                    @elseif ($dia->tipo === 'recesso')
+                        <td colspan="3" style="padding: 0.5rem; font-style: italic; color: var(--color-secondary-07);">Recesso</td>
+                        <td style="padding: 0.5rem;">
+                            <span class="badge-tre-ac">recesso</span>
                         </td>
                         <td style="padding: 0.5rem;">—</td>
                     @else

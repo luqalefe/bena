@@ -54,6 +54,7 @@ Sistema de Controle de Frequência de Estagiários · v1.0
 | **4 — PDF e assinatura** | Saída no formato CIEE com assinatura | H11, H12, H13 |
 | **5 — Admin** | Dashboard e visão multi-estagiário | H14, H15, H16, H20 |
 | **6 — Polimento** | Auditoria, observações, edge cases | H17, H18, H19 |
+| **7 — Conformidade Lei 11.788** | Vigência do TCE, jornada, recesso, alertas | H24, H25, H26, H27 |
 
 Cada iteração = ~1 semana de trabalho. Histórias dentro da iteração podem
 ser feitas em qualquer ordem, respeitando dependências marcadas.
@@ -819,6 +820,168 @@ testes novos (6 Unit em `PontoServiceTest`, 3 Feature em
 
 ---
 
+# Iteração 7 — Conformidade Lei 11.788/2008
+
+Quatro histórias que fecham gaps de conformidade endereçáveis no código.
+Não cobrem o que é processo (TCE, seguro, supervisor pedagógico) — só o
+que o sistema pode validar/registrar.
+
+## H24 — Bloquear ponto fora da vigência do TCE
+
+> **Como** sistema,
+> **eu preciso** impedir que um estagiário bata ponto antes do início ou
+> depois do fim do TCE,
+> **para que** registros não sejam criados em período sem vínculo válido.
+
+**Critérios de aceitação:**
+
+1. `PontoService::baterEntrada` rejeita com `DomainException` quando
+   `today < estagiario.inicio_estagio`. Mensagem:
+   "Estágio ainda não começou (início em dd/mm/aaaa)."
+2. `PontoService::baterEntrada` rejeita com `DomainException` quando
+   `today > estagiario.fim_estagio`. Mensagem:
+   "Estágio encerrado em dd/mm/aaaa."
+3. `PontoService::baterSaida` aplica as **mesmas** validações (estagiário
+   pode ter inativado durante o expediente; saída fora da vigência também
+   é bloqueada).
+4. Se `inicio_estagio` ou `fim_estagio` for `null`, a validação **não
+   bloqueia** — o sistema continua permitindo bater. (Compatibilidade
+   com cadastros legados; o RH pode preencher depois.)
+5. Validação acontece **antes** das checagens de dia útil/feriado, mas
+   **depois** de `garantirAtivo` (estagiário inativo continua tendo
+   prioridade na mensagem de erro).
+
+**Status:** ✅ Done — `PontoService::garantirVigencia` aplicado em
+`baterEntrada` e `baterSaida`. 7 testes Unit novos em `PontoServiceTest`
+cobrindo: bloqueio antes do início, bloqueio após o fim (entrada e
+saída), aceite no primeiro/último dia, datas nulas permitem ponto,
+prioridade do `inativo` sobre `vigencia`. **Depende de:** H2, H3, H16
+
+---
+
+## H25 — Validar dados administrativos contra Lei 11.788
+
+> **Como** admin/RH,
+> **eu quero** que o formulário de edição do estagiário rejeite valores
+> incompatíveis com a Lei 11.788,
+> **para que** eu não cadastre um estágio inválido (jornada acima de
+> 8h, duração maior que 2 anos, datas invertidas).
+
+**Critérios de aceitação:**
+
+1. `EstagiarioController::update` valida `horas_diarias` entre 1 e 8
+   (limite máximo da lei, art. 10, III).
+2. Valida `fim_estagio > inicio_estagio` quando ambos preenchidos.
+3. Valida `fim_estagio - inicio_estagio ≤ 2 anos` (art. 11).
+   Mensagem: "Duração máxima do estágio é 2 anos (Lei 11.788, art. 11)."
+4. Mensagens de erro usam o padrão Laravel (`@error` blade) e aparecem
+   junto ao campo correspondente.
+5. Validações ficam num `FormRequest` próprio
+   (`UpdateEstagiarioRequest`), não inline no controller.
+
+**Status:** ✅ Done — `app/Http/Requests/Admin/UpdateEstagiarioRequest.php`
+com `horas_diarias.max=8`, regra customizada de duração ≤ 2 anos
+(closure que compara `inicio.addYears(2)` com `fim`), e mensagens
+citando os artigos da Lei 11.788. Controller `EstagiarioController::update`
+refatorado para receber o FormRequest. 4 testes Feature novos em
+`EstagiarioEdicaoTest` (acima de 8h rejeita; 8h exato aceita; 2 anos +
+1 dia rejeita; 2 anos exato aceita). **Depende de:** H16
+
+---
+
+## H26 — Recesso anual do estagiário
+
+> **Como** RH,
+> **eu quero** registrar os recessos remunerados de cada estagiário,
+> **para que** o sistema bloqueie ponto durante o período e a folha
+> mensal classifique esses dias corretamente (art. 13 da Lei 11.788).
+
+**Critérios de aceitação:**
+
+1. Tabela nova `recessos_estagiario` com colunas: `id`, `estagiario_id`,
+   `inicio` (date), `fim` (date), `observacao` (string nullable, 255),
+   timestamps. Índice composto `(estagiario_id, inicio, fim)`.
+2. Modelo `RecessoEstagiario` com relação `belongsTo(Estagiario)`.
+3. CRUD em `/admin/estagiarios/{id}/recessos`:
+   - Listagem dos recessos do estagiário, ordenados por `inicio` desc.
+   - Formulário de criação com `inicio`, `fim`, `observacao`.
+   - Botão de remover. Edição não é necessária (basta deletar e recriar).
+4. Validações:
+   - `fim >= inicio`.
+   - Não pode haver sobreposição com recesso já existente do mesmo
+     estagiário. Mensagem: "Período se sobrepõe a outro recesso já
+     cadastrado."
+5. `PontoService::baterEntrada` e `baterSaida` rejeitam com
+   `DomainException` quando `today` está dentro de algum recesso ativo
+   do estagiário. Mensagem: "Em recesso até dd/mm/aaaa."
+6. Folha mensal (`FolhaMensalService`): dias dentro de um recesso são
+   classificados como tipo `recesso` (mesmo enum já usado para feriados
+   tipo recesso); não somam horas; aparecem com a label "Recesso" na
+   tabela e no PDF.
+7. Acesso restrito: apenas `admin` pode criar/remover recessos.
+   Supervisor e estagiário recebem 403 nessas rotas.
+
+**Status:** ✅ Done — Migration `create_recessos_estagiario_table` + modelo
+`RecessoEstagiario` com factory. CRUD em
+`app/Http/Controllers/Admin/RecessoEstagiarioController.php` (index/store/
+destroy) + `StoreRecessoEstagiarioRequest` com validação de
+sobreposição (closure que checa `inicio <= novo_fim AND fim >= novo_inicio`).
+Rotas registradas e nomes adicionados a `$adminOnlyRouteNames` em
+`ConfigureUserSession`. `PontoService::garantirNaoEmRecesso` bloqueia
+entrada/saída durante recesso. `FolhaMensalService::montar` carrega
+recessos do mês e classifica dias como tipo `recesso` (feriado tem
+prioridade; recesso supera dia útil). View `admin/recessos/index.blade.php`
+com formulário de cadastro e tabela de listagem; link "Gerenciar
+recessos" no formulário de edição do estagiário. Folha mensal e PDF
+mostram dias em recesso com badge/cor próprios. **15 testes novos** (5
+Unit em `PontoServiceTest`, 4 Unit em `FolhaMensalServiceTest`, 10
+Feature em `RecessoEstagiarioTest`). **Depende de:** H5, H14, H16
+
+---
+
+## H27 — Alertas de conformidade no dashboard admin
+
+> **Como** RH,
+> **eu quero** ver no `/admin` quais estagiários precisam de atenção
+> (TCE prestes a vencer, recesso pendente, jornada estourando),
+> **para que** eu aja antes da auditoria do CIEE/MTE.
+
+**Critérios de aceitação:**
+
+1. Dashboard admin (`/admin`) mostra coluna ou badge "Alertas" por
+   linha. Ícone neutro quando vazio; ícone de aviso quando há alerta.
+2. Tipos de alerta detectados:
+   - **TCE vencendo**: `fim_estagio - hoje ≤ 30 dias` e `fim_estagio >= hoje`.
+   - **Sem recesso há 12+ meses**: estagiário com
+     `inicio_estagio ≤ hoje - 12 meses` e nenhum `RecessoEstagiario`
+     registrado nos últimos 12 meses.
+   - **Jornada semanal acima do limite**: soma de `horas` na semana
+     corrente (segunda a domingo) > `horas_diarias * 5` para o
+     estagiário. (Limite operacional; assume 5 dias/semana.)
+3. Cada alerta tem código (`tce_vencendo`, `sem_recesso`,
+   `jornada_excedida`) e descrição amigável exibida em tooltip.
+4. Cálculo dos alertas fica num service novo
+   (`ConformidadeService`), não no `DashboardAdminService` (separação
+   de responsabilidades).
+5. Filtro `?alerta=tce_vencendo` (ou outros códigos) lista só linhas
+   com aquele alerta. Combinável com filtros existentes (`?liberadas=1`).
+6. Estagiário inativo não dispara alertas (já não aparece no dashboard
+   por H14).
+
+**Status:** ✅ Done — `app/Services/ConformidadeService.php` com
+`alertasParaEstagiario(Estagiario, ?CarbonImmutable)` retornando códigos
+`tce_vencendo`, `sem_recesso`, `jornada_excedida`, e
+`descricao(string $codigo)` com tooltips amigáveis. `DashboardAdminLinha`
+ganhou campo `alertas` (list de códigos). `DashboardAdminService`
+recebe o serviço por DI, chama por estagiário, aplica filtro `?alerta=`.
+Dashboard view (`admin/dashboard.blade.php`) renderiza badges com
+tooltip e adiciona seletor de filtro por alerta. Estagiário inativo é
+naturalmente filtrado pelo `where('ativo', true)` existente.
+**16 testes novos** (13 Unit em `ConformidadeServiceTest`, 3 Feature em
+`DashboardAdminTest`). **Depende de:** H14, H16, H26
+
+---
+
 # Requisitos não-funcionais
 
 ## Segurança
@@ -914,3 +1077,5 @@ testes novos (6 Unit em `PontoServiceTest`, 3 Feature em
 | 2026-04-30 | Documento inicial, 19 histórias em 6 iterações |
 | 2026-04-30 | Adicionada Iteração 0 (fundação Docker) com H0.1–H0.4; novos NF22–NF33 sobre infraestrutura Docker; renumeração de NF15+ |
 | 2026-05-01 | Refinado modelo de atores: Supervisor vira grupo Authelia separado (`supervisores`) com amarração 1↔N (`Estagiario.supervisor_username`); RH/Admin assume papel de baixar PDF para SEI. H13 ganha checagem de "supervisor responsável". H14/H15 incluem regras pra supervisor. H16 ganha contrato PDF e `supervisor_username`. Nova história H20 (RH anexa PDF no SEI). |
+| 2026-05-03 | Iteração 7 — Conformidade Lei 11.788. Quatro histórias novas: H24 (vigência do TCE), H25 (validação administrativa), H26 (recesso anual), H27 (alertas no dashboard admin). Cobre gaps endereçáveis no código frente à Lei 11.788/2008. |
+| 2026-05-03 | Sprint 7 fechada: H24, H25, H26, H27 todas em ✅ Done. 328 testes (38 novos cobrindo as quatro histórias). |

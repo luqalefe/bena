@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AuditoriaController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EstagiarioController;
 use App\Http\Controllers\Admin\FeriadoController;
+use App\Http\Controllers\Admin\RecessoEstagiarioController;
 use App\Http\Controllers\AssinaturaController;
 use App\Http\Controllers\CalendarioAnualController;
 use App\Http\Controllers\DashboardController;
@@ -74,6 +75,10 @@ Route::middleware('configure.session')->group(function () {
         Route::get('/estagiarios', [EstagiarioController::class, 'index'])->name('estagiarios.index');
         Route::get('/estagiarios/{estagiario}/editar', [EstagiarioController::class, 'edit'])->name('estagiarios.edit');
         Route::put('/estagiarios/{estagiario}', [EstagiarioController::class, 'update'])->name('estagiarios.update');
+
+        Route::get('/estagiarios/{estagiario}/recessos', [RecessoEstagiarioController::class, 'index'])->name('estagiarios.recessos.index');
+        Route::post('/estagiarios/{estagiario}/recessos', [RecessoEstagiarioController::class, 'store'])->name('estagiarios.recessos.store');
+        Route::delete('/estagiarios/{estagiario}/recessos/{recesso}', [RecessoEstagiarioController::class, 'destroy'])->name('estagiarios.recessos.destroy');
 
         Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
     });

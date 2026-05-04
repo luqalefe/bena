@@ -179,6 +179,66 @@ class DashboardAdminTest extends TestCase
         $response->assertSeeInOrder(['estagiário', '✓', 'supervisor', '✗'], false);
     }
 
+    public function test_dashboard_mostra_alerta_tce_vencendo(): void
+    {
+        Carbon::setTestNow('2026-05-15 10:00:00');
+
+        Estagiario::factory()->create([
+            'username' => 'tce.proximo',
+            'nome' => 'TCE Proximo',
+            'inicio_estagio' => '2025-06-01',
+            'fim_estagio' => '2026-05-25', // 10 dias
+        ]);
+
+        $response = $this->withHeaders($this->adminHeaders())->get('/admin');
+
+        $response->assertSee('TCE Proximo');
+        $response->assertSee('TCE vence em até 30 dias.', false);
+    }
+
+    public function test_dashboard_filtra_por_alerta_tce_vencendo(): void
+    {
+        Carbon::setTestNow('2026-05-15 10:00:00');
+
+        Estagiario::factory()->create([
+            'username' => 'tce.proximo',
+            'nome' => 'TCE Proximo',
+            'inicio_estagio' => '2025-06-01',
+            'fim_estagio' => '2026-05-25',
+        ]);
+        Estagiario::factory()->create([
+            'username' => 'tce.tranquilo',
+            'nome' => 'TCE Tranquilo',
+            'inicio_estagio' => '2026-01-01',
+            'fim_estagio' => '2027-12-31',
+        ]);
+
+        $response = $this->withHeaders($this->adminHeaders())
+            ->get('/admin?alerta=tce_vencendo');
+
+        $response->assertSee('TCE Proximo');
+        $response->assertDontSee('TCE Tranquilo');
+    }
+
+    public function test_dashboard_estagiario_sem_alertas_nao_mostra_badge(): void
+    {
+        Carbon::setTestNow('2026-05-15 10:00:00');
+
+        Estagiario::factory()->create([
+            'username' => 'tudo.certo',
+            'nome' => 'Tudo Certo',
+            'inicio_estagio' => '2026-01-01',
+            'fim_estagio' => '2027-12-31',
+            'horas_diarias' => 5.00,
+        ]);
+
+        $response = $this->withHeaders($this->adminHeaders())->get('/admin');
+
+        $response->assertSee('Tudo Certo');
+        $response->assertDontSee('TCE vence em até 30 dias.', false);
+        $response->assertDontSee('Recesso anual pendente', false);
+    }
+
     public function test_dashboard_filtra_apenas_liberadas_para_rh(): void
     {
         Carbon::setTestNow('2026-05-15 10:00:00');

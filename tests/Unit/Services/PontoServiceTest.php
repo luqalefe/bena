@@ -7,6 +7,7 @@ namespace Tests\Unit\Services;
 use App\Models\Estagiario;
 use App\Models\Feriado;
 use App\Models\Frequencia;
+use App\Models\RecessoEstagiario;
 use App\Services\DashboardService;
 use App\Services\PontoService;
 use Carbon\Carbon;
@@ -230,6 +231,187 @@ class PontoServiceTest extends TestCase
         $this->expectExceptionMessageMatches('/Estágio inativo.*coordenação/');
 
         app(PontoService::class)->baterSaida($estagiario);
+    }
+
+    public function test_bater_entrada_antes_do_inicio_do_estagio_lanca_excecao(): void
+    {
+        Carbon::setTestNow('2026-05-04 10:00:00'); // segunda
+        $estagiario = Estagiario::factory()->create([
+            'inicio_estagio' => '2026-06-01',
+            'fim_estagio' => '2027-05-31',
+        ]);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessageMatches('/Estágio ainda não começou.*01\/06\/2026/');
+
+        app(PontoService::class)->baterEntrada($estagiario);
+    }
+
+    public function test_bater_entrada_depois_do_fim_do_estagio_lanca_excecao(): void
+    {
+        Carbon::setTestNow('2026-05-04 10:00:00');
+        $estagiario = Estagiario::factory()->create([
+            'inicio_estagio' => '2025-05-01',
+            'fim_estagio' => '2026-04-30',
+        ]);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessageMatches('/Estágio encerrado em 30\/04\/2026/');
+
+        app(PontoService::class)->baterEntrada($estagiario);
+    }
+
+    public function test_bater_entrada_no_primeiro_dia_do_estagio_e_permitido(): void
+    {
+        Carbon::setTestNow('2026-05-04 10:00:00');
+        $estagiario = Estagiario::factory()->create([
+            'inicio_estagio' => '2026-05-04',
+            'fim_estagio' => '2027-05-03',
+        ]);
+
+        $frequencia = app(PontoService::class)->baterEntrada($estagiario);
+
+        $this->assertSame('2026-05-04', $frequencia->data->format('Y-m-d'));
+    }
+
+    public function test_bater_entrada_no_ultimo_dia_do_estagio_e_permitido(): void
+    {
+        Carbon::setTestNow('2026-05-04 10:00:00');
+        $estagiario = Estagiario::factory()->create([
+            'inicio_estagio' => '2025-05-05',
+            'fim_estagio' => '2026-05-04',
+        ]);
+
+        $frequencia = app(PontoService::class)->baterEntrada($estagiario);
+
+        $this->assertSame('2026-05-04', $frequencia->data->format('Y-m-d'));
+    }
+
+    public function test_bater_entrada_sem_datas_de_vigencia_e_permitido(): void
+    {
+        Carbon::setTestNow('2026-05-04 10:00:00');
+        $estagiario = Estagiario::factory()->create([
+            'inicio_estagio' => null,
+            'fim_estagio' => null,
+        ]);
+
+        $frequencia = app(PontoService::class)->baterEntrada($estagiario);
+
+        $this->assertSame('2026-05-04', $frequencia->data->format('Y-m-d'));
+    }
+
+    public function test_bater_saida_apos_fim_do_estagio_lanca_excecao(): void
+    {
+        // Cenário: estagiário bate entrada num dia válido. Durante o
+        // expediente o RH altera fim_estagio para o dia anterior (ex:
+        // desligamento antecipado). Saída no mesmo dia deve ser bloqueada.
+        Carbon::setTestNow('2026-05-04 09:00:00');
+        $estagiario = Estagiario::factory()->create([
+            'inicio_estagio' => '2025-05-01',
+            'fim_estagio' => '2027-04-30',
+        ]);
+        app(PontoService::class)->baterEntrada($estagiario);
+
+        $estagiario->update(['fim_estagio' => '2026-05-03']);
+
+        Carbon::setTestNow('2026-05-04 14:00:00');
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessageMatches('/Estágio encerrado em 03\/05\/2026/');
+
+        app(PontoService::class)->baterSaida($estagiario);
+    }
+
+    public function test_bater_entrada_durante_recesso_lanca_excecao(): void
+    {
+        Carbon::setTestNow('2026-07-15 09:00:00'); // quarta
+        $estagiario = Estagiario::factory()->create();
+        RecessoEstagiario::factory()->create([
+            'estagiario_id' => $estagiario->id,
+            'inicio' => '2026-07-13',
+            'fim' => '2026-07-31',
+        ]);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessageMatches('/Em recesso até 31\/07\/2026/');
+
+        app(PontoService::class)->baterEntrada($estagiario);
+    }
+
+    public function test_bater_entrada_no_primeiro_dia_do_recesso_lanca_excecao(): void
+    {
+        Carbon::setTestNow('2026-07-13 09:00:00');
+        $estagiario = Estagiario::factory()->create();
+        RecessoEstagiario::factory()->create([
+            'estagiario_id' => $estagiario->id,
+            'inicio' => '2026-07-13',
+            'fim' => '2026-07-31',
+        ]);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessageMatches('/Em recesso/');
+
+        app(PontoService::class)->baterEntrada($estagiario);
+    }
+
+    public function test_bater_entrada_no_ultimo_dia_do_recesso_lanca_excecao(): void
+    {
+        Carbon::setTestNow('2026-07-31 09:00:00');
+        $estagiario = Estagiario::factory()->create();
+        RecessoEstagiario::factory()->create([
+            'estagiario_id' => $estagiario->id,
+            'inicio' => '2026-07-13',
+            'fim' => '2026-07-31',
+        ]);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessageMatches('/Em recesso/');
+
+        app(PontoService::class)->baterEntrada($estagiario);
+    }
+
+    public function test_bater_entrada_apos_recesso_e_permitido(): void
+    {
+        Carbon::setTestNow('2026-08-03 09:00:00'); // segunda
+        $estagiario = Estagiario::factory()->create();
+        RecessoEstagiario::factory()->create([
+            'estagiario_id' => $estagiario->id,
+            'inicio' => '2026-07-13',
+            'fim' => '2026-07-31',
+        ]);
+
+        $frequencia = app(PontoService::class)->baterEntrada($estagiario);
+
+        $this->assertSame('2026-08-03', $frequencia->data->format('Y-m-d'));
+    }
+
+    public function test_recesso_de_outro_estagiario_nao_bloqueia(): void
+    {
+        Carbon::setTestNow('2026-07-15 09:00:00');
+        $estagiario = Estagiario::factory()->create();
+        $outro = Estagiario::factory()->create();
+        RecessoEstagiario::factory()->create([
+            'estagiario_id' => $outro->id,
+            'inicio' => '2026-07-13',
+            'fim' => '2026-07-31',
+        ]);
+
+        $frequencia = app(PontoService::class)->baterEntrada($estagiario);
+
+        $this->assertNotNull($frequencia);
+    }
+
+    public function test_estagiario_inativo_tem_prioridade_sobre_vigencia(): void
+    {
+        Carbon::setTestNow('2026-05-04 10:00:00');
+        $estagiario = Estagiario::factory()->inativo()->create([
+            'inicio_estagio' => '2026-06-01',
+            'fim_estagio' => '2027-05-31',
+        ]);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessageMatches('/Estágio inativo/');
+
+        app(PontoService::class)->baterEntrada($estagiario);
     }
 
     public function test_bater_entrada_em_feriado_lanca_excecao(): void

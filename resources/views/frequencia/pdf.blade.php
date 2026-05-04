@@ -20,9 +20,10 @@
         table.dias { width: 100%; border-collapse: collapse; font-size: 9pt; }
         table.dias th, table.dias td { border: 1px solid #999; padding: 0.25rem 0.4rem; text-align: left; }
         table.dias th { background: #003366; color: #fff; }
-        table.dias tr.fds td, table.dias tr.feriado td { font-style: italic; color: #555; }
+        table.dias tr.fds td, table.dias tr.feriado td, table.dias tr.recesso td { font-style: italic; color: #555; }
         table.dias tr.fds { background: #f3f4f6; }
         table.dias tr.feriado { background: #fef9c3; }
+        table.dias tr.recesso { background: #e0f2fe; }
         .total { text-align: right; font-weight: bold; padding: 0.5rem 0.4rem; }
         .assinaturas { margin-top: 1.5rem; display: table; width: 100%; }
         .assinaturas .col { display: table-cell; width: 50%; padding: 0.5rem; vertical-align: top; }
@@ -88,6 +89,7 @@
                 @php
                     $cls = match (true) {
                         $dia->tipo === 'feriado' => 'feriado',
+                        $dia->tipo === 'recesso' => 'recesso',
                         in_array($dia->tipo, ['sabado', 'domingo'], true) => 'fds',
                         default => '',
                     };
@@ -102,6 +104,10 @@
                     @elseif (in_array($dia->tipo, ['sabado', 'domingo'], true))
                         <td colspan="3">—</td>
                         <td>{{ $rotuloFds[$dia->tipo] }}</td>
+                        <td>—</td>
+                    @elseif ($dia->tipo === 'recesso')
+                        <td colspan="3">Recesso</td>
+                        <td>recesso</td>
                         <td>—</td>
                     @elseif ($dia->frequencia !== null && ($dia->frequencia->entrada !== null || $dia->frequencia->saida !== null))
                         <td>{{ $dia->frequencia->entrada?->format('H:i') ?? '—' }}</td>

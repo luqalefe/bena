@@ -32,6 +32,15 @@
             <input type="checkbox" name="liberadas" value="1" onchange="this.form.submit()" @checked($apenasLiberadas)>
             <span>Apenas liberadas para RH</span>
         </label>
+        <label style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Alerta</span>
+            <select name="alerta" onchange="this.form.submit()" style="padding: 0.4rem 0.6rem;">
+                <option value="">Todos</option>
+                <option value="tce_vencendo" @selected($alerta === 'tce_vencendo')>TCE vencendo</option>
+                <option value="sem_recesso" @selected($alerta === 'sem_recesso')>Sem recesso</option>
+                <option value="jornada_excedida" @selected($alerta === 'jornada_excedida')>Jornada excedida</option>
+            </select>
+        </label>
         <noscript>
             <button type="submit" class="br-button primary">Filtrar</button>
         </noscript>
@@ -56,6 +65,7 @@
                     <th style="text-align: right; padding: 0.5rem;">Horas no mês</th>
                     <th style="text-align: right; padding: 0.5rem;">Dias batidos</th>
                     <th style="text-align: left; padding: 0.5rem;">Assinatura</th>
+                    <th style="text-align: left; padding: 0.5rem;">Alertas</th>
                     <th style="text-align: left; padding: 0.5rem;"></th>
                 </tr>
             </thead>
@@ -69,6 +79,18 @@
                         <td style="padding: 0.5rem; font-size: 0.85rem;">
                             <div>estagiário {!! $linha->assinadoEstagiario ? '<strong style="color:#166534;">✓</strong>' : '<span style="color:#991b1b;">✗</span>' !!}</div>
                             <div>supervisor {!! $linha->assinadoSupervisor ? '<strong style="color:#166534;">✓</strong>' : '<span style="color:#991b1b;">✗</span>' !!}</div>
+                        </td>
+                        <td style="padding: 0.5rem; font-size: 0.85rem;">
+                            @if (count($linha->alertas) === 0)
+                                <span style="color: #166534;" title="Sem alertas">✓</span>
+                            @else
+                                @foreach ($linha->alertas as $codigo)
+                                    <span title="{{ $descricaoAlerta($codigo) }}"
+                                          style="display: inline-block; padding: 0.15rem 0.5rem; margin: 0.1rem 0.2rem 0.1rem 0; background: #fef3c7; color: #92400e; border-radius: 3px; font-size: 0.75rem; cursor: help;">
+                                        ⚠ {{ $descricaoAlerta($codigo) }}
+                                    </span>
+                                @endforeach
+                            @endif
                         </td>
                         <td style="padding: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
                             <a href="{{ route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $linha->estagiario->username]) }}" class="br-button primary small">Ver folha</a>

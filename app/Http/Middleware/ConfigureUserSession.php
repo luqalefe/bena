@@ -30,6 +30,9 @@ class ConfigureUserSession
         'admin.estagiarios.index',
         'admin.estagiarios.edit',
         'admin.estagiarios.update',
+        'admin.estagiarios.recessos.index',
+        'admin.estagiarios.recessos.store',
+        'admin.estagiarios.recessos.destroy',
         'admin.auditoria.index',
     ];
 

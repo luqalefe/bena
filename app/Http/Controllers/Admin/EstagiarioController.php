@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UpdateEstagiarioRequest;
 use App\Models\Estagiario;
 use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
@@ -46,20 +47,9 @@ class EstagiarioController extends Controller
         return view('admin.estagiarios.edit', ['estagiario' => $estagiario]);
     }
 
-    public function update(Request $request, Estagiario $estagiario): RedirectResponse
+    public function update(UpdateEstagiarioRequest $request, Estagiario $estagiario): RedirectResponse
     {
-        $dados = $request->validate([
-            'matricula' => ['nullable', 'string', 'max:30'],
-            'lotacao' => ['nullable', 'string', 'max:100'],
-            'supervisor_nome' => ['nullable', 'string', 'max:200'],
-            'supervisor_username' => ['nullable', 'string', 'max:100'],
-            'sei' => ['nullable', 'string', 'max:50'],
-            'inicio_estagio' => ['nullable', 'date'],
-            'fim_estagio' => ['nullable', 'date', 'after:inicio_estagio'],
-            'horas_diarias' => ['required', 'numeric', 'min:0.25', 'max:24'],
-            'ativo' => ['nullable', 'boolean'],
-            'contrato' => ['nullable', 'file', 'mimes:pdf', 'mimetypes:application/pdf', 'max:5120'],
-        ]);
+        $dados = $request->validated();
 
         $estagiario->fill([
             'matricula' => $dados['matricula'] ?? null,

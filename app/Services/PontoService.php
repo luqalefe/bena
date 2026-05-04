@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Estagiario;
 use App\Models\Frequencia;
+use App\Models\RecessoEstagiario;
 use Carbon\CarbonImmutable;
 use DomainException;
 
@@ -19,6 +20,9 @@ class PontoService
 
         $agora = CarbonImmutable::now();
         $hoje = $agora->toDateString();
+
+        $this->garantirVigencia($estagiario, $agora);
+        $this->garantirNaoEmRecesso($estagiario, $agora);
 
         if (! $this->calendario->ehDiaUtil($agora)) {
             throw new DomainException('Hoje não é dia útil.');
@@ -48,6 +52,9 @@ class PontoService
 
         $agora = CarbonImmutable::now();
         $hoje = $agora->toDateString();
+
+        $this->garantirVigencia($estagiario, $agora);
+        $this->garantirNaoEmRecesso($estagiario, $agora);
 
         $frequencia = Frequencia::where('estagiario_id', $estagiario->id)
             ->whereDate('data', $hoje)
@@ -84,6 +91,45 @@ class PontoService
     {
         if (! $estagiario->ativo) {
             throw new DomainException('Estágio inativo. Procure a coordenação.');
+        }
+    }
+
+    private function garantirNaoEmRecesso(Estagiario $estagiario, CarbonImmutable $agora): void
+    {
+        $hoje = $agora->toDateString();
+
+        $recesso = RecessoEstagiario::query()
+            ->where('estagiario_id', $estagiario->id)
+            ->whereDate('inicio', '<=', $hoje)
+            ->whereDate('fim', '>=', $hoje)
+            ->first();
+
+        if ($recesso !== null) {
+            $fim = CarbonImmutable::parse($recesso->fim)->format('d/m/Y');
+            throw new DomainException("Em recesso até {$fim}.");
+        }
+    }
+
+    private function garantirVigencia(Estagiario $estagiario, CarbonImmutable $agora): void
+    {
+        $hoje = $agora->startOfDay();
+
+        if ($estagiario->inicio_estagio !== null) {
+            $inicio = CarbonImmutable::parse($estagiario->inicio_estagio)->startOfDay();
+            if ($hoje->lt($inicio)) {
+                throw new DomainException(
+                    'Estágio ainda não começou (início em '.$inicio->format('d/m/Y').').'
+                );
+            }
+        }
+
+        if ($estagiario->fim_estagio !== null) {
+            $fim = CarbonImmutable::parse($estagiario->fim_estagio)->startOfDay();
+            if ($hoje->gt($fim)) {
+                throw new DomainException(
+                    'Estágio encerrado em '.$fim->format('d/m/Y').'.'
+                );
+            }
         }
     }
 

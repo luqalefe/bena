@@ -96,7 +96,7 @@
                 <label for="horas_diarias" class="bena-form__label">
                     Horas diárias <span class="required" aria-hidden="true">*</span>
                 </label>
-                <input type="number" id="horas_diarias" name="horas_diarias" value="{{ old('horas_diarias', $estagiario->horas_diarias) }}" step="0.25" min="0.25" max="24" required class="bena-form__input">
+                <input type="number" id="horas_diarias" name="horas_diarias" value="{{ old('horas_diarias', $estagiario->horas_diarias) }}" step="0.25" min="0.25" max="8" required class="bena-form__input">
                 <p class="bena-form__help">Jornada diária prevista (em horas, ex: 5 ou 6).</p>
             </div>
 
@@ -127,5 +127,12 @@
                 </button>
             </div>
         </form>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+            <a href="{{ route('admin.estagiarios.recessos.index', $estagiario) }}" class="br-button">
+                <i class="fas fa-umbrella-beach" aria-hidden="true"></i>
+                Gerenciar recessos
+            </a>
+        </div>
     </div>
 @endsection

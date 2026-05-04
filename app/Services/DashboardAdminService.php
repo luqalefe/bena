@@ -11,10 +11,12 @@ use Illuminate\Support\Collection;
 
 class DashboardAdminService
 {
+    public function __construct(private readonly ConformidadeService $conformidade) {}
+
     /**
      * @return Collection<int, DashboardAdminLinha>
      */
-    public function montar(int $ano, int $mes, ?string $lotacao = null, bool $apenasLiberadas = false): Collection
+    public function montar(int $ano, int $mes, ?string $lotacao = null, bool $apenasLiberadas = false, ?string $alerta = null): Collection
     {
         $estagiarios = Estagiario::query()
             ->where('ativo', true)
@@ -50,11 +52,16 @@ class DashboardAdminService
                 diasBatidos: (int) ($linha->dias ?? 0),
                 assinadoEstagiario: $sigs->contains('papel', Assinatura::PAPEL_ESTAGIARIO),
                 assinadoSupervisor: $sigs->contains('papel', Assinatura::PAPEL_SUPERVISOR),
+                alertas: $this->conformidade->alertasParaEstagiario($e),
             );
         });
 
         if ($apenasLiberadas) {
             $linhas = $linhas->filter(fn (DashboardAdminLinha $l) => $l->liberadaParaRh());
+        }
+
+        if ($alerta !== null && $alerta !== '') {
+            $linhas = $linhas->filter(fn (DashboardAdminLinha $l) => in_array($alerta, $l->alertas, true));
         }
 
         return $linhas->values();

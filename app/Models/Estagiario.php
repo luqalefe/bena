@@ -8,6 +8,7 @@ use Database\Factories\EstagiarioFactory;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Estagiario extends Model implements Authenticatable
 {
@@ -75,5 +76,11 @@ class Estagiario extends Model implements Authenticatable
     public function getRememberTokenName(): string
     {
         return '';
+    }
+
+    /** @return HasMany<RecessoEstagiario, $this> */
+    public function recessos(): HasMany
+    {
+        return $this->hasMany(RecessoEstagiario::class);
     }
 }
