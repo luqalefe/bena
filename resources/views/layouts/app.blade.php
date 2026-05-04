@@ -699,6 +699,303 @@
             vertical-align: -0.1em;
             display: inline-block;
         }
+
+        /* ─────────────────────────────────────────────────────────────
+           Listings — sistema visual para páginas de admin com tabela.
+           Substitui as classes inline ad-hoc e a antiga `.tre-ac-table`
+           (que nem existia no CSS).
+           ───────────────────────────────────────────────────────────── */
+
+        .bena-listing__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .bena-listing__header-text {
+            min-width: 0;
+        }
+        .bena-listing__title {
+            color: #003366;
+            font-size: 1.625rem;
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            margin: 0;
+            line-height: 1.2;
+        }
+        .bena-listing__subtitle {
+            color: #64748b;
+            margin: 0.25rem 0 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .bena-flash {
+            border-radius: 8px;
+            padding: 0.85rem 1.1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.92rem;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            border: 1px solid transparent;
+        }
+        .bena-flash--sucesso {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+        .bena-flash--erro {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+        .bena-flash i {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .bena-filters {
+            background: #ffffff;
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 10px;
+            padding: 1rem 1.15rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 0.9rem 1rem;
+        }
+        .bena-filters__field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            flex: 1 1 180px;
+            min-width: 0;          /* permite encolher dentro do flex */
+            max-width: 260px;
+        }
+        .bena-filters__field--narrow {
+            flex: 0 0 110px;
+            max-width: 110px;
+        }
+        .bena-filters__field--wide {
+            flex: 1 1 240px;
+            max-width: 360px;
+        }
+        .bena-filters__label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        .bena-filters__control {
+            width: 100%;
+            box-sizing: border-box;
+            background: #ffffff;
+            border: 1px solid rgba(15, 23, 42, 0.14);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.92rem;
+            font-family: inherit;
+            color: #0f172a;
+            line-height: 1.3;
+            height: 38px;          /* alinha select/input/date na mesma altura */
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .bena-filters__control:focus {
+            outline: none;
+            border-color: #003366;
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.12);
+        }
+        select.bena-filters__control {
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2364748b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            padding-right: 2rem;
+        }
+        .bena-filters__check {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.92rem;
+            color: #334155;
+            cursor: pointer;
+            height: 38px;          /* alinha vertical com os controles */
+            padding: 0 0.25rem;
+            white-space: nowrap;
+        }
+        .bena-filters__check input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #003366;
+            cursor: pointer;
+            margin: 0;
+        }
+        .bena-filters .br-button {
+            height: 38px;
+        }
+        @media (max-width: 540px) {
+            .bena-filters__field,
+            .bena-filters__field--narrow,
+            .bena-filters__field--wide {
+                flex: 1 1 100%;
+                max-width: none;
+            }
+            .bena-filters__check {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        .bena-search {
+            position: relative;
+            margin-bottom: 1rem;
+            max-width: 420px;
+        }
+        .bena-search__icon {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+        .bena-search__input {
+            width: 100%;
+            padding: 0.55rem 0.85rem 0.55rem 2.25rem;
+            border: 1px solid rgba(15, 23, 42, 0.14);
+            border-radius: 8px;
+            font-size: 0.92rem;
+            font-family: inherit;
+            background: #ffffff;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .bena-search__input:focus {
+            outline: none;
+            border-color: #003366;
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.12);
+        }
+
+        .bena-table-wrap {
+            background: #ffffff;
+            border: 1px solid rgba(15, 23, 42, 0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04),
+                        0 4px 14px rgba(0, 51, 102, 0.04);
+        }
+        .bena-table-wrap--scroll {
+            overflow-x: auto;
+        }
+
+        .bena-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.92rem;
+            color: #1e293b;
+        }
+        .bena-table thead th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+            white-space: nowrap;
+        }
+        .bena-table thead th.is-num,
+        .bena-table tbody td.is-num {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        .bena-table thead th.is-actions,
+        .bena-table tbody td.is-actions {
+            text-align: right;
+            white-space: nowrap;
+            width: 1%;
+        }
+        .bena-table tbody td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+            vertical-align: middle;
+        }
+        .bena-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .bena-table tbody tr:hover td {
+            background: rgba(0, 51, 102, 0.025);
+        }
+        .bena-table code {
+            background: rgba(15, 23, 42, 0.05);
+            padding: 0.12rem 0.45rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+            color: #334155;
+        }
+        .bena-table .muted {
+            color: #94a3b8;
+        }
+        .bena-table__name {
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .bena-table__sub {
+            display: block;
+            font-size: 0.78rem;
+            color: #64748b;
+            margin-top: 0.15rem;
+        }
+
+        .bena-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.18rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+        .bena-pill--ativo    { background: #dcfce7; color: #166534; }
+        .bena-pill--inativo  { background: #f1f5f9; color: #64748b; }
+        .bena-pill--alerta   { background: #fef3c7; color: #92400e; }
+        .bena-pill--ok       { background: #dbeafe; color: #1e40af; }
+
+        .bena-empty {
+            background: #ffffff;
+            border: 1px dashed rgba(15, 23, 42, 0.12);
+            border-radius: 10px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        .bena-empty i {
+            display: block;
+            font-size: 2rem;
+            color: #cbd5e1;
+            margin-bottom: 0.6rem;
+        }
+
+        @media (max-width: 600px) {
+            .bena-listing__header { flex-direction: column; align-items: stretch; }
+            .bena-filters { padding: 0.85rem 0.95rem; }
+            .bena-table thead { display: none; }
+            .bena-table tbody td { padding: 0.7rem 0.85rem; }
+        }
     </style>
 
     @stack('styles')

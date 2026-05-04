@@ -3,20 +3,26 @@
 @section('title', 'Estagiários — Bena')
 
 @section('content')
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-        <h1 style="color: var(--color-primary-default); margin: 0;">Estagiários</h1>
-    </div>
+    <header class="bena-listing__header">
+        <div class="bena-listing__header-text">
+            <h1 class="bena-listing__title">Estagiários</h1>
+            <p class="bena-listing__subtitle">
+                Cadastro completo. Use o filtro por lotação para focar num setor.
+            </p>
+        </div>
+    </header>
 
     @if (session('sucesso'))
-        <div style="background: #dcfce7; color: #166534; padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <div class="bena-flash bena-flash--sucesso">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
             {{ session('sucesso') }}
         </div>
     @endif
 
-    <form method="GET" action="{{ url('/admin/estagiarios') }}" style="margin-bottom: 1.5rem; display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap;">
-        <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-            <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Lotação</span>
-            <select name="lotacao" onchange="this.form.submit()" style="padding: 0.4rem 0.6rem;">
+    <form method="GET" action="{{ url('/admin/estagiarios') }}" class="bena-filters">
+        <label class="bena-filters__field">
+            <span class="bena-filters__label">Lotação</span>
+            <select name="lotacao" onchange="this.form.submit()" class="bena-filters__control">
                 <option value="">Todas</option>
                 @foreach ($lotacoes as $opt)
                     <option value="{{ $opt }}" @selected($lotacao === $opt)>{{ $opt }}</option>
@@ -26,51 +32,69 @@
         <noscript>
             <button type="submit" class="br-button primary">Filtrar</button>
         </noscript>
+        @if ($lotacao)
+            <a href="{{ url('/admin/estagiarios') }}" class="br-button secondary">Limpar</a>
+        @endif
     </form>
 
     @if ($estagiarios->isEmpty())
-        <p style="color: var(--color-secondary-07);">Nenhum estagiário encontrado.</p>
+        <div class="bena-empty">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            Nenhum estagiário encontrado.
+        </div>
     @else
-        <div class="bena-form__field" style="margin-bottom: 1rem; max-width: 480px;">
-            <label for="busca-tabela" class="bena-form__label">
-                <i class="fas fa-search" aria-hidden="true"></i> Busca rápida
-            </label>
-            <input type="text" id="busca-tabela" class="bena-form__input"
+        <div class="bena-search">
+            <i class="fas fa-search bena-search__icon" aria-hidden="true"></i>
+            <input type="text" id="busca-tabela" class="bena-search__input"
                    placeholder="Buscar por nome, username ou lotação…"
                    autocomplete="off">
         </div>
-        <table id="tabela-principal" class="tre-ac-table" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th style="text-align: left; padding: 0.5rem;">Nome</th>
-                    <th style="text-align: left; padding: 0.5rem;">Username</th>
-                    <th style="text-align: left; padding: 0.5rem;">Lotação</th>
-                    <th style="text-align: left; padding: 0.5rem;">Matrícula</th>
-                    <th style="text-align: left; padding: 0.5rem;">Status</th>
-                    <th style="text-align: left; padding: 0.5rem;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($estagiarios as $estagiario)
+
+        <div class="bena-table-wrap bena-table-wrap--scroll">
+            <table id="tabela-principal" class="bena-table">
+                <thead>
                     <tr>
-                        <td style="padding: 0.5rem;">{{ $estagiario->nome }}</td>
-                        <td style="padding: 0.5rem;"><code>{{ $estagiario->username }}</code></td>
-                        <td style="padding: 0.5rem;">{{ $estagiario->lotacao ?? '—' }}</td>
-                        <td style="padding: 0.5rem;">{{ $estagiario->matricula ?? '—' }}</td>
-                        <td style="padding: 0.5rem;">
-                            @if ($estagiario->ativo)
-                                <span class="badge-tre-ac">ativo</span>
-                            @else
-                                <span class="badge-tre-ac is-pendente">inativo</span>
-                            @endif
-                        </td>
-                        <td style="padding: 0.5rem;">
-                            <a href="{{ route('admin.estagiarios.edit', $estagiario) }}" class="br-button secondary small">Editar</a>
-                        </td>
+                        <th>Nome</th>
+                        <th>Username</th>
+                        <th>Lotação</th>
+                        <th>Matrícula</th>
+                        <th>Status</th>
+                        <th class="is-actions"></th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($estagiarios as $estagiario)
+                        <tr>
+                            <td>
+                                <span class="bena-table__name">{{ $estagiario->nome }}</span>
+                                @if ($estagiario->email)
+                                    <span class="bena-table__sub">{{ $estagiario->email }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if ($estagiario->username)
+                                    <code>{{ $estagiario->username }}</code>
+                                @else
+                                    <span class="muted">—</span>
+                                @endif
+                            </td>
+                            <td>{{ $estagiario->lotacao ?? '—' }}</td>
+                            <td>{{ $estagiario->matricula ?? '—' }}</td>
+                            <td>
+                                @if ($estagiario->ativo)
+                                    <span class="bena-pill bena-pill--ativo">ativo</span>
+                                @else
+                                    <span class="bena-pill bena-pill--inativo">inativo</span>
+                                @endif
+                            </td>
+                            <td class="is-actions">
+                                <a href="{{ route('admin.estagiarios.edit', $estagiario) }}" class="br-button secondary small">Editar</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 @endsection
 
@@ -81,7 +105,7 @@
         const tabela = document.getElementById('tabela-principal');
         if (!input || !tabela) return;
 
-        const normalizar = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        const normalizar = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
         input.addEventListener('input', function () {
             const termo = normalizar(this.value);

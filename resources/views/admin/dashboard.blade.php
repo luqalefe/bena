@@ -3,43 +3,47 @@
 @section('title', 'Dashboard admin — Bena')
 
 @section('content')
-    <h1 style="color: var(--color-primary-default); margin: 0 0 0.25rem;">Dashboard administrativo</h1>
-    <p style="color: var(--color-secondary-07); margin: 0 0 1.5rem; text-transform: capitalize;">{{ $mesAnoExtenso }}</p>
+    <header class="bena-listing__header">
+        <div class="bena-listing__header-text">
+            <h1 class="bena-listing__title">Dashboard administrativo</h1>
+            <p class="bena-listing__subtitle" style="text-transform: capitalize;">{{ $mesAnoExtenso }}</p>
+        </div>
+    </header>
 
-    <form method="GET" action="{{ url('/admin') }}" style="margin-bottom: 1.5rem; display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap;">
-        <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-            <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Lotação</span>
-            <select name="lotacao" onchange="this.form.submit()" style="padding: 0.4rem 0.6rem;">
+    <form method="GET" action="{{ url('/admin') }}" class="bena-filters">
+        <label class="bena-filters__field">
+            <span class="bena-filters__label">Lotação</span>
+            <select name="lotacao" onchange="this.form.submit()" class="bena-filters__control">
                 <option value="">Todas</option>
                 @foreach ($lotacoes as $opt)
                     <option value="{{ $opt }}" @selected($lotacao === $opt)>{{ $opt }}</option>
                 @endforeach
             </select>
         </label>
-        <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-            <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Ano</span>
-            <input type="number" name="ano" value="{{ $ano }}" min="2000" max="2100" style="padding: 0.4rem 0.6rem; width: 100px;">
+        <label class="bena-filters__field bena-filters__field--narrow">
+            <span class="bena-filters__label">Ano</span>
+            <input type="number" name="ano" value="{{ $ano }}" min="2000" max="2100" class="bena-filters__control">
         </label>
-        <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-            <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Mês</span>
-            <select name="mes" onchange="this.form.submit()" style="padding: 0.4rem 0.6rem;">
+        <label class="bena-filters__field bena-filters__field--narrow">
+            <span class="bena-filters__label">Mês</span>
+            <select name="mes" onchange="this.form.submit()" class="bena-filters__control">
                 @foreach (range(1, 12) as $m)
                     <option value="{{ $m }}" @selected($mes === $m)>{{ str_pad((string) $m, 2, '0', STR_PAD_LEFT) }}</option>
                 @endforeach
             </select>
         </label>
-        <label style="display: flex; align-items: center; gap: 0.5rem;">
-            <input type="checkbox" name="liberadas" value="1" onchange="this.form.submit()" @checked($apenasLiberadas)>
-            <span>Apenas liberadas para RH</span>
-        </label>
-        <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-            <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Alerta</span>
-            <select name="alerta" onchange="this.form.submit()" style="padding: 0.4rem 0.6rem;">
+        <label class="bena-filters__field">
+            <span class="bena-filters__label">Alerta</span>
+            <select name="alerta" onchange="this.form.submit()" class="bena-filters__control">
                 <option value="">Todos</option>
                 <option value="tce_vencendo" @selected($alerta === 'tce_vencendo')>TCE vencendo</option>
                 <option value="sem_recesso" @selected($alerta === 'sem_recesso')>Sem recesso</option>
                 <option value="jornada_excedida" @selected($alerta === 'jornada_excedida')>Jornada excedida</option>
             </select>
+        </label>
+        <label class="bena-filters__check">
+            <input type="checkbox" name="liberadas" value="1" onchange="this.form.submit()" @checked($apenasLiberadas)>
+            <span>Apenas liberadas para RH</span>
         </label>
         <noscript>
             <button type="submit" class="br-button primary">Filtrar</button>
@@ -47,62 +51,72 @@
     </form>
 
     @if ($linhas->isEmpty())
-        <p style="color: var(--color-secondary-07);">Nenhum estagiário ativo encontrado.</p>
+        <div class="bena-empty">
+            <i class="fas fa-folder-open" aria-hidden="true"></i>
+            Nenhum estagiário ativo encontrado para os filtros aplicados.
+        </div>
     @else
-        <div class="bena-form__field" style="margin-bottom: 1rem; max-width: 480px;">
-            <label for="busca-tabela" class="bena-form__label">
-                <i class="fas fa-search" aria-hidden="true"></i> Busca rápida
-            </label>
-            <input type="text" id="busca-tabela" class="bena-form__input"
+        <div class="bena-search">
+            <i class="fas fa-search bena-search__icon" aria-hidden="true"></i>
+            <input type="text" id="busca-tabela" class="bena-search__input"
                    placeholder="Buscar estagiário…"
                    autocomplete="off">
         </div>
-        <table id="tabela-principal" class="tre-ac-table" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th style="text-align: left; padding: 0.5rem;">Nome</th>
-                    <th style="text-align: left; padding: 0.5rem;">Lotação</th>
-                    <th style="text-align: right; padding: 0.5rem;">Horas no mês</th>
-                    <th style="text-align: right; padding: 0.5rem;">Dias batidos</th>
-                    <th style="text-align: left; padding: 0.5rem;">Assinatura</th>
-                    <th style="text-align: left; padding: 0.5rem;">Alertas</th>
-                    <th style="text-align: left; padding: 0.5rem;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($linhas as $linha)
+
+        <div class="bena-table-wrap bena-table-wrap--scroll">
+            <table id="tabela-principal" class="bena-table">
+                <thead>
                     <tr>
-                        <td style="padding: 0.5rem;">{{ $linha->estagiario->nome }}</td>
-                        <td style="padding: 0.5rem;">{{ $linha->estagiario->lotacao ?? '—' }}</td>
-                        <td style="padding: 0.5rem; text-align: right;">{{ number_format($linha->horasMes, 2, ',', '.') }}</td>
-                        <td style="padding: 0.5rem; text-align: right;">{{ $linha->diasBatidos }} dias</td>
-                        <td style="padding: 0.5rem; font-size: 0.85rem;">
-                            <div>estagiário {!! $linha->assinadoEstagiario ? '<strong style="color:#166534;">✓</strong>' : '<span style="color:#991b1b;">✗</span>' !!}</div>
-                            <div>supervisor {!! $linha->assinadoSupervisor ? '<strong style="color:#166534;">✓</strong>' : '<span style="color:#991b1b;">✗</span>' !!}</div>
-                        </td>
-                        <td style="padding: 0.5rem; font-size: 0.85rem;">
-                            @if (count($linha->alertas) === 0)
-                                <span style="color: #166534;" title="Sem alertas">✓</span>
-                            @else
-                                @foreach ($linha->alertas as $codigo)
-                                    <span title="{{ $descricaoAlerta($codigo) }}"
-                                          style="display: inline-block; padding: 0.15rem 0.5rem; margin: 0.1rem 0.2rem 0.1rem 0; background: #fef3c7; color: #92400e; border-radius: 3px; font-size: 0.75rem; cursor: help;">
-                                        ⚠ {{ $descricaoAlerta($codigo) }}
-                                    </span>
-                                @endforeach
-                            @endif
-                        </td>
-                        <td style="padding: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            <a href="{{ route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $linha->estagiario->username]) }}" class="br-button primary small">Ver folha</a>
-                            @if ($linha->liberadaParaRh())
-                                <a href="{{ route('frequencia.pdf', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $linha->estagiario->username]) }}" class="br-button small">Baixar PDF</a>
-                            @endif
-                            <a href="{{ route('admin.estagiarios.edit', $linha->estagiario) }}" class="br-button secondary small">Editar</a>
-                        </td>
+                        <th>Nome</th>
+                        <th>Lotação</th>
+                        <th class="is-num">Horas no mês</th>
+                        <th class="is-num">Dias batidos</th>
+                        <th>Assinatura</th>
+                        <th>Alertas</th>
+                        <th class="is-actions"></th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($linhas as $linha)
+                        <tr>
+                            <td>
+                                <span class="bena-table__name">{{ $linha->estagiario->nome }}</span>
+                                @if ($linha->estagiario->username)
+                                    <code class="bena-table__sub">{{ $linha->estagiario->username }}</code>
+                                @endif
+                            </td>
+                            <td>{{ $linha->estagiario->lotacao ?? '—' }}</td>
+                            <td class="is-num">{{ number_format($linha->horasMes, 2, ',', '.') }}</td>
+                            <td class="is-num">{{ $linha->diasBatidos }} dias</td>
+                            <td style="font-size: 0.82rem; line-height: 1.5;">
+                                <div>estagiário {!! $linha->assinadoEstagiario ? '<strong style="color:#166534;">✓</strong>' : '<span style="color:#991b1b;">✗</span>' !!}</div>
+                                <div>supervisor {!! $linha->assinadoSupervisor ? '<strong style="color:#166534;">✓</strong>' : '<span style="color:#991b1b;">✗</span>' !!}</div>
+                            </td>
+                            <td>
+                                @if (count($linha->alertas) === 0)
+                                    <span class="muted" title="Sem alertas">—</span>
+                                @else
+                                    @foreach ($linha->alertas as $codigo)
+                                        <span class="bena-pill bena-pill--alerta" title="{{ $descricaoAlerta($codigo) }}" style="margin: 0.1rem 0.2rem 0.1rem 0;">
+                                            ⚠ {{ $descricaoAlerta($codigo) }}
+                                        </span>
+                                    @endforeach
+                                @endif
+                            </td>
+                            <td class="is-actions">
+                                <div style="display: inline-flex; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-end;">
+                                    <a href="{{ route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $linha->estagiario->username]) }}" class="br-button primary small">Ver folha</a>
+                                    @if ($linha->liberadaParaRh())
+                                        <a href="{{ route('frequencia.pdf', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $linha->estagiario->username]) }}" class="br-button small">PDF</a>
+                                    @endif
+                                    <a href="{{ route('admin.estagiarios.edit', $linha->estagiario) }}" class="br-button secondary small">Editar</a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 @endsection
 

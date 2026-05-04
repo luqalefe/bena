@@ -3,82 +3,94 @@
 @section('title', 'Recessos — ' . $estagiario->nome)
 
 @section('content')
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <h1 style="color: var(--color-primary-default); margin: 0;">Recessos</h1>
-            <p style="margin: 0.25rem 0 0; color: var(--color-secondary-07);">
-                {{ $estagiario->nome }}
-                @if ($estagiario->lotacao)
-                    — {{ $estagiario->lotacao }}
-                @endif
+    <header class="bena-listing__header">
+        <div class="bena-listing__header-text">
+            <h1 class="bena-listing__title">Recessos</h1>
+            <p class="bena-listing__subtitle">
+                {{ $estagiario->nome }}@if ($estagiario->lotacao) · {{ $estagiario->lotacao }}@endif
             </p>
         </div>
-        <a href="{{ route('admin.estagiarios.edit', $estagiario) }}" class="br-button">
-            ← Voltar para edição
+        <a href="{{ route('admin.estagiarios.edit', $estagiario) }}" class="br-button secondary">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+            Voltar para edição
         </a>
-    </div>
+    </header>
 
     @if (session('sucesso'))
-        <div style="background: #dcfce7; color: #166534; padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem;">
+        <div class="bena-flash bena-flash--sucesso">
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
             {{ session('sucesso') }}
         </div>
     @endif
 
-    <section style="margin-bottom: 2rem; padding: 1rem; background: #f9fafb; border-radius: 4px;">
-        <h2 style="font-size: 1.1rem; margin: 0 0 1rem;">Cadastrar novo recesso</h2>
-        <form method="POST" action="{{ route('admin.estagiarios.recessos.store', $estagiario) }}" style="display: flex; gap: 0.75rem; align-items: end; flex-wrap: wrap;">
-            @csrf
-            <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-                <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Início</span>
-                <input type="date" name="inicio" value="{{ old('inicio') }}" required style="padding: 0.4rem 0.6rem;">
-            </label>
-            <label style="display: flex; flex-direction: column; gap: 0.25rem;">
-                <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Fim</span>
-                <input type="date" name="fim" value="{{ old('fim') }}" required style="padding: 0.4rem 0.6rem;">
-            </label>
-            <label style="display: flex; flex-direction: column; gap: 0.25rem; flex: 1; min-width: 200px;">
-                <span style="font-size: 0.875rem; color: var(--color-secondary-07);">Observação</span>
-                <input type="text" name="observacao" value="{{ old('observacao') }}" maxlength="255" style="padding: 0.4rem 0.6rem;">
-            </label>
-            <button type="submit" class="br-button primary">Cadastrar</button>
-        </form>
-        @error('inicio')
-            <p style="color: #b91c1c; margin: 0.5rem 0 0; font-size: 0.875rem;">{{ $message }}</p>
-        @enderror
-        @error('fim')
-            <p style="color: #b91c1c; margin: 0.5rem 0 0; font-size: 0.875rem;">{{ $message }}</p>
-        @enderror
-    </section>
+    @if ($errors->any())
+        <div class="bena-error-summary" role="alert">
+            <p class="bena-error-summary__title">
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+                Corrija os erros:
+            </p>
+            <ul class="bena-error-summary__list">
+                @foreach ($errors->all() as $erro)
+                    <li>{{ $erro }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('admin.estagiarios.recessos.store', $estagiario) }}" class="bena-filters" style="margin-bottom: 1.5rem;">
+        @csrf
+        <label class="bena-filters__field bena-filters__field--narrow">
+            <span class="bena-filters__label">Início</span>
+            <input type="date" name="inicio" value="{{ old('inicio') }}" required class="bena-filters__control">
+        </label>
+        <label class="bena-filters__field bena-filters__field--narrow">
+            <span class="bena-filters__label">Fim</span>
+            <input type="date" name="fim" value="{{ old('fim') }}" required class="bena-filters__control">
+        </label>
+        <label class="bena-filters__field" style="flex: 1; min-width: 220px;">
+            <span class="bena-filters__label">Observação</span>
+            <input type="text" name="observacao" value="{{ old('observacao') }}" maxlength="255" class="bena-filters__control">
+        </label>
+        <button type="submit" class="br-button primary">
+            <i class="fas fa-plus" aria-hidden="true"></i>
+            Cadastrar recesso
+        </button>
+    </form>
 
     @if ($recessos->isEmpty())
-        <p style="color: var(--color-secondary-07);">Nenhum recesso cadastrado.</p>
+        <div class="bena-empty">
+            <i class="fas fa-umbrella-beach" aria-hidden="true"></i>
+            Nenhum recesso cadastrado para este estagiário.
+        </div>
     @else
-        <table class="tre-ac-table" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th style="text-align: left; padding: 0.5rem;">Início</th>
-                    <th style="text-align: left; padding: 0.5rem;">Fim</th>
-                    <th style="text-align: left; padding: 0.5rem;">Observação</th>
-                    <th style="text-align: left; padding: 0.5rem;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($recessos as $recesso)
+        <div class="bena-table-wrap">
+            <table class="bena-table">
+                <thead>
                     <tr>
-                        <td style="padding: 0.5rem;">{{ $recesso->inicio->format('d/m/Y') }}</td>
-                        <td style="padding: 0.5rem;">{{ $recesso->fim->format('d/m/Y') }}</td>
-                        <td style="padding: 0.5rem;">{{ $recesso->observacao ?? '—' }}</td>
-                        <td style="padding: 0.5rem;">
-                            <form method="POST" action="{{ route('admin.estagiarios.recessos.destroy', [$estagiario, $recesso]) }}"
-                                  onsubmit="return confirm('Remover este recesso?')" style="display: inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="br-button" style="color: #b91c1c;">Remover</button>
-                            </form>
-                        </td>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Observação</th>
+                        <th class="is-actions"></th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($recessos as $recesso)
+                        <tr>
+                            <td>{{ $recesso->inicio->format('d/m/Y') }}</td>
+                            <td>{{ $recesso->fim->format('d/m/Y') }}</td>
+                            <td>{{ $recesso->observacao ?? '—' }}</td>
+                            <td class="is-actions">
+                                <form method="POST" action="{{ route('admin.estagiarios.recessos.destroy', [$estagiario, $recesso]) }}"
+                                      onsubmit="return confirm('Remover este recesso?')" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="br-button danger small">Remover</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 @endsection

@@ -3,30 +3,48 @@
 @section('title', 'Painel do supervisor — Bena')
 
 @section('content')
-    <h1 style="color: var(--color-primary-default); margin: 0 0 1rem;">Estagiários sob sua responsabilidade</h1>
+    <header class="bena-listing__header">
+        <div class="bena-listing__header-text">
+            <h1 class="bena-listing__title">Estagiários sob sua responsabilidade</h1>
+            <p class="bena-listing__subtitle">
+                Acesse a folha mensal de cada um para revisar e contra-assinar.
+            </p>
+        </div>
+    </header>
 
     @if ($estagiarios->isEmpty())
-        <p style="color: var(--color-secondary-07);">Nenhum estagiário sob sua responsabilidade. Se isso parece errado, peça ao RH para preencher o campo "Supervisor (username Authelia)" no cadastro.</p>
+        <div class="bena-empty">
+            <i class="fas fa-user-friends" aria-hidden="true"></i>
+            Nenhum estagiário sob sua responsabilidade. Se isso parece errado,
+            peça ao admin para preencher o supervisor no cadastro.
+        </div>
     @else
-        <table class="tre-ac-table" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th style="text-align: left; padding: 0.5rem;">Nome</th>
-                    <th style="text-align: left; padding: 0.5rem;">Lotação</th>
-                    <th style="text-align: left; padding: 0.5rem;"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($estagiarios as $estagiario)
+        <div class="bena-table-wrap">
+            <table class="bena-table">
+                <thead>
                     <tr>
-                        <td style="padding: 0.5rem;">{{ $estagiario->nome }}</td>
-                        <td style="padding: 0.5rem;">{{ $estagiario->lotacao ?? '—' }}</td>
-                        <td style="padding: 0.5rem;">
-                            <a href="{{ route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $estagiario->username]) }}" class="br-button primary small">Ver folha</a>
-                        </td>
+                        <th>Nome</th>
+                        <th>Lotação</th>
+                        <th class="is-actions"></th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach ($estagiarios as $estagiario)
+                        <tr>
+                            <td>
+                                <span class="bena-table__name">{{ $estagiario->nome }}</span>
+                                @if ($estagiario->username)
+                                    <code class="bena-table__sub">{{ $estagiario->username }}</code>
+                                @endif
+                            </td>
+                            <td>{{ $estagiario->lotacao ?? '—' }}</td>
+                            <td class="is-actions">
+                                <a href="{{ route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $estagiario->username]) }}" class="br-button primary small">Ver folha</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     @endif
 @endsection
