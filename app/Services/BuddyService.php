@@ -29,10 +29,11 @@ class BuddyService
      */
     private function poolPara(Estagiario $estagiario, ?string $grupo): array
     {
-        // Estagiários da STI têm seu próprio pool — as cartas lendárias,
-        // inspiradas em personagens da casa. Servidores e admin da STI
-        // continuam no pool sênior comum.
-        if ($grupo === 'E' && $estagiario->lotacao === 'STI') {
+        // Estagiários das lotações listadas em `buddies.lotacoes_lendarias`
+        // (STI e SSEC, hoje) recebem o pool lendário, inspirado em personagens
+        // da casa. Servidores e admin dessas seções continuam no pool sênior.
+        $lendarias = (array) config('buddies.lotacoes_lendarias', []);
+        if ($grupo === 'E' && in_array($estagiario->lotacao, $lendarias, true)) {
             return (array) config('buddies.tipos_lendarios', []);
         }
 

@@ -688,6 +688,129 @@
             }
         }
 
+        /* ─────────────────────────────────────────────────────────────
+           Onboarding — hero do Lucander e revelação do mascote.
+           ───────────────────────────────────────────────────────────── */
+        .bena-onboarding-hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .bena-onboarding-hero__logo {
+            width: 96px;
+            height: 96px;
+            object-fit: contain;
+            margin-bottom: 1rem;
+        }
+        .bena-onboarding-hero__title {
+            color: #003366;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0 0 1rem;
+            letter-spacing: -0.02em;
+        }
+        .bena-onboarding-hero__narrator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid rgba(217, 119, 6, 0.25);
+            border-radius: 999px;
+            padding: 0.55rem 1.1rem 0.55rem 0.55rem;
+            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12);
+        }
+        .bena-onboarding-hero__avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            line-height: 1;
+            flex-shrink: 0;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1), inset 0 0 0 2px rgba(217, 119, 6, 0.35);
+        }
+        .bena-onboarding-hero__avatar img.emoji {
+            height: 1.4rem;
+            width: 1.4rem;
+            margin: 0;
+        }
+        .bena-onboarding-hero__narrator-text {
+            color: #422006;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            text-align: left;
+        }
+        .bena-onboarding-hero__narrator-text strong {
+            color: #78350f;
+        }
+
+        .bena-buddy-reveal {
+            text-align: center;
+            margin: 0 0 2.5rem;
+        }
+        .bena-buddy-reveal__intro {
+            color: #475569;
+            font-size: 0.95rem;
+            margin: 0 0 1rem;
+            line-height: 1.5;
+        }
+        .bena-buddy-reveal__trigger {
+            font-size: 1rem !important;
+            padding: 0.85rem 2rem !important;
+            box-shadow: 0 6px 20px rgba(0, 51, 102, 0.22);
+            position: relative;
+            overflow: hidden;
+        }
+        .bena-buddy-reveal__trigger::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            transform: translateX(-100%);
+            animation: benaBuddyShimmer 2.4s infinite;
+        }
+        .bena-buddy-reveal__card {
+            display: none;
+            margin-top: 1.25rem;
+            text-align: left;
+        }
+        .bena-buddy-reveal__after {
+            display: none;
+            margin-top: 1rem;
+        }
+        .bena-buddy-reveal[data-buddy-reveal="true"] .bena-buddy-reveal__trigger,
+        .bena-buddy-reveal[data-buddy-reveal="true"] .bena-buddy-reveal__intro {
+            display: none;
+        }
+        .bena-buddy-reveal[data-buddy-reveal="true"] .bena-buddy-reveal__card,
+        .bena-buddy-reveal[data-buddy-reveal="true"] .bena-buddy-reveal__after {
+            display: flex;
+            animation: benaBuddyReveal 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .bena-buddy-reveal[data-buddy-reveal="true"] .bena-buddy-reveal__after {
+            display: block;
+        }
+        @keyframes benaBuddyReveal {
+            0% { opacity: 0; transform: scale(0.82) translateY(24px); }
+            60% { opacity: 1; }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes benaBuddyShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .bena-buddy-reveal[data-buddy-reveal="true"] .bena-buddy-reveal__card,
+            .bena-buddy-reveal[data-buddy-reveal="true"] .bena-buddy-reveal__after {
+                animation: none;
+            }
+            .bena-buddy-reveal__trigger::before {
+                animation: none;
+            }
+        }
+
         /* Twemoji: emojis do Twitter (SVG) substituem os do SO. Garante
            que glifos novos (🦫) e ZWJ-sequences (🧑‍🚒, 🧑‍🔬) renderizem
            igual em qualquer SO/navegador, em vez de cair em fallback do

@@ -41,3 +41,4 @@ docker/data/
 !/storage/logs/.gitkeep
 /bootstrap/cache/*
 !/bootstrap/cache/.gitkeep
+*.Identifier

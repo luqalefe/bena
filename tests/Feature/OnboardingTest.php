@@ -80,6 +80,76 @@ class OnboardingTest extends TestCase
             ->assertSee('Entendi');
     }
 
+    public function test_bem_vindo_apresenta_lucander_como_narrador(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'))
+            ->assertSee('Lucander')
+            ->assertSee('criador do Bena');
+    }
+
+    public function test_estagiario_ve_fluxo_de_estagiario(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'))
+            ->assertSee('Bater ponto')
+            ->assertSee('Folha mensal')
+            ->assertSee('Assinatura')
+            ->assertDontSee('contra-assina');
+    }
+
+    public function test_supervisor_ve_fluxo_de_supervisor(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'super.novato']);
+
+        $this->withHeaders($this->supervisorHeaders('super.novato'))
+            ->get(route('onboarding.show'))
+            ->assertSee('Revisar')
+            ->assertSee('Contra-assinar')
+            ->assertDontSee('Bater ponto');
+    }
+
+    public function test_admin_ve_fluxo_de_admin(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'rh.novato']);
+
+        $this->withHeaders($this->adminHeaders('rh.novato'))
+            ->get(route('onboarding.show'))
+            ->assertSee('Auditoria')
+            ->assertSee('Feriados')
+            ->assertSee('Cadastrar')
+            ->assertDontSee('Bater ponto')
+            ->assertDontSee('Contra-assinar');
+    }
+
+    public function test_mascote_aparece_apos_explicacao_nao_no_topo(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'))
+            ->assertSeeInOrder([
+                'criador do Bena',
+                'Por que Bena',
+                'Bater ponto',
+                'Conheça seu mascote',
+            ]);
+    }
+
+    public function test_card_mascote_inicia_oculto_e_botao_descobrir_existe(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'))
+            ->assertSee('Descobrir meu mascote')
+            ->assertSee('data-buddy-reveal="false"', false);
+    }
+
     public function test_view_inclui_origem_do_nome_bena(): void
     {
         Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);

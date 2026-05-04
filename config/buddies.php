@@ -28,12 +28,17 @@ return [
     ],
 
     // Pool lendário: dez cartas únicas inspiradas em personagens da casa.
-    // Sorteadas exclusivamente pra estagiários lotados na STI — servidores
-    // e admin da STI continuam no pool sênior comum.
+    // Sorteadas exclusivamente pra estagiários lotados nas seções listadas
+    // em `lotacoes_lendarias` — servidores e admin dessas seções continuam
+    // no pool sênior comum.
     'tipos_lendarios' => [
         'edcley', 'lucir', 'lucas', 'bortoli', 'ilis',
         'felipe', 'thallys', 'jonatan', 'jair', 'keith',
     ],
+
+    // Lotações que recebem o pool lendário. SSEC é parte do grupo
+    // institucional da STI, então entra junto.
+    'lotacoes_lendarias' => ['STI', 'SSEC'],
 
     'perfis' => [
         'coruja' => [

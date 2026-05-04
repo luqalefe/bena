@@ -155,6 +155,24 @@ class BuddyServiceTest extends TestCase
         );
     }
 
+    public function test_garantir_buddy_estagiario_ssec_sorteia_carta_lendaria(): void
+    {
+        // SSEC faz parte do mesmo grupo institucional da STI, então estagiários
+        // de lá entram no mesmo sorteio de cartas lendárias.
+        $estagiario = Estagiario::factory()->create([
+            'username' => 'novo.ssec',
+            'lotacao' => 'SSEC',
+            'buddy_tipo' => null,
+        ]);
+
+        app(BuddyService::class)->garantirBuddy($estagiario, 'E');
+
+        $this->assertContains(
+            $estagiario->fresh()->buddy_tipo,
+            config('buddies.tipos_lendarios'),
+        );
+    }
+
     public function test_garantir_buddy_servidor_sti_usa_pool_senior_e_nao_lendaria(): void
     {
         // Servidores e admin da STI não recebem cartas lendárias — elas

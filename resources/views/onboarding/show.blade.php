@@ -3,69 +3,18 @@
 @section('title', 'Bem-vindo ao Bena')
 
 @section('content')
-    @php
-        $passos = [
-            [
-                'icone' => 'fa-clock',
-                'titulo' => 'Bater ponto pelo navegador',
-                'texto' => 'Entrada e saída diretamente da tela inicial. Sem planilha, sem papel. O sistema já calcula as horas trabalhadas.',
-            ],
-            [
-                'icone' => 'fa-calendar-alt',
-                'titulo' => 'Folha mensal automática',
-                'texto' => 'Veja o mês inteiro com horas calculadas, feriados destacados e fins de semana classificados. Adicione observações em dias específicos.',
-            ],
-            [
-                'icone' => 'fa-pen-fancy',
-                'titulo' => 'Assinatura digital ao final do mês',
-                'texto' => 'Quando o mês fechar, você assina sua folha eletronicamente. O sistema gera um hash SHA-256 do conteúdo + carimbo de tempo, no modelo do SEI, sem necessidade de certificado físico.',
-            ],
-            [
-                'icone' => 'fa-user-check',
-                'titulo' => 'Supervisor e RH no mesmo fluxo',
-                'texto' => 'Após você assinar, seu supervisor contra-assina pelo sistema. O RH baixa o PDF assinado e anexa direto no processo SEI.',
-            ],
-            [
-                'icone' => 'fa-magic',
-                'titulo' => 'Esqueceu de bater saída?',
-                'texto' => 'O sistema fecha automaticamente após sua jornada (5h por padrão). Aparece marcado como "auto" para você saber que foi auto-fechamento.',
-            ],
-        ];
-    @endphp
-
     <div style="max-width: 720px; margin: 1rem auto;">
-        <header style="text-align: center; margin-bottom: 2rem;">
-            <img src="{{ asset('img/bena.png') }}" alt="Bena" style="width: 96px; height: 96px; object-fit: contain; margin-bottom: 1rem;">
-            <h1 style="color: #003366; font-size: 1.75rem; font-weight: 700; margin: 0 0 0.5rem; letter-spacing: -0.02em;">
-                Bem-vindo ao Bena
-            </h1>
-            <p style="color: #475569; font-size: 1rem; margin: 0;">
-                Sistema de Controle de Frequência de Estagiários do TRE-AC.
-                Veja em 30 segundos como vai ser o seu dia a dia.
-            </p>
+        <header class="bena-onboarding-hero">
+            <img src="{{ asset('img/bena.png') }}" alt="Bena" class="bena-onboarding-hero__logo">
+            <h1 class="bena-onboarding-hero__title">Bem-vindo ao Bena</h1>
+            <div class="bena-onboarding-hero__narrator">
+                <span class="bena-onboarding-hero__avatar" aria-hidden="true">🧙‍♂️</span>
+                <span class="bena-onboarding-hero__narrator-text">
+                    Olá! Sou o <strong>Lucander, o Improvisador</strong> — criador do Bena.<br>
+                    Deixa eu te mostrar como funciona em 30 segundos.
+                </span>
+            </div>
         </header>
-
-        @isset($buddy)
-            <section aria-labelledby="buddy-titulo" class="bena-buddy-card bena-buddy-card--apresentacao">
-                <div class="bena-buddy-card__avatar bena-buddy-card__avatar--grande" aria-hidden="true">{{ $buddy->emoji }}</div>
-                <div class="bena-buddy-card__content">
-                    <span id="buddy-titulo" class="bena-buddy-card__name">Conheça seu mascote · {{ $buddy->nome }}</span>
-                    <p class="bena-buddy-card__frase">{{ $buddy->frase }}</p>
-                    <p class="bena-buddy-card__rodape">
-                        Cada estagiário recebe um mascote sorteado no primeiro acesso.
-                        Ele te recebe na dashboard com uma frase diferente a cada dia.
-                    </p>
-                </div>
-            </section>
-        @endisset
-
-        <p style="text-align: center; margin: -1rem 0 2.5rem;">
-            <a href="{{ route('mascotes.index') }}" class="br-button secondary">
-                <i class="fas fa-paw" aria-hidden="true"></i>
-                Conhecer todos os mascotes
-            </a>
-        </p>
-
 
         <section aria-labelledby="por-que-bena" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 4px solid #d97706; border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08);">
             <h2 id="por-que-bena" style="color: #78350f; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 0.75rem;">
@@ -113,6 +62,36 @@
                 </li>
             @endforeach
         </ol>
+
+        @isset($buddy)
+            <div class="bena-buddy-reveal" data-buddy-reveal="false">
+                <p class="bena-buddy-reveal__intro">
+                    Antes de você entrar pra valer, eu sorteei um mascote pra te
+                    acompanhar — clica pra revelar.
+                </p>
+                <button type="button" class="br-button primary bena-buddy-reveal__trigger" data-buddy-trigger>
+                    <i class="fas fa-gift" aria-hidden="true"></i>
+                    Descobrir meu mascote
+                </button>
+                <section aria-labelledby="buddy-titulo" class="bena-buddy-card bena-buddy-card--apresentacao bena-buddy-reveal__card">
+                    <div class="bena-buddy-card__avatar bena-buddy-card__avatar--grande" aria-hidden="true">{{ $buddy->emoji }}</div>
+                    <div class="bena-buddy-card__content">
+                        <span id="buddy-titulo" class="bena-buddy-card__name">Conheça seu mascote · {{ $buddy->nome }}</span>
+                        <p class="bena-buddy-card__frase">{{ $buddy->frase }}</p>
+                        <p class="bena-buddy-card__rodape">
+                            Cada usuário recebe um mascote sorteado no primeiro acesso.
+                            Ele te recebe na dashboard com uma frase diferente a cada dia.
+                        </p>
+                    </div>
+                </section>
+                <div class="bena-buddy-reveal__after">
+                    <a href="{{ route('mascotes.index') }}" class="br-button secondary">
+                        <i class="fas fa-paw" aria-hidden="true"></i>
+                        Conhecer todos os mascotes
+                    </a>
+                </div>
+            </div>
+        @endisset
 
         <section aria-labelledby="bastidores" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 4px solid #d97706; border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08);">
             <h2 id="bastidores" style="color: #78350f; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 0.75rem;">
@@ -238,4 +217,18 @@
             </p>
         </form>
     </div>
+
+    <script>
+        (function () {
+            var reveal = document.querySelector('[data-buddy-reveal]');
+            if (!reveal) return;
+            var trigger = reveal.querySelector('[data-buddy-trigger]');
+            if (!trigger) return;
+            trigger.addEventListener('click', function () {
+                reveal.setAttribute('data-buddy-reveal', 'true');
+                var card = reveal.querySelector('.bena-buddy-reveal__card');
+                if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        })();
+    </script>
 @endsection
