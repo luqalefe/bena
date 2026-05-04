@@ -11,12 +11,11 @@ Sistema web de controle de frequência de estagiários no formato CIEE,
 construído para uso interno em tribunal. Substitui o preenchimento manual
 da Ficha de Controle de Frequência (FCF) em papel.
 
-**Stack:** Laravel 11 · PHP 8.2+ · Oracle 19c · gov.br DS v3 (com tema TRE-AC) · Authelia (SSO) · Docker
+**Stack:** Laravel 11 · PHP 8.2+ · Oracle (XE 21 em dev, externo em prod) · gov.br DS v3 (com tema TRE-AC) · Authelia (SSO em prod, simulado em dev) · Docker
 
 **Documentos relacionados (leitura obrigatória antes de implementar):**
 - `REQUISITOS.md` — user stories, critérios de aceitação, priorização
-- `docs/authelia-configuration.yml` — config do SSO
-- `docs/reverse-proxy.md` — Traefik/nginx + forward auth
+- `docs/dev-sessao.md` — bypass de Authelia em dev e troca de usuário simulado
 
 ---
 
@@ -76,16 +75,18 @@ nele primeiro.
 
 ```bash
 cp .env.example .env
-docker compose up -d --build              # sobe app, oracle, authelia, traefik
+docker compose up -d --build              # sobe app, oracle, nginx
 docker compose exec app composer install
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate
 docker compose exec app php artisan db:seed --class=FeriadosNacionaisSeeder
 ```
 
-A app fica em `https://ponto.localhost` (Traefik gera cert auto-assinado).
-O Authelia em `https://auth.localhost`. Adicione esses hosts no
-`/etc/hosts` apontando para `127.0.0.1`.
+Atalho equivalente: `make bootstrap`.
+
+A app fica em `http://localhost:8082` (HTTP direto, sem proxy local).
+Em dev não há TLS nem `ponto.localhost` — Traefik/Authelia ficam só em
+produção (na infra do tribunal, externos a este compose).
 
 ### Atalho recomendado
 
@@ -130,7 +131,7 @@ então não dependem do Oracle do compose — rodam rápido e isolados.
 make shell                                # bash no container app
 docker compose exec app php artisan tinker
 docker compose logs -f app                # logs do Laravel
-docker compose logs -f authelia           # logs do SSO
+docker compose logs -f nginx              # logs do HTTP
 docker compose logs -f oracle             # logs do banco (demora pra subir!)
 ```
 
@@ -155,15 +156,19 @@ que código de aplicação (são código também).
 
 | Serviço | Imagem base | Função |
 |---------|-------------|--------|
-| `app` | `php:8.2-fpm-alpine` (custom) | Laravel + extensões Oracle (oci8) |
-| `nginx` | `nginx:alpine` | Serve a app, fala com php-fpm via socket |
-| `oracle` | `gvenzl/oracle-free:23-slim-faststart` | Oracle local pra dev (dados em volume) |
-| `traefik` | `traefik:v3` | Reverse proxy + TLS auto-assinado |
-| `redis` | `redis:7-alpine` | Cache e sessões do Laravel |
+| `app` | `php:8.2-fpm` (custom, Dockerfile na raiz) | Laravel + Oracle Instant Client + oci8 |
+| `nginx` | `nginx:alpine` | Serve a app, fala com php-fpm via TCP `app:9000` |
+| `oracle` | `gvenzl/oracle-xe:21-slim` | Oracle local pra dev (dados em volume) |
 
-> Authelia **não roda em dev**. O middleware `AutheliaAuth` simula os
-> headers via `.env` quando `AUTHELIA_DEV_BYPASS=true`. Authelia real
-> entra em `docker-compose.prod.yml` (LDAP do tribunal).
+Sem Traefik, sem Redis em dev. Sessions/cache/queue no driver `database`.
+Acesso: `http://localhost:8082` (porta 8080 ocupada por outros projetos —
+remap pra 8082; Oracle em `localhost:1523`).
+
+> Authelia **não roda em dev nem em prod via compose**. O middleware
+> `AutheliaAuth` simula os headers via `.env` quando
+> `AUTHELIA_DEV_BYPASS=true`. Em produção, o reverse proxy + Authelia do
+> tribunal ficam à frente do nginx daqui (externos a este compose) e
+> injetam os headers `Remote-*`.
 
 `oracle` demora ~3 min pra ficar healthy na primeira subida — é normal.
 Use `docker compose logs -f oracle` pra acompanhar e espere ver
@@ -173,72 +178,67 @@ Use `docker compose logs -f oracle` pra acompanhar e espere ver
 
 ```
 .
+├── Dockerfile                      # single-stage, código copiado in
 ├── docker/
-│   ├── app/
-│   │   ├── Dockerfile             # multi-stage: dev e prod
-│   │   ├── php.ini                # config PHP
-│   │   └── entrypoint.sh          # roda migrate em prod, espera oracle
 │   ├── nginx/
 │   │   └── default.conf
-│   ├── authelia/
-│   │   ├── configuration.yml      # config do SSO (ver docs/authelia-configuration.yml)
-│   │   └── users_database.yml     # usuários de DEV (em prod usa LDAP)
-│   └── traefik/
-│       └── traefik.yml
-├── docker-compose.yml             # base (dev)
-├── docker-compose.prod.yml        # overrides para produção
-├── docker-compose.test.yml        # overrides para CI/testes
+│   └── php/
+│       └── local.ini               # upload/post/memory limits
+├── docker-compose.yml              # base (dev)
+├── docker-compose.prod.yml         # overrides para produção
+├── docker-compose.test.yml         # overrides para CI/testes
 ├── .dockerignore
 └── Makefile
 ```
 
 ### Boas práticas que seguimos
 
-- **Multi-stage builds.** O `Dockerfile` da app tem stages `base`, `dev`
-  e `prod`. Prod NÃO contém Xdebug, dev tools, código de teste.
+- **Dockerfile simples na raiz.** Single-stage. O código é copiado pra
+  dentro da imagem; em dev um bind mount sobrepõe pra hot reload.
 - **.dockerignore robusto.** `vendor/`, `node_modules/`, `.git/`, `.env`
   ficam fora do contexto de build.
-- **Sem `latest` em produção.** Tags fixas (`php:8.2.20-fpm-alpine`).
-  Em dev pode usar `latest` por agilidade.
-- **Volumes nomeados pra dados persistentes** (Oracle, Redis, Authelia
-  storage). Nunca dependa de bind mounts pra dados de prod.
-- **Healthchecks em todos os serviços.** `depends_on` com `condition:
-  service_healthy` garante ordem correta de inicialização.
-- **Secrets via Docker secrets ou env**, nunca commitados. `.env.example`
-  só tem placeholders.
-- **Imagens não-root em produção.** O container `app` roda como UID
-  1000 (`www-data`), não como root.
+- **Volume nomeado pros dados do Oracle dev** (`oracle-data`). Nunca
+  dependa de bind mount pra dados.
+- **Healthcheck no Oracle.** `depends_on: condition: service_healthy`
+  garante que app/nginx só sobem depois do banco pronto.
+- **Secrets via env**, nunca commitados. `.env.example` só tem
+  placeholders.
+- **Container app como `laravel` (uid 1000).** Mantenha os arquivos do
+  projeto chowned pra `1000:1000` no host (em WSL/root, rode
+  `chown -R 1000:1000 .` no setup inicial — sem isso composer/artisan
+  falham por permissão).
 
 ### Ambientes
 
 | Ambiente | Como subir |
 |----------|------------|
 | **Dev local** | `docker compose up -d` (usa `docker-compose.yml`) |
-| **CI (GitHub Actions / GitLab CI)** | `docker compose -f docker-compose.yml -f docker-compose.test.yml up --abort-on-container-exit` |
-| **Produção** | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d` |
+| **CI (GitHub Actions / GitLab CI)** | `docker compose -f docker-compose.yml -f docker-compose.test.yml run --rm app` |
+| **Produção** | `docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d` (Authelia + reverse proxy externos a este compose) |
 
 A diferença chave entre dev e prod:
 
-- **Dev**: monta o código como volume (`./:/var/www/html`), Xdebug ativo,
-  Oracle local no compose, Authelia em modo "file users", certificados
-  auto-assinados.
-- **Prod**: código copiado pra dentro da imagem, Xdebug ausente, Oracle
-  externo (do tribunal), Authelia em LDAP/AD, TLS via cert-manager ou
-  Let's Encrypt, secrets injetados pelo orquestrador.
+- **Dev**: monta o código como volume (`./:/var/www/html`), Oracle local
+  no compose (XE 21), HTTP em `localhost:8082`.
+- **Prod**: código self-contained na imagem (sem bind mount), Oracle
+  externo (do tribunal), Authelia + reverse proxy do tribunal à frente
+  do nginx, secrets injetados pelo orquestrador.
 
 ### Pegadinhas comuns
 
 - **Esqueceu de rodar `composer install` no container** depois de
   alterar `composer.json`? `docker compose exec app composer install`.
 - **Mudou `.env`?** Reinicie a app: `docker compose restart app`.
-- **Permissões de `storage/` ou `bootstrap/cache/`?** Geralmente é
-  problema de UID. O entrypoint corrige automaticamente, mas se persistir:
-  `docker compose exec app chown -R www-data:www-data storage bootstrap/cache`.
+- **Permissões em `storage/`, `bootstrap/cache/` ou `vendor/`?**
+  Provável uid mismatch. O container roda como `laravel` (uid 1000);
+  no host, `chown -R 1000:1000 .` resolve.
 - **Oracle "ORA-12541: TNS:no listener"?** Aguarde mais — o Oracle ainda
   está subindo. Healthcheck só fica green quando está realmente pronto.
-- **"sqlite3 not found" em testes?** O Dockerfile precisa instalar
-  `php82-sqlite3` mesmo em prod (a extensão é leve e usar SQLite em
-  testes é nossa decisão).
+- **ORA-00942 em `SESSIONS` / `CACHE` / `JOBS`?** Falta migrar. Como
+  usamos drivers `database` para sessions/cache/queue, as tabelas
+  precisam estar criadas (`php artisan migrate`).
+- **Conflito de portas (8080/1521)?** Outros projetos no host podem
+  estar usando essas portas. Os defaults aqui são `8082` e `1523`.
 
 ---
 
@@ -427,14 +427,21 @@ história, **pare** e pergunte se entra na história ou vira nova.
 ## Decisões já tomadas (não rediscutir sem motivo forte)
 
 - **Oracle, não Postgres/MySQL.** Restrição institucional do tribunal.
+- **Stack mínima espelhando `cadastro-magistrados`.** 3 serviços em dev:
+   `app` (PHP 8.2-fpm + Oracle Instant Client + oci8), `nginx`, `oracle`
+   (XE 21-slim). Sem Traefik, sem Redis, sem Authelia em compose. A
+   simplicidade ganhou do isolamento que Traefik/Redis dariam — todos os
+   projetos do time seguem esse mesmo formato.
 - **Authelia em produção, simulação em dev.** Em prod o tribunal usa
-   Authelia atrás do Traefik (LDAP/AD), e ele injeta os headers
-   `Remote-*`. Em dev NÃO subimos Authelia: `AUTHELIA_DEV_BYPASS=true`
-   simula os headers via `.env`, e a rota `/_dev/sessao` permite trocar
-   usuário/grupo simulado em runtime sem reiniciar. Decisão prática:
-   rodar Authelia local exige TOTP, hashes argon2, configuração
-   especial de cookie domain — não vale o ROI pra iterar. Ver
-   `docs/dev-sessao.md`.
+   Authelia (LDAP/AD) atrás do reverse proxy de infra, externos a este
+   compose; ele injeta os headers `Remote-*`. Em dev NÃO subimos
+   Authelia: `AUTHELIA_DEV_BYPASS=true` simula os headers via `.env`, e
+   a rota `/_dev/sessao` permite trocar usuário/grupo simulado em
+   runtime sem reiniciar. Ver `docs/dev-sessao.md`.
+- **Drivers `database` para sessions/cache/queue.** Sem Redis. Trade-off
+   aceito: o ganho de Redis não justifica o serviço extra na stack;
+   carga prevista é interna ao tribunal (dezenas de estagiários, não
+   milhares de usuários simultâneos).
 - **Assinatura por hash + carimbo, não ICP-Brasil.** Por enquanto. Authelia
    + 2FA dão segurança suficiente pra uso interno. Slot pronto pra trocar
    por PAdES no `AssinaturaService`.
@@ -446,7 +453,7 @@ história, **pare** e pergunte se entra na história ou vira nova.
    de bundle, troca-se pelo `@govbr-ds/core` via npm + Vite.
 - **PDF via DomPDF, não Snappy/wkhtmltopdf.** DomPDF é PHP puro, não exige
    binário externo, suficiente pra layout da FCF.
-- **Docker pra dev, CI e produção.** Mesma stack em todos os ambientes;
+- **Docker pra dev, CI e produção.** Mesma imagem em todos os ambientes;
    "funciona na minha máquina" deixa de existir. Em prod, orquestrado
    por Docker Swarm ou Kubernetes (decisão da infra do tribunal).
 - **Oracle no compose APENAS pra dev.** Em CI usa SQLite in-memory,

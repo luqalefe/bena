@@ -122,11 +122,9 @@ bootstrap: ## Setup inicial: build + up + composer install + key:generate + migr
 	@if [ ! -f .env ]; then cp .env.example .env; echo "[bootstrap] .env criado a partir do .env.example"; fi
 	$(DC) build
 	$(DC) up -d
-	@echo "[bootstrap] aguardando containers ficarem healthy..."
-	@sleep 10
+	@echo "[bootstrap] aguardando oracle ficar healthy (pode levar ~3min na primeira subida)..."
+	$(DC) exec -T oracle bash -c 'until healthcheck.sh; do sleep 5; done'
 	$(DX) composer install
 	$(DX) php artisan key:generate
-	@echo "[bootstrap] aguardando oracle (pode levar até 3min)..."
-	$(DC) exec oracle bash -c 'until healthcheck.sh; do sleep 5; done'
-	$(DX) php artisan migrate
-	@echo "[bootstrap] pronto. acesse https://ponto.localhost"
+	$(DX) php artisan migrate --force
+	@echo "[bootstrap] pronto. acesse http://localhost:8082"

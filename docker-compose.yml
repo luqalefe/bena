@@ -1,160 +1,62 @@
-###############################################################################
-# Stack de DESENVOLVIMENTO.
-# - Código bind-mounted em ./ → /var/www/html
-# - Oracle local no container (gvenzl/oracle-free)
-# - SEM Authelia: em dev usamos AUTHELIA_DEV_BYPASS=true e simulamos
-#   usuário/grupos via .env e via /_dev/sessao. Authelia real entra em
-#   docker-compose.prod.yml (LDAP do tribunal).
-# - Traefik gera cert auto-assinado para *.localhost
-#
-# Para subir:   cp .env.example .env && docker compose up -d
-# Acessar app:  https://ponto.localhost
-###############################################################################
-
-name: ponto
-
-networks:
-  internal:
-    name: ponto_internal
-    driver: bridge
-
-volumes:
-  oracle_data:
-  redis_data:
-  composer_cache:
-  app_node_modules:
-
 services:
-  ###########################################################################
-  # Reverse proxy (HTTPS + cert auto-assinado)
-  ###########################################################################
-  traefik:
-    image: traefik:v3.4
-    restart: unless-stopped
-    command: []
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"   # dashboard (dev only — porta exposta direta)
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-      - ./docker/traefik/dynamic:/etc/traefik/dynamic:ro
-    networks:
-      - internal
-    healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
-
-  ###########################################################################
-  # Redis (cache + sessões do Laravel)
-  ###########################################################################
-  redis:
-    image: redis:7.4-alpine
-    restart: unless-stopped
-    command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redis_data:/data
-    networks:
-      - internal
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 5s
-
-  ###########################################################################
-  # Oracle Free 23 (DEV apenas)
-  # Demora ~3 min na primeira subida. Seja paciente.
-  ###########################################################################
-  oracle:
-    image: gvenzl/oracle-free:23.5-slim-faststart
-    restart: unless-stopped
-    expose:
-      - "1521"
-    ports:
-      - "1521:1521"   # exposta no host pra inspeção via DBeaver/SQL Developer
-    environment:
-      ORACLE_PASSWORD: ${ORACLE_PASSWORD:-oracle_root_dev}
-      APP_USER: ${ORACLE_APP_USER:-ponto}
-      APP_USER_PASSWORD: ${ORACLE_APP_USER_PASSWORD:-ponto_dev_only}
-      ORACLE_DATABASE: FREEPDB1
-    volumes:
-      - oracle_data:/opt/oracle/oradata
-      - ./docker/oracle/init:/container-entrypoint-initdb.d:ro
-    networks:
-      - internal
-    healthcheck:
-      test: ["CMD", "healthcheck.sh"]
-      interval: 30s
-      timeout: 10s
-      retries: 20
-      start_period: 90s
-
-  ###########################################################################
-  # App (Laravel + PHP-FPM + oci8)
-  ###########################################################################
+  # Laravel Application
   app:
     build:
       context: .
-      dockerfile: docker/app/Dockerfile
-      target: dev
+      dockerfile: Dockerfile
+    container_name: ponto-app
     restart: unless-stopped
-    user: "1000:1000"
-    expose:
-      - "9000"
+    working_dir: /var/www/html
     volumes:
-      - ./:/var/www/html
-      - composer_cache:/var/www/.composer
-      - app_node_modules:/var/www/html/node_modules
-    # NÃO usar `env_file: .env` aqui. Isso vaza todas as vars do .env para
-    # o environment do processo PHP, e $_SERVER pré-populado com (por ex.)
-    # DB_CONNECTION='oracle' vence sobre o que o phpunit.xml tenta sobrescrever
-    # com sqlite. Laravel/Dotenv lê o .env direto do disco — não precisamos
-    # propagar nada para o environment do container.
-    environment:
-      # Apenas o que o entrypoint precisa para o wait-for-db.
-      WAIT_DB_HOST: oracle
-      WAIT_DB_PORT: 1521
+      - .:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - ponto-network
     depends_on:
       oracle:
         condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - internal
-    healthcheck:
-      test: ["CMD-SHELL", "php -r 'exit(@fsockopen(\"127.0.0.1\", 9000) ? 0 : 1);'"]
-      interval: 15s
-      timeout: 3s
-      retries: 5
-      start_period: 20s
 
-  ###########################################################################
-  # Nginx (frontend HTTP da app)
-  ###########################################################################
+  # Nginx Web Server
   nginx:
-    image: nginx:1.27-alpine
+    image: nginx:alpine
+    container_name: ponto-nginx
     restart: unless-stopped
-    expose:
-      - "80"
+    ports:
+      - "8082:80"
     volumes:
-      - ./:/var/www/html:ro
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      app:
-        condition: service_healthy
+      - .:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     networks:
-      - internal
-    # Sem labels Traefik — provider docker está desabilitado (incompat com
-    # Docker Desktop 29.x). Roteamento vem de docker/traefik/dynamic/routers.yml
+      - ponto-network
+    depends_on:
+      - app
+
+  # Oracle Database
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: ponto-oracle
+    restart: unless-stopped
+    environment:
+      ORACLE_PASSWORD: secret
+      APP_USER: ponto
+      APP_USER_PASSWORD: secret
+    ports:
+      - "1523:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    networks:
+      - ponto-network
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/__health"]
-      interval: 15s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
+      test: [ "CMD", "healthcheck.sh" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+networks:
+  ponto-network:
+    driver: bridge
+
+volumes:
+  oracle-data:
+    driver: local

@@ -5,53 +5,33 @@
 #
 # Diferenças em relação ao dev:
 #   - Sem container Oracle (conecta no Oracle externo do tribunal)
-#   - Sem bind mount do código (imagem prod self-contained)
-#   - Sem Xdebug, sem dashboard do Traefik exposto
-#   - Authelia com backend LDAP (config externa via secret)
+#   - Sem bind mount do código (imagem self-contained, código copiado via Dockerfile)
+#   - Em produção, Authelia + reverse proxy (Traefik/nginx do tribunal) são
+#     externos a este compose. Eles ficam à frente do nginx daqui e injetam
+#     os headers Remote-* lidos pelo middleware AutheliaAuth.
 ###############################################################################
 
 services:
-  traefik:
-    command:
-      - "--api.dashboard=false"
-    ports: !reset []   # nenhuma porta direta — apenas 80/443 via host network upstream
-    # Ports devem ser configuradas pelo deploy do tribunal (host network ou ingress).
-
   oracle:
     profiles: ["never"]   # não sobe em prod
     deploy:
       replicas: 0
 
   app:
-    build:
-      target: prod
-    user: "1000:1000"
     volumes: !reset []   # imagem self-contained
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
+      APP_URL: ${APP_URL}
       AUTHELIA_DEV_BYPASS: "false"
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT:-1521}
       DB_SERVICE_NAME: ${DB_SERVICE_NAME}
+      DB_DATABASE: ${DB_DATABASE}
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
-    depends_on: !reset
-      redis:
-        condition: service_healthy
+    depends_on: !reset []
 
   nginx:
     volumes:
-      - app_static:/var/www/html:ro
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-
-  authelia:
-    volumes:
-      - ./docker/authelia/configuration.prod.yml:/config/configuration.yml:ro
-      - authelia_data:/data
-    environment:
-      TZ: ${APP_TIMEZONE:-America/Sao_Paulo}
-      # Em prod, os secrets vêm do orquestrador, não do compose.
-
-volumes:
-  app_static:
