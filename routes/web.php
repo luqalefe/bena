@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\EstagiarioController;
 use App\Http\Controllers\Admin\FeriadoController;
 use App\Http\Controllers\Admin\RecessoEstagiarioController;
+use App\Http\Controllers\Admin\SupervisorController;
 use App\Http\Controllers\AssinaturaController;
 use App\Http\Controllers\CalendarioAnualController;
 use App\Http\Controllers\DashboardController;
@@ -75,6 +76,13 @@ Route::middleware('configure.session')->group(function () {
         Route::get('/estagiarios', [EstagiarioController::class, 'index'])->name('estagiarios.index');
         Route::get('/estagiarios/{estagiario}/editar', [EstagiarioController::class, 'edit'])->name('estagiarios.edit');
         Route::put('/estagiarios/{estagiario}', [EstagiarioController::class, 'update'])->name('estagiarios.update');
+
+        Route::get('/supervisores', [SupervisorController::class, 'index'])->name('supervisores.index');
+        Route::get('/supervisores/criar', [SupervisorController::class, 'create'])->name('supervisores.create');
+        Route::post('/supervisores', [SupervisorController::class, 'store'])->name('supervisores.store');
+        Route::get('/supervisores/{supervisor}/editar', [SupervisorController::class, 'edit'])->name('supervisores.edit');
+        Route::put('/supervisores/{supervisor}', [SupervisorController::class, 'update'])->name('supervisores.update');
+        Route::delete('/supervisores/{supervisor}', [SupervisorController::class, 'destroy'])->name('supervisores.destroy');
 
         Route::get('/estagiarios/{estagiario}/recessos', [RecessoEstagiarioController::class, 'index'])->name('estagiarios.recessos.index');
         Route::post('/estagiarios/{estagiario}/recessos', [RecessoEstagiarioController::class, 'store'])->name('estagiarios.recessos.store');

@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             FeriadosNacionaisSeeder::class,
+            EstagiariosCsvSeeder::class,
         ]);
     }
 }

@@ -17,15 +17,11 @@
     <section class="bena-readonly-info" aria-label="Identidade vinda do SSO">
         <h2 class="bena-readonly-info__title">
             <i class="fas fa-id-badge" aria-hidden="true"></i>
-            Identidade · vinda do SSO, não editável
+            Identidade · username vem do SSO, não editável
         </h2>
         <dl class="bena-readonly-info__list">
             <dt>Username</dt>
-            <dd><code>{{ $estagiario->username }}</code></dd>
-            <dt>Nome</dt>
-            <dd>{{ $estagiario->nome }}</dd>
-            <dt>E-mail</dt>
-            <dd>{{ $estagiario->email }}</dd>
+            <dd><code>{{ $estagiario->username ?? '—' }}</code></dd>
         </dl>
     </section>
 
@@ -48,6 +44,19 @@
             @csrf
             @method('PUT')
 
+            <div class="bena-form__field">
+                <label for="nome" class="bena-form__label">
+                    Nome <span class="required" aria-hidden="true">*</span>
+                </label>
+                <input type="text" id="nome" name="nome" value="{{ old('nome', $estagiario->nome) }}" maxlength="200" required class="bena-form__input">
+            </div>
+
+            <div class="bena-form__field">
+                <label for="email" class="bena-form__label">E-mail</label>
+                <input type="email" id="email" name="email" value="{{ old('email', $estagiario->email) }}" maxlength="200" class="bena-form__input" placeholder="exemplo@tre-ac.jus.br">
+                <p class="bena-form__help">Deixe em branco se ainda não souber. O username é derivado da parte antes do @.</p>
+            </div>
+
             <div class="bena-form__row">
                 <div class="bena-form__field">
                     <label for="matricula" class="bena-form__label">Matrícula</label>
@@ -65,19 +74,25 @@
                 <input type="text" id="lotacao" name="lotacao" value="{{ old('lotacao', $estagiario->lotacao) }}" maxlength="100" class="bena-form__input" placeholder="Ex: STI / SDBD">
             </div>
 
-            <div class="bena-form__row">
-                <div class="bena-form__field">
-                    <label for="supervisor_nome" class="bena-form__label">Supervisor (nome)</label>
-                    <input type="text" id="supervisor_nome" name="supervisor_nome" value="{{ old('supervisor_nome', $estagiario->supervisor_nome) }}" maxlength="200" class="bena-form__input">
-                </div>
+            <div class="bena-form__field">
+                <label for="supervisor_id" class="bena-form__label">Supervisor</label>
+                <select id="supervisor_id" name="supervisor_id" class="bena-form__select">
+                    <option value="">— sem supervisor —</option>
+                    @foreach ($supervisores as $sup)
+                        <option value="{{ $sup->id }}" @selected((int) old('supervisor_id', $estagiario->supervisor_id) === (int) $sup->id)>
+                            {{ $sup->nome }}@if ($sup->lotacao) · {{ $sup->lotacao }}@endif
+                        </option>
+                    @endforeach
+                </select>
+                <p class="bena-form__help">
+                    Cadastre supervisores em <a href="{{ route('admin.supervisores.index') }}">Supervisores</a>.
+                    A vinculação aqui também alimenta a autorização (quem pode contra-assinar a folha).
+                </p>
+            </div>
 
-                <div class="bena-form__field">
-                    <label for="supervisor_username" class="bena-form__label">Supervisor (username)</label>
-                    <input type="text" id="supervisor_username" name="supervisor_username" value="{{ old('supervisor_username', $estagiario->supervisor_username) }}" maxlength="100" placeholder="ex: marco.supervisor" class="bena-form__input">
-                    <p class="bena-form__help">
-                        Quem pode contra-assinar a folha. Deve bater com o login do supervisor no Authelia.
-                    </p>
-                </div>
+            <div class="bena-form__field">
+                <label for="instituicao_ensino" class="bena-form__label">Instituição de ensino</label>
+                <input type="text" id="instituicao_ensino" name="instituicao_ensino" value="{{ old('instituicao_ensino', $estagiario->instituicao_ensino) }}" maxlength="200" class="bena-form__input" placeholder="Ex: UFAC, IFAC, UNINORTE">
             </div>
 
             <div class="bena-form__row">
@@ -89,6 +104,19 @@
                 <div class="bena-form__field">
                     <label for="fim_estagio" class="bena-form__label">Fim do estágio</label>
                     <input type="date" id="fim_estagio" name="fim_estagio" value="{{ old('fim_estagio', optional($estagiario->fim_estagio)->format('Y-m-d')) }}" class="bena-form__input">
+                </div>
+            </div>
+
+            <div class="bena-form__row">
+                <div class="bena-form__field">
+                    <label for="prorrogacao_inicio" class="bena-form__label">Início da prorrogação</label>
+                    <input type="date" id="prorrogacao_inicio" name="prorrogacao_inicio" value="{{ old('prorrogacao_inicio', optional($estagiario->prorrogacao_inicio)->format('Y-m-d')) }}" class="bena-form__input">
+                </div>
+
+                <div class="bena-form__field">
+                    <label for="prorrogacao_fim" class="bena-form__label">Fim da prorrogação</label>
+                    <input type="date" id="prorrogacao_fim" name="prorrogacao_fim" value="{{ old('prorrogacao_fim', optional($estagiario->prorrogacao_fim)->format('Y-m-d')) }}" class="bena-form__input">
+                    <p class="bena-form__help">Preencha apenas se houve renovação além do `fim do estágio`.</p>
                 </div>
             </div>
 

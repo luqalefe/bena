@@ -8,6 +8,7 @@ use Database\Factories\EstagiarioFactory;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Estagiario extends Model implements Authenticatable
@@ -25,9 +26,13 @@ class Estagiario extends Model implements Authenticatable
         'lotacao',
         'supervisor_nome',
         'supervisor_username',
+        'supervisor_id',
         'sei',
+        'instituicao_ensino',
         'inicio_estagio',
         'fim_estagio',
+        'prorrogacao_inicio',
+        'prorrogacao_fim',
         'horas_diarias',
         'contrato_path',
         'ativo',
@@ -40,6 +45,8 @@ class Estagiario extends Model implements Authenticatable
         return [
             'inicio_estagio' => 'date',
             'fim_estagio' => 'date',
+            'prorrogacao_inicio' => 'date',
+            'prorrogacao_fim' => 'date',
             'horas_diarias' => 'decimal:2',
             'ativo' => 'boolean',
             'tutorial_visto_em' => 'datetime',
@@ -82,5 +89,11 @@ class Estagiario extends Model implements Authenticatable
     public function recessos(): HasMany
     {
         return $this->hasMany(RecessoEstagiario::class);
+    }
+
+    /** @return BelongsTo<Supervisor, $this> */
+    public function supervisor(): BelongsTo
+    {
+        return $this->belongsTo(Supervisor::class);
     }
 }

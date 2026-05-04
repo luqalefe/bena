@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Admin;
 
 use App\Models\Estagiario;
+use App\Models\Supervisor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -46,7 +47,6 @@ class EstagiarioEdicaoTest extends TestCase
         $alvo = Estagiario::factory()->create([
             'matricula' => 'EST12345',
             'lotacao' => 'Gabinete 1',
-            'supervisor_nome' => 'Dra. Joana Silva',
             'sei' => 'SEI-00123/2026',
             'inicio_estagio' => '2026-03-01',
             'fim_estagio' => '2026-12-01',
@@ -60,27 +60,39 @@ class EstagiarioEdicaoTest extends TestCase
         $response->assertStatus(200)
             ->assertSee('name="matricula"', false)
             ->assertSee('name="lotacao"', false)
-            ->assertSee('name="supervisor_nome"', false)
             ->assertSee('name="sei"', false)
             ->assertSee('name="inicio_estagio"', false)
             ->assertSee('name="fim_estagio"', false)
             ->assertSee('name="horas_diarias"', false)
             ->assertSee('name="ativo"', false)
             ->assertSee('value="EST12345"', false)
-            ->assertSee('value="Gabinete 1"', false)
-            ->assertSee('value="Dra. Joana Silva"', false);
+            ->assertSee('value="Gabinete 1"', false);
     }
 
-    public function test_form_nao_inclui_inputs_para_username_nome_email(): void
+    public function test_form_nao_inclui_input_de_username(): void
     {
+        // Username é fonte de verdade do Authelia — não pode ser editado.
         $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo))
+            ->assertDontSee('name="username"', false);
+    }
+
+    public function test_form_inclui_inputs_editaveis_de_nome_e_email(): void
+    {
+        $alvo = Estagiario::factory()->create([
+            'nome' => 'Lucas Alefe',
+            'email' => 'lucas.alefe@tre-ac.jus.br',
+        ]);
 
         $response = $this->withHeaders($this->adminHeaders())
             ->get(route('admin.estagiarios.edit', $alvo));
 
-        $response->assertDontSee('name="username"', false);
-        $response->assertDontSee('name="nome"', false);
-        $response->assertDontSee('name="email"', false);
+        $response->assertSee('name="nome"', false)
+            ->assertSee('name="email"', false)
+            ->assertSee('value="Lucas Alefe"', false)
+            ->assertSee('value="lucas.alefe@tre-ac.jus.br"', false);
     }
 
     public function test_admin_atualiza_dados_administrativos_e_redireciona(): void
@@ -94,9 +106,10 @@ class EstagiarioEdicaoTest extends TestCase
 
         $response = $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
                 'matricula' => 'EST99999',
                 'lotacao' => 'CTI',
-                'supervisor_nome' => 'Carlos Souza',
                 'sei' => 'SEI-77777/2026',
                 'inicio_estagio' => '2026-04-01',
                 'fim_estagio' => '2026-09-30',
@@ -110,7 +123,6 @@ class EstagiarioEdicaoTest extends TestCase
         $alvo->refresh();
         $this->assertSame('EST99999', $alvo->matricula);
         $this->assertSame('CTI', $alvo->lotacao);
-        $this->assertSame('Carlos Souza', $alvo->supervisor_nome);
         $this->assertSame('SEI-77777/2026', $alvo->sei);
         $this->assertSame('2026-04-01', $alvo->inicio_estagio->format('Y-m-d'));
         $this->assertSame('2026-09-30', $alvo->fim_estagio->format('Y-m-d'));
@@ -118,29 +130,49 @@ class EstagiarioEdicaoTest extends TestCase
         $this->assertTrue($alvo->ativo);
     }
 
-    public function test_admin_atualiza_supervisor_username(): void
+    public function test_admin_vincula_estagiario_a_supervisor_via_dropdown(): void
     {
-        $alvo = Estagiario::factory()->create(['supervisor_username' => null]);
+        $supervisor = Supervisor::factory()->create([
+            'nome' => 'Daniele Carlos de Oliveira Nunes',
+            'username' => 'daniele.nunes',
+        ]);
+        $alvo = Estagiario::factory()->create([
+            'supervisor_id' => null,
+            'supervisor_nome' => null,
+            'supervisor_username' => null,
+        ]);
 
         $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
-                'supervisor_username' => 'marco.supervisor',
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
+                'supervisor_id' => $supervisor->id,
                 'horas_diarias' => '5',
                 'ativo' => '1',
             ])
             ->assertRedirect(route('admin.estagiarios.index'));
 
-        $this->assertSame('marco.supervisor', $alvo->fresh()->supervisor_username);
+        $alvo->refresh();
+        $this->assertSame($supervisor->id, $alvo->supervisor_id);
+        // Para preservar a autorização legada (middleware checa supervisor_username),
+        // a vinculação por dropdown também deve sincronizar nome/username do supervisor.
+        $this->assertSame('Daniele Carlos de Oliveira Nunes', $alvo->supervisor_nome);
+        $this->assertSame('daniele.nunes', $alvo->supervisor_username);
     }
 
-    public function test_form_de_edicao_inclui_campo_supervisor_username(): void
+    public function test_form_inclui_dropdown_de_supervisores_ativos(): void
     {
-        $alvo = Estagiario::factory()->create(['supervisor_username' => 'lucas.supervisor']);
+        Supervisor::factory()->create(['nome' => 'Aieza Bandeira', 'ativo' => true]);
+        Supervisor::factory()->create(['nome' => 'Inativo Antigo', 'ativo' => false]);
+        $alvo = Estagiario::factory()->create();
 
-        $this->withHeaders($this->adminHeaders())
-            ->get(route('admin.estagiarios.edit', $alvo))
-            ->assertSee('name="supervisor_username"', false)
-            ->assertSee('value="lucas.supervisor"', false);
+        $response = $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo));
+
+        $response->assertSee('name="supervisor_id"', false)
+            ->assertSee('Aieza Bandeira');
+        // Supervisor inativo NÃO aparece como opção do dropdown.
+        $response->assertDontSee('Inativo Antigo');
     }
 
     public function test_form_de_edicao_aceita_upload_de_contrato_pdf(): void
@@ -162,6 +194,8 @@ class EstagiarioEdicaoTest extends TestCase
 
         $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
                 'horas_diarias' => '5',
                 'ativo' => '1',
                 'contrato' => $pdf,
@@ -218,6 +252,8 @@ class EstagiarioEdicaoTest extends TestCase
         // Primeiro upload
         $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
                 'horas_diarias' => '5',
                 'ativo' => '1',
                 'contrato' => UploadedFile::fake()->create('original.pdf', 100, 'application/pdf'),
@@ -229,6 +265,8 @@ class EstagiarioEdicaoTest extends TestCase
         // Segundo upload — deve deletar o antigo
         $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
                 'horas_diarias' => '5',
                 'ativo' => '1',
                 'contrato' => UploadedFile::fake()->create('novo.pdf', 100, 'application/pdf'),
@@ -264,6 +302,8 @@ class EstagiarioEdicaoTest extends TestCase
 
         $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
                 'lotacao' => 'CTI',
                 'horas_diarias' => '5',
                 // ativo não enviado = inativado
@@ -273,28 +313,114 @@ class EstagiarioEdicaoTest extends TestCase
         $this->assertFalse($alvo->fresh()->ativo);
     }
 
-    public function test_update_nao_altera_username_nome_ou_email(): void
+    public function test_update_nao_altera_username(): void
     {
+        // Username é fonte de verdade do Authelia; payload mal-intencionado é descartado.
         $alvo = Estagiario::factory()->create([
             'username' => 'original.user',
-            'nome' => 'Nome Original',
-            'email' => 'original@example.local',
         ]);
 
         $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
                 'username' => 'tentativa.hack',
-                'nome' => 'Nome Falso',
-                'email' => 'falso@example.local',
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
                 'lotacao' => 'CTI',
                 'horas_diarias' => '5',
                 'ativo' => '1',
             ]);
 
+        $this->assertSame('original.user', $alvo->fresh()->username);
+    }
+
+    public function test_admin_atualiza_nome_e_email(): void
+    {
+        $alvo = Estagiario::factory()->create([
+            'nome' => 'Nome Antigo',
+            'email' => 'antigo@example.local',
+        ]);
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => 'Nome Corrigido',
+                'email' => 'novo@tre-ac.jus.br',
+                'horas_diarias' => '5',
+                'ativo' => '1',
+            ])
+            ->assertRedirect(route('admin.estagiarios.index'));
+
         $alvo->refresh();
-        $this->assertSame('original.user', $alvo->username);
-        $this->assertSame('Nome Original', $alvo->nome);
-        $this->assertSame('original@example.local', $alvo->email);
+        $this->assertSame('Nome Corrigido', $alvo->nome);
+        $this->assertSame('novo@tre-ac.jus.br', $alvo->email);
+    }
+
+    public function test_validacao_nome_obrigatorio_no_update(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => '',
+                'email' => $alvo->email,
+                'horas_diarias' => '5',
+            ])
+            ->assertSessionHasErrors(['nome']);
+    }
+
+    public function test_admin_persiste_instituicao_e_prorrogacao(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
+                'instituicao_ensino' => 'IFAC',
+                'prorrogacao_inicio' => '2025-07-21',
+                'prorrogacao_fim' => '2026-07-21',
+                'horas_diarias' => '5',
+                'ativo' => '1',
+            ])
+            ->assertRedirect(route('admin.estagiarios.index'));
+
+        $alvo->refresh();
+        $this->assertSame('IFAC', $alvo->instituicao_ensino);
+        $this->assertSame('2025-07-21', $alvo->prorrogacao_inicio->format('Y-m-d'));
+        $this->assertSame('2026-07-21', $alvo->prorrogacao_fim->format('Y-m-d'));
+    }
+
+    public function test_validacao_prorrogacao_fim_posterior_a_inicio(): void
+    {
+        $alvo = Estagiario::factory()->create();
+
+        $this->withHeaders($this->adminHeaders())
+            ->put(route('admin.estagiarios.update', $alvo), [
+                'nome' => $alvo->nome,
+                'email' => $alvo->email,
+                'prorrogacao_inicio' => '2025-12-01',
+                'prorrogacao_fim' => '2025-06-01',
+                'horas_diarias' => '5',
+            ])
+            ->assertSessionHasErrors(['prorrogacao_fim']);
+    }
+
+    public function test_form_inclui_inputs_de_instituicao_e_prorrogacao(): void
+    {
+        $alvo = Estagiario::factory()->create([
+            'instituicao_ensino' => 'IFAC',
+            'prorrogacao_inicio' => '2025-07-21',
+            'prorrogacao_fim' => '2026-07-21',
+        ]);
+
+        $response = $this->withHeaders($this->adminHeaders())
+            ->get(route('admin.estagiarios.edit', $alvo));
+
+        $response->assertSee('name="instituicao_ensino"', false)
+            ->assertSee('name="prorrogacao_inicio"', false)
+            ->assertSee('name="prorrogacao_fim"', false)
+            ->assertSee('value="IFAC"', false)
+            ->assertSee('value="2025-07-21"', false)
+            ->assertSee('value="2026-07-21"', false);
     }
 
     public function test_validacao_horas_diarias_obrigatorias_e_positivas(): void

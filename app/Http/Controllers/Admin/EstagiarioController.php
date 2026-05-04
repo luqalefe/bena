@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateEstagiarioRequest;
 use App\Models\Estagiario;
+use App\Models\Supervisor;
 use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,7 +45,15 @@ class EstagiarioController extends Controller
 
     public function edit(Estagiario $estagiario): View
     {
-        return view('admin.estagiarios.edit', ['estagiario' => $estagiario]);
+        $supervisores = Supervisor::query()
+            ->where('ativo', true)
+            ->orderBy('nome')
+            ->get(['id', 'nome', 'lotacao']);
+
+        return view('admin.estagiarios.edit', [
+            'estagiario' => $estagiario,
+            'supervisores' => $supervisores,
+        ]);
     }
 
     public function update(UpdateEstagiarioRequest $request, Estagiario $estagiario): RedirectResponse
@@ -52,16 +61,21 @@ class EstagiarioController extends Controller
         $dados = $request->validated();
 
         $estagiario->fill([
+            'nome' => $dados['nome'],
+            'email' => $dados['email'] ?? null,
             'matricula' => $dados['matricula'] ?? null,
             'lotacao' => $dados['lotacao'] ?? null,
-            'supervisor_nome' => $dados['supervisor_nome'] ?? null,
-            'supervisor_username' => $dados['supervisor_username'] ?? null,
             'sei' => $dados['sei'] ?? null,
+            'instituicao_ensino' => $dados['instituicao_ensino'] ?? null,
             'inicio_estagio' => $dados['inicio_estagio'] ?? null,
             'fim_estagio' => $dados['fim_estagio'] ?? null,
+            'prorrogacao_inicio' => $dados['prorrogacao_inicio'] ?? null,
+            'prorrogacao_fim' => $dados['prorrogacao_fim'] ?? null,
             'horas_diarias' => $dados['horas_diarias'],
             'ativo' => (bool) ($dados['ativo'] ?? false),
         ]);
+
+        $this->vincularSupervisor($estagiario, $dados['supervisor_id'] ?? null);
 
         if ($request->hasFile('contrato')) {
             if ($estagiario->contrato_path) {
@@ -105,6 +119,31 @@ class EstagiarioController extends Controller
             "contrato_{$estagiario->username}.pdf",
             ['Content-Type' => 'application/pdf'],
         );
+    }
+
+    /**
+     * Sincroniza supervisor_id e os campos legados (supervisor_nome /
+     * supervisor_username) a partir do dropdown. Mantém a autorização
+     * existente — que ainda lê supervisor_username — funcionando.
+     */
+    private function vincularSupervisor(Estagiario $estagiario, ?int $supervisorId): void
+    {
+        if ($supervisorId === null) {
+            $estagiario->supervisor_id = null;
+            $estagiario->supervisor_nome = null;
+            $estagiario->supervisor_username = null;
+
+            return;
+        }
+
+        $supervisor = Supervisor::find($supervisorId);
+        if ($supervisor === null) {
+            return;
+        }
+
+        $estagiario->supervisor_id = $supervisor->id;
+        $estagiario->supervisor_nome = $supervisor->nome;
+        $estagiario->supervisor_username = $supervisor->username;
     }
 
     private function podeBaixarContratoDe(Estagiario $estagiario): bool

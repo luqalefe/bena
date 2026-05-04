@@ -687,6 +687,18 @@
                 font-size: 2.75rem;
             }
         }
+
+        /* Twemoji: emojis do Twitter (SVG) substituem os do SO. Garante
+           que glifos novos (🦫) e ZWJ-sequences (🧑‍🚒, 🧑‍🔬) renderizem
+           igual em qualquer SO/navegador, em vez de cair em fallback do
+           Segoe UI Emoji. */
+        img.emoji {
+            height: 1em;
+            width: 1em;
+            margin: 0 0.05em 0 0.1em;
+            vertical-align: -0.1em;
+            display: inline-block;
+        }
     </style>
 
     @stack('styles')
@@ -739,6 +751,7 @@
                     @if ($grupo === '0')
                         <a href="{{ route('admin.dashboard') }}">Dashboard</a>
                         <a href="{{ route('admin.estagiarios.index') }}">Estagiários</a>
+                        <a href="{{ route('admin.supervisores.index') }}">Supervisores</a>
                         <a href="{{ route('admin.auditoria.index') }}" title="Log de ações sensíveis">Auditoria</a>
                     @elseif ($grupo === 'S')
                         <a href="{{ route('supervisor.dashboard') }}">Meus estagiários</a>
@@ -804,5 +817,18 @@
     </footer>
 
     @stack('scripts')
+
+    {{-- Twemoji parser: troca emojis Unicode por <img> SVG do Twitter. --}}
+    <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@15.1.0/dist/twemoji.min.js" crossorigin="anonymous"></script>
+    <script>
+        (function () {
+            if (typeof twemoji === 'undefined') return;
+            twemoji.parse(document.body, {
+                folder: 'svg',
+                ext: '.svg',
+                base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/',
+            });
+        })();
+    </script>
 </body>
 </html>
