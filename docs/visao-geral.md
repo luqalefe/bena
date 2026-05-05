@@ -169,15 +169,19 @@ tempo.
 
 - **PHP 8.2** com `declare(strict_types=1)` e tipagem em tudo.
 - **Laravel 11** como framework.
-- **Oracle 19c+** (institucional) em produção; **Oracle 23ai (slim-faststart)**
-  em desenvolvimento via Docker; **SQLite in-memory** em testes.
-- **Authelia** como SSO + 2FA, com forward-auth pelo reverse proxy
-  (Traefik em dev, nginx + traefik em prod).
+- **Oracle** institucional em produção; **Oracle XE 21 (slim)** em
+  desenvolvimento via Docker; **SQLite in-memory** em testes.
+- **Authelia** como SSO + 2FA em produção, atrás do reverse proxy do
+  tribunal — externos a este compose. Em dev, simulado via
+  `AUTHELIA_DEV_BYPASS=true` (sem Authelia/Traefik no compose local).
 - **gov.br Design System v3** com tema **TRE-AC** (paleta navy `#003366`
   sobrescrevendo as cores primárias do gov.br).
 - **DomPDF** para geração do PDF da folha mensal (sem binário externo).
-- **Redis** para cache e sessões.
+- **Driver `database`** para sessions, cache e queue (sem Redis — ganho
+  não justificava o serviço extra na stack).
 - **Docker / Docker Compose** em dev, CI e produção.
+- **TRE-AC Visão API** (`/unidades/`, `/lotacao/`, `/ferias/setor/`)
+  consumida pelo `TreApiClient` para sincronizar setores.
 
 ### Camadas
 
@@ -208,23 +212,33 @@ relacionamentos, casts e scopes simples.
 
 | Modelo | Tabela | O que representa |
 |---|---|---|
-| `Estagiario` | `estagiarios` | Pessoa cadastrada (todo usuário do sistema, mesmo admin/supervisor, é um `Estagiario` — o que muda é o grupo). |
+| `Estagiario` | `estagiarios` | Pessoa cadastrada (todo usuário do sistema, mesmo admin/supervisor, é um `Estagiario` — o que muda é o grupo). Hoje aponta pra `Setor` via FK e pra `Supervisor` via FK. |
 | `Frequencia` | `frequencias` | Um dia de ponto: data, entrada, saída, horas, observação, marca de auto-fechamento. |
 | `Feriado` | `feriados` | Data não útil: data, descrição, tipo (`nacional` / `estadual` / `municipal` / `recesso`), UF, recorrente. |
 | `Assinatura` | `assinaturas` | Carimbo da folha mensal: papel (`estagiario`/`supervisor`), hash, snapshot, timestamp, IP, e (se substituída) `substituida_em`. |
+| `Setor` | `setores` | Sigla institucional (`SIGLA_UNID_TSE`) sincronizada das APIs do TRE-AC. Estagiários referenciam por FK. |
+| `Supervisor` | `supervisores` | Servidor responsável por um ou mais estagiários. Contra-assina folha. |
+| `RecessoEstagiario` | `recessos_estagiario` | Janela de recesso anual (CIEE, Lei 11.788). Bloqueia bater ponto e zera o alerta de "sem recesso". |
+| `Auditoria` | `auditoria` | Log append-only de ações sensíveis. Nunca recebe `update()`/`delete()` na app. |
+
+> Detalhamento campo a campo de cada modelo está em
+> [`dominio.md`](./dominio.md).
 
 ### Services principais
 
 | Service | Responsabilidade |
 |---|---|
-| `PontoService` | Bater entrada/saída com validações (não bate em fds/feriado, não duplica). |
+| `PontoService` | Bater entrada/saída com validações (não bate em fds/feriado/recesso, não duplica, respeita vigência); fecha pontos esquecidos. |
 | `CalendarioService` | Determina `ehDiaUtil` / `ehFeriado` / `feriadosDoAno`. |
 | `FolhaMensalService` | Monta a `FolhaMensal` (DTO com lista de `DiaFolha`). |
 | `PdfFolhaMensalService` | Renderiza a folha em PDF no layout CIEE via DomPDF. |
-| `AssinaturaService` | Snapshot canônico → SHA-256 → grava `Assinatura`; verifica integridade; suporta re-assinatura. |
+| `AssinaturaService` | Snapshot canônico → SHA-256 → grava `Assinatura`; verifica integridade; suporta re-assinatura; gera diff entre snapshot gravado e atual. |
 | `DashboardService` | DTO `DashboardData` para a home do estagiário. |
 | `DashboardAdminService` | DTO `DashboardAdminLinha[]` para o `/admin` (1 linha por estagiário no mês). |
 | `BuddyService` | Sistema de mascotes (atribuição, montagem da frase, boas-vindas). |
+| `ConformidadeService` | Alertas de conformidade Lei 11.788: TCE vencendo (≤ 30 dias), sem recesso (12+ meses), jornada semanal excedida. |
+| `AuditoriaService` | Append-only em `auditoria` (chamado pelos controllers em ações sensíveis). |
+| `TreApiClient` | HTTP client cacheado pras APIs TRE-AC (`/unidades/`, `/lotacao/`). |
 
 ### Convenções de nomenclatura
 
@@ -387,8 +401,8 @@ avião pelas zonas remotas, o ribeirinho que vê a urna chegar.
 
 ### Pools
 
-Existem **dois pools de mascotes**, com personalidades adequadas ao
-papel do usuário no sistema:
+Existem **três pools de mascotes**, com personalidades adequadas ao
+papel e à lotação do usuário:
 
 - **Pool padrão** — atribuído ao grupo `estagiarios`. 8 mascotes com
   personalidades variadas: do empolgado ao preguiçoso, do zen ao
@@ -396,9 +410,14 @@ papel do usuário no sistema:
 - **Pool sênior** — atribuído ao grupo `supervisores` e `admin`.
   4 mascotes em tom de mentoria, mais maduros, com voz de quem já
   acompanhou muito ciclo eleitoral.
+- **Pool lendário** — exclusivo de estagiários lotados em `STI` ou `SSEC`
+  (configurado em `buddies.lotacoes_lendarias`). 9 cartas inspiradas
+  em servidores reais da casa, cada uma com **classe**, **habilidade**
+  e **flavor text** no estilo de carta de RPG/TCG.
 
 A escolha é aleatória dentro do pool e **permanente** — você adota o
-seu mascote na primeira visita à dashboard ou ao `/bem-vindo`.
+seu mascote na primeira visita à dashboard ou ao `/bem-vindo`. Lore
+completa em [`lore.md`](./lore.md).
 
 ### Pool padrão (estagiários)
 
@@ -517,8 +536,10 @@ cp .env.example .env
 make bootstrap   # build + up + composer install + key:generate + migrate
 ```
 
-App em `https://ponto.localhost`. **Não precisa mexer em `/etc/hosts`**:
-Chrome/Firefox/Edge resolvem `*.localhost` para 127.0.0.1 (RFC 6761).
+App em `http://localhost:8082` (HTTP direto, sem proxy local). Não há
+TLS nem `ponto.localhost` em dev — Traefik/Authelia ficam só em
+produção (na infra do tribunal, externos a este compose). Detalhes
+operacionais em [`operacao.md`](./operacao.md).
 
 ### Comandos do dia a dia
 
@@ -555,14 +576,18 @@ Decisões já tomadas. Mudanças aqui exigem justificativa explícita no PR.
 ### Banco
 
 - **Oracle, não Postgres/MySQL.** Restrição institucional do tribunal.
-- **Oracle no compose APENAS para dev.** Em CI usa SQLite in-memory; em
-  produção, conecta no Oracle externo do tribunal.
+- **Oracle no compose APENAS para dev** (XE 21-slim). Em CI usa SQLite
+  in-memory; em produção, conecta no Oracle externo do tribunal.
 - **SQLite in-memory para testes.** Migrations são compatíveis com
   ambos. Trade-off aceito: testes rápidos > paridade total de banco.
 - **Cuidados específicos do Oracle:** sem tipo `TIME` (usar `string(8)`
   HH:MM:SS + Attribute no model); identifiers ≤ 30 chars; `Rule::unique`
   em coluna data falha com cast `date` puro — usar `whereDate` em
   closure de validação.
+- **Drivers `database` para sessions/cache/queue.** Sem Redis. Trade-off
+  aceito: ganho não justifica o serviço extra na stack — carga prevista
+  é interna ao tribunal (dezenas de estagiários, não milhares
+  simultâneos).
 
 ### Autenticação
 
@@ -608,10 +633,15 @@ Decisões já tomadas. Mudanças aqui exigem justificativa explícita no PR.
 
 - **Docker para dev, CI e produção.** Mesma stack em todos os
   ambientes; "funciona na minha máquina" deixa de existir.
+- **Stack mínima espelhando `cadastro-magistrados`.** 3 serviços em dev:
+  `app` (PHP 8.2-fpm + Oracle Instant Client + oci8), `nginx`, `oracle`
+  (XE 21-slim). Sem Traefik, sem Redis, sem Authelia em compose. A
+  simplicidade ganhou do isolamento que Traefik/Redis dariam — todos os
+  projetos do time seguem esse mesmo formato.
 - Em dev, código montado como volume (`./:/var/www/html`); em prod,
-  copiado dentro da imagem.
-- Multi-stage build: dev tem Xdebug, prod não.
-- Imagens de prod < 300 MB; rodam como UID 1000 (`www-data`), não root.
+  copiado dentro da imagem (self-contained).
+- Imagem `app` roda como UID 1000 (`laravel`), não root.
+- Plano detalhado de subida em produção: [`deploy-prod.md`](./deploy-prod.md).
 
 ### Workflow
 
@@ -729,9 +759,9 @@ Decisões já tomadas. Mudanças aqui exigem justificativa explícita no PR.
 
 ### Cobertura de testes
 
-- **278 testes / 671 asserções**, todos verdes.
+- **425 testes / 978 asserções**, todos verdes (snapshot 2026-05-05).
 - Razão **teste/produção ≈ 2,8 : 1** — coerente com TDD estrito.
-- Suíte roda em ~60s (SQLite in-memory).
+- Suíte roda em ~13s (SQLite in-memory).
 - Gate de cobertura: ≥ 80% global (`--min=80`).
 
 ---
