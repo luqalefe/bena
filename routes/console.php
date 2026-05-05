@@ -16,3 +16,9 @@ Schedule::command('ponto:fechar-abertos')
     ->dailyAt('00:05')
     ->withoutOverlapping()
     ->onOneServer();
+
+// Sincroniza setores com as APIs do TRE-AC (/unidades/ e /lotacao/).
+Schedule::command('setores:sincronizar')
+    ->dailyAt('03:00')
+    ->withoutOverlapping()
+    ->onOneServer();

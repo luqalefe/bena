@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'tre_ac' => [
+        'base_url' => env('TRE_AC_API_BASE_URL', 'https://visao.tre-ac.jus.br/painel/view/api'),
+        'timeout' => (int) env('TRE_AC_API_TIMEOUT', 8),
+        'cache_ttl' => (int) env('TRE_AC_API_CACHE_TTL', 3600),
+    ],
+
 ];
