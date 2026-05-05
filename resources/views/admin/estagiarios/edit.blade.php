@@ -70,8 +70,16 @@
             </div>
 
             <div class="bena-form__field">
-                <label for="lotacao" class="bena-form__label">Lotação</label>
-                <input type="text" id="lotacao" name="lotacao" value="{{ old('lotacao', $estagiario->lotacao) }}" maxlength="100" class="bena-form__input" placeholder="Ex: STI / SDBD">
+                <label for="setor_id" class="bena-form__label">Setor</label>
+                <select id="setor_id" name="setor_id" class="bena-form__select">
+                    <option value="">— sem setor —</option>
+                    @foreach ($setores as $s)
+                        <option value="{{ $s->id }}" @selected((int) old('setor_id', $estagiario->setor_id) === (int) $s->id)>{{ $s->sigla }}</option>
+                    @endforeach
+                </select>
+                <p class="bena-form__help">
+                    Lista sincronizada do TRE-AC pelo comando <code>setores:sincronizar</code> (cron diário 03h).
+                </p>
             </div>
 
             <div class="bena-form__field">

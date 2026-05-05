@@ -7,7 +7,7 @@
         <div class="bena-listing__header-text">
             <h1 class="bena-listing__title">Recessos</h1>
             <p class="bena-listing__subtitle">
-                {{ $estagiario->nome }}@if ($estagiario->lotacao) · {{ $estagiario->lotacao }}@endif
+                {{ $estagiario->nome }}@if ($estagiario->setor) · {{ $estagiario->setor->sigla }}@endif
             </p>
         </div>
         <a href="{{ route('admin.estagiarios.edit', $estagiario) }}" class="br-button secondary">

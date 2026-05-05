@@ -16,11 +16,12 @@ class DashboardAdminService
     /**
      * @return Collection<int, DashboardAdminLinha>
      */
-    public function montar(int $ano, int $mes, ?string $lotacao = null, bool $apenasLiberadas = false, ?string $alerta = null): Collection
+    public function montar(int $ano, int $mes, ?string $setorSigla = null, bool $apenasLiberadas = false, ?string $alerta = null): Collection
     {
         $estagiarios = Estagiario::query()
             ->where('ativo', true)
-            ->when($lotacao, fn ($q) => $q->where('lotacao', $lotacao))
+            ->when($setorSigla, fn ($q) => $q->whereHas('setor', fn ($s) => $s->where('sigla', $setorSigla)))
+            ->with('setor')
             ->orderBy('nome')
             ->get();
 

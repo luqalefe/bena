@@ -26,8 +26,8 @@
         <div style="background: var(--color-primary-lighten-02, #e6f0ff); color: var(--color-primary-darken-01); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
             <span>
                 <strong>Visualizando folha de {{ $estagiario->nome }}</strong>
-                @if ($estagiario->lotacao)
-                    — {{ $estagiario->lotacao }}
+                @if ($estagiario->setor)
+                    — {{ $estagiario->setor->sigla }}
                 @endif
             </span>
             <a href="{{ route('admin.dashboard') }}" style="color: inherit; text-decoration: underline; font-size: 0.875rem;">← Dashboard admin</a>

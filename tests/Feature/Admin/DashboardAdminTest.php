@@ -53,7 +53,7 @@ class DashboardAdminTest extends TestCase
         Estagiario::factory()->create([
             'username' => 'ana.ativa',
             'nome' => 'Ana Ativa',
-            'lotacao' => 'SECEP',
+            'setor_id' => $this->setorId('SECEP'),
             'ativo' => true,
         ]);
 
@@ -69,7 +69,7 @@ class DashboardAdminTest extends TestCase
         Estagiario::factory()->inativo()->create([
             'username' => 'inativo.bruno',
             'nome' => 'Bruno Inativo',
-            'lotacao' => 'CTI',
+            'setor_id' => $this->setorId('CTI'),
         ]);
 
         $response = $this->withHeaders($this->adminHeaders())->get('/admin');
@@ -84,7 +84,7 @@ class DashboardAdminTest extends TestCase
 
         $ana = Estagiario::factory()->create([
             'nome' => 'Ana Horas',
-            'lotacao' => 'SECEP',
+            'setor_id' => $this->setorId('SECEP'),
         ]);
 
         Frequencia::create([
@@ -109,19 +109,19 @@ class DashboardAdminTest extends TestCase
             ->assertSee('2 dias'); // dias batidos
     }
 
-    public function test_dashboard_filtra_por_lotacao(): void
+    public function test_dashboard_filtra_por_setor(): void
     {
         Estagiario::factory()->create([
             'nome' => 'Carla SECEP',
-            'lotacao' => 'SECEP',
+            'setor_id' => $this->setorId('SECEP'),
         ]);
         Estagiario::factory()->create([
             'nome' => 'Diego CTI',
-            'lotacao' => 'CTI',
+            'setor_id' => $this->setorId('CTI'),
         ]);
 
         $response = $this->withHeaders($this->adminHeaders())
-            ->get('/admin?lotacao=SECEP');
+            ->get('/admin?setor=SECEP');
 
         $response->assertStatus(200);
         $response->assertSee('Carla SECEP');
@@ -159,7 +159,7 @@ class DashboardAdminTest extends TestCase
         $ana = Estagiario::factory()->create([
             'username' => 'ana.test',
             'nome' => 'Ana Test',
-            'lotacao' => 'SECEP',
+            'setor_id' => $this->setorId('SECEP'),
         ]);
 
         Assinatura::create([

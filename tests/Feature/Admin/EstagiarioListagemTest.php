@@ -42,13 +42,13 @@ class EstagiarioListagemTest extends TestCase
         Estagiario::factory()->create([
             'username' => 'ana.estagiaria',
             'nome' => 'Ana Estagiária',
-            'lotacao' => 'Gabinete 1',
+            'setor_id' => $this->setorId('GAB1'),
             'ativo' => true,
         ]);
         Estagiario::factory()->inativo()->create([
             'username' => 'bruno.afastado',
             'nome' => 'Bruno Afastado',
-            'lotacao' => 'CTI',
+            'setor_id' => $this->setorId('CTI'),
         ]);
 
         $response = $this->withHeaders($this->adminHeaders())
@@ -57,7 +57,7 @@ class EstagiarioListagemTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Ana Estagiária');
         $response->assertSee('Bruno Afastado');
-        $response->assertSee('Gabinete 1');
+        $response->assertSee('GAB1');
         $response->assertSee('CTI');
     }
 }

@@ -129,7 +129,7 @@ class PdfFolhaMensalTest extends TestCase
         $estagiario = Estagiario::factory()->create([
             'username' => 'lucas.dev',
             'nome' => 'Lucas Dev',
-            'lotacao' => 'CTI',
+            'setor_id' => $this->setorId('CTI'),
             'matricula' => 'EST00001',
             'sei' => 'SEI-DEV-1/2026',
             'supervisor_nome' => 'Lucas Supervisor',

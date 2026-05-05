@@ -54,7 +54,7 @@
             <td class="label">Matrícula</td><td>{{ $estagiario->matricula ?? '—' }}</td>
         </tr>
         <tr>
-            <td class="label">Lotação</td><td>{{ $estagiario->lotacao ?? '—' }}</td>
+            <td class="label">Lotação</td><td>{{ $estagiario->setor?->sigla ?? '—' }}</td>
             <td class="label">SEI</td><td>{{ $estagiario->sei ?? '—' }}</td>
         </tr>
         <tr>

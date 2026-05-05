@@ -7,7 +7,7 @@
         <div class="bena-listing__header-text">
             <h1 class="bena-listing__title">Estagiários</h1>
             <p class="bena-listing__subtitle">
-                Cadastro completo. Use o filtro por lotação para focar num setor.
+                Cadastro completo. Use o filtro por setor para focar.
             </p>
         </div>
     </header>
@@ -21,18 +21,18 @@
 
     <form method="GET" action="{{ url('/admin/estagiarios') }}" class="bena-filters">
         <label class="bena-filters__field">
-            <span class="bena-filters__label">Lotação</span>
-            <select name="lotacao" onchange="this.form.submit()" class="bena-filters__control">
-                <option value="">Todas</option>
-                @foreach ($lotacoes as $opt)
-                    <option value="{{ $opt }}" @selected($lotacao === $opt)>{{ $opt }}</option>
+            <span class="bena-filters__label">Setor</span>
+            <select name="setor" onchange="this.form.submit()" class="bena-filters__control">
+                <option value="">Todos</option>
+                @foreach ($setores as $opt)
+                    <option value="{{ $opt }}" @selected($setor === $opt)>{{ $opt }}</option>
                 @endforeach
             </select>
         </label>
         <noscript>
             <button type="submit" class="br-button primary">Filtrar</button>
         </noscript>
-        @if ($lotacao)
+        @if ($setor)
             <a href="{{ url('/admin/estagiarios') }}" class="br-button secondary">Limpar</a>
         @endif
     </form>
@@ -56,7 +56,7 @@
                     <tr>
                         <th>Nome</th>
                         <th>Username</th>
-                        <th>Lotação</th>
+                        <th>Setor</th>
                         <th>Matrícula</th>
                         <th>Status</th>
                         <th class="is-actions"></th>
@@ -78,7 +78,7 @@
                                     <span class="muted">—</span>
                                 @endif
                             </td>
-                            <td>{{ $estagiario->lotacao ?? '—' }}</td>
+                            <td>{{ $estagiario->setor?->sigla ?? '—' }}</td>
                             <td>{{ $estagiario->matricula ?? '—' }}</td>
                             <td>
                                 @if ($estagiario->ativo)

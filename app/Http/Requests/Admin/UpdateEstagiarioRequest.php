@@ -24,7 +24,7 @@ class UpdateEstagiarioRequest extends FormRequest
             'nome' => ['required', 'string', 'max:200'],
             'email' => ['nullable', 'email', 'max:200'],
             'matricula' => ['nullable', 'string', 'max:30'],
-            'lotacao' => ['nullable', 'string', 'max:100'],
+            'setor_id' => ['nullable', 'integer', 'exists:setores,id'],
             'supervisor_id' => ['nullable', 'integer', 'exists:supervisores,id'],
             'sei' => ['nullable', 'string', 'max:50'],
             'instituicao_ensino' => ['nullable', 'string', 'max:200'],

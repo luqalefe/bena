@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Estagiario;
+use App\Models\Setor;
 use App\Services\ConformidadeService;
 use App\Services\DashboardAdminService;
 use Carbon\CarbonImmutable;
@@ -24,24 +25,23 @@ class DashboardController extends Controller
         $hoje = CarbonImmutable::now();
         $ano = (int) $request->query('ano', (string) $hoje->year);
         $mes = (int) $request->query('mes', (string) $hoje->month);
-        $lotacao = $request->query('lotacao');
+        $setor = $request->query('setor');
+        $setor = is_string($setor) && $setor !== '' ? $setor : null;
         $apenasLiberadas = $request->boolean('liberadas');
         $alerta = $request->query('alerta');
         $alerta = is_string($alerta) && $alerta !== '' ? $alerta : null;
 
-        $linhas = $this->service->montar($ano, $mes, $lotacao, $apenasLiberadas, $alerta);
+        $linhas = $this->service->montar($ano, $mes, $setor, $apenasLiberadas, $alerta);
 
-        $lotacoes = Estagiario::query()
-            ->where('ativo', true)
-            ->whereNotNull('lotacao')
-            ->distinct()
-            ->orderBy('lotacao')
-            ->pluck('lotacao');
+        $setores = Setor::query()
+            ->whereIn('id', Estagiario::query()->where('ativo', true)->whereNotNull('setor_id')->pluck('setor_id'))
+            ->orderBy('sigla')
+            ->pluck('sigla');
 
         return view('admin.dashboard', [
             'linhas' => $linhas,
-            'lotacoes' => $lotacoes,
-            'lotacao' => $lotacao,
+            'setores' => $setores,
+            'setor' => $setor,
             'ano' => $ano,
             'mes' => $mes,
             'apenasLiberadas' => $apenasLiberadas,

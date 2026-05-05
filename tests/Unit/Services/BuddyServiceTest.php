@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services;
 
 use App\Models\Estagiario;
+use App\Models\Setor;
 use App\Services\BuddyData;
 use App\Services\BuddyService;
 use App\Support\BuddySprite;
@@ -169,7 +170,7 @@ class BuddyServiceTest extends TestCase
     {
         $estagiario = Estagiario::factory()->create([
             'username' => 'novo.estagiario',
-            'lotacao' => 'STI',
+            'setor_id' => Setor::firstOrCreate(['sigla' => 'STI'], ['ativo' => true])->id,
             'buddy_tipo' => null,
         ]);
 
@@ -187,7 +188,7 @@ class BuddyServiceTest extends TestCase
         // de lá entram no mesmo sorteio de cartas lendárias.
         $estagiario = Estagiario::factory()->create([
             'username' => 'novo.ssec',
-            'lotacao' => 'SSEC',
+            'setor_id' => Setor::firstOrCreate(['sigla' => 'SSEC'], ['ativo' => true])->id,
             'buddy_tipo' => null,
         ]);
 
@@ -205,7 +206,7 @@ class BuddyServiceTest extends TestCase
         // são exclusivas do sorteio dos estagiários da STI.
         $estagiario = Estagiario::factory()->create([
             'username' => 'servidor.sti',
-            'lotacao' => 'STI',
+            'setor_id' => Setor::firstOrCreate(['sigla' => 'STI'], ['ativo' => true])->id,
             'buddy_tipo' => null,
         ]);
 
@@ -221,7 +222,7 @@ class BuddyServiceTest extends TestCase
     {
         $estagiario = Estagiario::factory()->create([
             'username' => 'estagiario.cogep',
-            'lotacao' => 'COGEP',
+            'setor_id' => Setor::firstOrCreate(['sigla' => 'COGEP'], ['ativo' => true])->id,
             'buddy_tipo' => null,
         ]);
 

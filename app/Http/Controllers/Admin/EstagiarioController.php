@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateEstagiarioRequest;
 use App\Models\Estagiario;
+use App\Models\Setor;
 use App\Models\Supervisor;
 use App\Services\AuditoriaService;
 use Illuminate\Http\RedirectResponse;
@@ -22,24 +23,25 @@ class EstagiarioController extends Controller
 
     public function index(Request $request): View
     {
-        $lotacao = $request->query('lotacao');
+        $setor = $request->query('setor');
+        $setor = is_string($setor) && $setor !== '' ? $setor : null;
 
         $estagiarios = Estagiario::query()
-            ->when($lotacao, fn ($q) => $q->where('lotacao', $lotacao))
+            ->with('setor')
+            ->when($setor, fn ($q) => $q->whereHas('setor', fn ($s) => $s->where('sigla', $setor)))
             ->orderByDesc('ativo')
             ->orderBy('nome')
             ->get();
 
-        $lotacoes = Estagiario::query()
-            ->whereNotNull('lotacao')
-            ->distinct()
-            ->orderBy('lotacao')
-            ->pluck('lotacao');
+        $setores = Setor::query()
+            ->whereIn('id', Estagiario::query()->whereNotNull('setor_id')->pluck('setor_id'))
+            ->orderBy('sigla')
+            ->pluck('sigla');
 
         return view('admin.estagiarios.index', [
             'estagiarios' => $estagiarios,
-            'lotacoes' => $lotacoes,
-            'lotacao' => $lotacao,
+            'setores' => $setores,
+            'setor' => $setor,
         ]);
     }
 
@@ -50,9 +52,12 @@ class EstagiarioController extends Controller
             ->orderBy('nome')
             ->get(['id', 'nome', 'lotacao']);
 
+        $setores = Setor::ativos()->orderBy('sigla')->get(['id', 'sigla']);
+
         return view('admin.estagiarios.edit', [
             'estagiario' => $estagiario,
             'supervisores' => $supervisores,
+            'setores' => $setores,
         ]);
     }
 
@@ -64,7 +69,7 @@ class EstagiarioController extends Controller
             'nome' => $dados['nome'],
             'email' => $dados['email'] ?? null,
             'matricula' => $dados['matricula'] ?? null,
-            'lotacao' => $dados['lotacao'] ?? null,
+            'setor_id' => $dados['setor_id'] ?? null,
             'sei' => $dados['sei'] ?? null,
             'instituicao_ensino' => $dados['instituicao_ensino'] ?? null,
             'inicio_estagio' => $dados['inicio_estagio'] ?? null,

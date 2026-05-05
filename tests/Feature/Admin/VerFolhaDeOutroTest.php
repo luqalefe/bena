@@ -99,7 +99,7 @@ class VerFolhaDeOutroTest extends TestCase
         Estagiario::factory()->create([
             'username' => 'ana.alvo',
             'nome' => 'Ana Alvo',
-            'lotacao' => 'SECEP',
+            'setor_id' => $this->setorId('SECEP'),
         ]);
 
         $response = $this->withHeaders($this->adminHeaders())

@@ -46,7 +46,7 @@ class EstagiarioEdicaoTest extends TestCase
     {
         $alvo = Estagiario::factory()->create([
             'matricula' => 'EST12345',
-            'lotacao' => 'Gabinete 1',
+            'setor_id' => $this->setorId('GAB1'),
             'sei' => 'SEI-00123/2026',
             'inicio_estagio' => '2026-03-01',
             'fim_estagio' => '2026-12-01',
@@ -59,14 +59,14 @@ class EstagiarioEdicaoTest extends TestCase
 
         $response->assertStatus(200)
             ->assertSee('name="matricula"', false)
-            ->assertSee('name="lotacao"', false)
+            ->assertSee('name="setor_id"', false)
             ->assertSee('name="sei"', false)
             ->assertSee('name="inicio_estagio"', false)
             ->assertSee('name="fim_estagio"', false)
             ->assertSee('name="horas_diarias"', false)
             ->assertSee('name="ativo"', false)
             ->assertSee('value="EST12345"', false)
-            ->assertSee('value="Gabinete 1"', false);
+            ->assertSee('GAB1');
     }
 
     public function test_form_nao_inclui_input_de_username(): void
@@ -99,17 +99,18 @@ class EstagiarioEdicaoTest extends TestCase
     {
         $alvo = Estagiario::factory()->create([
             'matricula' => null,
-            'lotacao' => null,
+            'setor_id' => null,
             'horas_diarias' => 5.00,
             'ativo' => true,
         ]);
+        $cti = $this->setorId('CTI');
 
         $response = $this->withHeaders($this->adminHeaders())
             ->put(route('admin.estagiarios.update', $alvo), [
                 'nome' => $alvo->nome,
                 'email' => $alvo->email,
                 'matricula' => 'EST99999',
-                'lotacao' => 'CTI',
+                'setor_id' => $cti,
                 'sei' => 'SEI-77777/2026',
                 'inicio_estagio' => '2026-04-01',
                 'fim_estagio' => '2026-09-30',
@@ -122,7 +123,7 @@ class EstagiarioEdicaoTest extends TestCase
 
         $alvo->refresh();
         $this->assertSame('EST99999', $alvo->matricula);
-        $this->assertSame('CTI', $alvo->lotacao);
+        $this->assertSame($cti, $alvo->setor_id);
         $this->assertSame('SEI-77777/2026', $alvo->sei);
         $this->assertSame('2026-04-01', $alvo->inicio_estagio->format('Y-m-d'));
         $this->assertSame('2026-09-30', $alvo->fim_estagio->format('Y-m-d'));
@@ -304,7 +305,7 @@ class EstagiarioEdicaoTest extends TestCase
             ->put(route('admin.estagiarios.update', $alvo), [
                 'nome' => $alvo->nome,
                 'email' => $alvo->email,
-                'lotacao' => 'CTI',
+                'setor_id' => $this->setorId('CTI'),
                 'horas_diarias' => '5',
                 // ativo não enviado = inativado
             ])
@@ -325,7 +326,7 @@ class EstagiarioEdicaoTest extends TestCase
                 'username' => 'tentativa.hack',
                 'nome' => $alvo->nome,
                 'email' => $alvo->email,
-                'lotacao' => 'CTI',
+                'setor_id' => $this->setorId('CTI'),
                 'horas_diarias' => '5',
                 'ativo' => '1',
             ]);

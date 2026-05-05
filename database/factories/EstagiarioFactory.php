@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Estagiario;
+use App\Models\Setor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +25,8 @@ class EstagiarioFactory extends Factory
             'nome' => $primeiro.' '.$sobrenome,
             'email' => strtolower($primeiro).'.'.strtolower($sobrenome).'@example.local',
             'matricula' => fake()->numerify('EST#####'),
-            'lotacao' => fake()->randomElement(['Gabinete 1', 'Gabinete 2', 'Secretaria', 'CTI']),
+            'setor_id' => Setor::query()->inRandomOrder()->value('id')
+                ?? Setor::create(['sigla' => fake()->unique()->lexify('SET???'), 'ativo' => true])->id,
             'supervisor_nome' => fake()->name(),
             'supervisor_username' => null,
             'sei' => fake()->numerify('SEI-#####/2026'),

@@ -23,7 +23,7 @@ class Estagiario extends Model implements Authenticatable
         'nome',
         'email',
         'matricula',
-        'lotacao',
+        'setor_id',
         'supervisor_nome',
         'supervisor_username',
         'supervisor_id',
@@ -95,5 +95,11 @@ class Estagiario extends Model implements Authenticatable
     public function supervisor(): BelongsTo
     {
         return $this->belongsTo(Supervisor::class);
+    }
+
+    /** @return BelongsTo<Setor, $this> */
+    public function setor(): BelongsTo
+    {
+        return $this->belongsTo(Setor::class);
     }
 }

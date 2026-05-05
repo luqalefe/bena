@@ -12,11 +12,11 @@
 
     <form method="GET" action="{{ url('/admin') }}" class="bena-filters">
         <label class="bena-filters__field">
-            <span class="bena-filters__label">Lotação</span>
-            <select name="lotacao" onchange="this.form.submit()" class="bena-filters__control">
-                <option value="">Todas</option>
-                @foreach ($lotacoes as $opt)
-                    <option value="{{ $opt }}" @selected($lotacao === $opt)>{{ $opt }}</option>
+            <span class="bena-filters__label">Setor</span>
+            <select name="setor" onchange="this.form.submit()" class="bena-filters__control">
+                <option value="">Todos</option>
+                @foreach ($setores as $opt)
+                    <option value="{{ $opt }}" @selected($setor === $opt)>{{ $opt }}</option>
                 @endforeach
             </select>
         </label>
@@ -68,7 +68,7 @@
                 <thead>
                     <tr>
                         <th>Nome</th>
-                        <th>Lotação</th>
+                        <th>Setor</th>
                         <th class="is-num">Horas no mês</th>
                         <th class="is-num">Dias batidos</th>
                         <th>Assinatura</th>
@@ -85,7 +85,7 @@
                                     <code class="bena-table__sub">{{ $linha->estagiario->username }}</code>
                                 @endif
                             </td>
-                            <td>{{ $linha->estagiario->lotacao ?? '—' }}</td>
+                            <td>{{ $linha->estagiario->setor?->sigla ?? '—' }}</td>
                             <td class="is-num">{{ number_format($linha->horasMes, 2, ',', '.') }}</td>
                             <td class="is-num">{{ $linha->diasBatidos }} dias</td>
                             <td style="font-size: 0.82rem; line-height: 1.5;">

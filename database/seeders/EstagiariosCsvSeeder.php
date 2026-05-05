@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\Estagiario;
+use App\Models\Setor;
 use App\Models\Supervisor;
 use App\Support\CsvDateParser;
 use App\Support\NomeNormalizer;
@@ -39,10 +40,41 @@ class EstagiariosCsvSeeder extends Seeder
         $linhas = $this->lerCsv();
 
         $supervisoresPorNome = $this->semearSupervisores($linhas);
+        $setoresNorm = $this->mapearSetores();
 
         foreach ($linhas as $linha) {
-            $this->semearEstagiario($linha, $supervisoresPorNome);
+            $this->semearEstagiario($linha, $supervisoresPorNome, $setoresNorm);
         }
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    private function mapearSetores(): array
+    {
+        $mapa = [];
+        foreach (Setor::query()->get(['id', 'sigla']) as $setor) {
+            $mapa[$this->normalizarSigla((string) $setor->sigla)] = (int) $setor->id;
+        }
+
+        return $mapa;
+    }
+
+    private function normalizarSigla(string $s): string
+    {
+        $s = mb_strtoupper(trim($s));
+        $s = strtr($s, [
+            'Ã' => 'A', 'Á' => 'A', 'À' => 'A', 'Â' => 'A',
+            'É' => 'E', 'Ê' => 'E',
+            'Í' => 'I',
+            'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O',
+            'Ú' => 'U',
+            'Ç' => 'C',
+            'º' => 'ª',
+        ]);
+        $s = str_replace([' ', 'ZONA'], ['', 'ZE'], $s);
+
+        return $s;
     }
 
     /**
@@ -128,8 +160,9 @@ class EstagiariosCsvSeeder extends Seeder
     /**
      * @param  array<string, string>  $linha
      * @param  array<string, Supervisor>  $supervisoresPorNome
+     * @param  array<string, int>  $setoresNorm
      */
-    private function semearEstagiario(array $linha, array $supervisoresPorNome): void
+    private function semearEstagiario(array $linha, array $supervisoresPorNome, array $setoresNorm): void
     {
         $sei = trim($linha['N° SEI'] ?? '');
         if ($sei === '') {
@@ -164,13 +197,22 @@ class EstagiariosCsvSeeder extends Seeder
             ]);
         }
 
+        $setorBruto = trim($linha['SETOR'] ?? '');
+        $setorId = $setorBruto !== '' ? ($setoresNorm[$this->normalizarSigla($setorBruto)] ?? null) : null;
+        if ($setorBruto !== '' && $setorId === null) {
+            Log::warning('[EstagiariosCsvSeeder] sigla de setor não encontrada', [
+                'sei' => $sei,
+                'setor' => $setorBruto,
+            ]);
+        }
+
         Estagiario::updateOrCreate(
             ['sei' => $sei],
             [
                 'nome' => $this->nomeNormalizer->normalizar($linha['NOME'] ?? ''),
                 'email' => $email,
                 'username' => $username,
-                'lotacao' => trim($linha['SETOR'] ?? '') ?: null,
+                'setor_id' => $setorId,
                 'instituicao_ensino' => trim($linha['INSTITUIÇÃO DE ENSINO'] ?? '') ?: null,
                 'inicio_estagio' => $inicio?->format('Y-m-d'),
                 'fim_estagio' => $fim?->format('Y-m-d'),

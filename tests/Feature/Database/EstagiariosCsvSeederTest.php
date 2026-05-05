@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Database;
 
 use App\Models\Estagiario;
+use App\Models\Setor;
 use App\Models\Supervisor;
 use Database\Seeders\EstagiariosCsvSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,6 +14,24 @@ use Tests\TestCase;
 class EstagiariosCsvSeederTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        // Em prod a tabela setores é populada por setores:sincronizar antes
+        // do seed. Aqui simulamos esse pré-requisito com as siglas da API
+        // que aparecem no CSV (incluindo a forma normalizada "Nª ZE").
+        $siglas = [
+            '4ª ZE', '7ª ZE', '8ª ZE', '9ª ZE',
+            'ASCOM', 'ASGIM', 'ASPLAN', 'COGEP', 'CRIP', 'EJE', 'GADG',
+            'OUVIDORIA', 'SEADE', 'SECAP', 'SECEP', 'SECON', 'SEDES',
+            'SEJUD', 'SSEC', 'SSU',
+        ];
+        foreach ($siglas as $sigla) {
+            Setor::create(['sigla' => $sigla, 'ativo' => true]);
+        }
+    }
 
     public function test_seeder_cria_28_estagiarios_a_partir_do_csv(): void
     {
@@ -41,7 +60,7 @@ class EstagiariosCsvSeederTest extends TestCase
         $this->assertNotNull($lucas);
         $this->assertSame('Lucas Álefe Estevo de Araújo', $lucas->nome);
         $this->assertSame('lucas.araujo', $lucas->username);
-        $this->assertSame('SSEC', $lucas->lotacao);
+        $this->assertSame('SSEC', $lucas->setor?->sigla);
         $this->assertSame('IFAC', $lucas->instituicao_ensino);
         $this->assertSame('0001820-40.2024.6.01.8000', $lucas->sei);
         $this->assertSame('2024-07-22', $lucas->inicio_estagio->format('Y-m-d'));

@@ -37,7 +37,7 @@
                                     <code class="bena-table__sub">{{ $estagiario->username }}</code>
                                 @endif
                             </td>
-                            <td>{{ $estagiario->lotacao ?? '—' }}</td>
+                            <td>{{ $estagiario->setor?->sigla ?? '—' }}</td>
                             <td class="is-actions">
                                 <a href="{{ route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $estagiario->username]) }}" class="br-button primary small">Ver folha</a>
                             </td>

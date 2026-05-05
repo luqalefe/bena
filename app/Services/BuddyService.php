@@ -36,7 +36,7 @@ class BuddyService
         // (STI e SSEC, hoje) recebem o pool lendário, inspirado em personagens
         // da casa. Servidores e admin dessas seções continuam no pool sênior.
         $lendarias = (array) config('buddies.lotacoes_lendarias', []);
-        if ($grupo === 'E' && in_array($estagiario->lotacao, $lendarias, true)) {
+        if ($grupo === 'E' && in_array($estagiario->setor?->sigla, $lendarias, true)) {
             return (array) config('buddies.tipos_lendarios', []);
         }
 
