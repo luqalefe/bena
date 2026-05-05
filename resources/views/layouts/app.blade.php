@@ -708,42 +708,10 @@
             margin: 0 0 1rem;
             letter-spacing: -0.02em;
         }
-        .bena-onboarding-hero__narrator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 1px solid rgba(217, 119, 6, 0.25);
-            border-radius: 999px;
-            padding: 0.55rem 1.1rem 0.55rem 0.55rem;
-            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.12);
-        }
-        .bena-onboarding-hero__avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: #ffffff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            line-height: 1;
-            flex-shrink: 0;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1), inset 0 0 0 2px rgba(217, 119, 6, 0.35);
-        }
-        .bena-onboarding-hero__avatar img.emoji {
-            height: 1.4rem;
-            width: 1.4rem;
-            margin: 0;
-        }
-        .bena-onboarding-hero__narrator-text {
-            color: #422006;
-            font-size: 0.95rem;
-            line-height: 1.4;
+        .bena-onboarding-hero__narrator-card {
+            margin-left: auto;
+            margin-right: auto;
             text-align: left;
-        }
-        .bena-onboarding-hero__narrator-text strong {
-            color: #78350f;
         }
 
         .bena-buddy-reveal {

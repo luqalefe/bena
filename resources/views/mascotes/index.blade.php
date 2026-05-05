@@ -100,7 +100,7 @@
                     inset 0 0 0 1px rgba(250, 204, 21, 0.18);
     }
     /* Reserva espaço para o selo "LENDÁRIA" no topo direito —
-       sem isso, nomes longos como "Kéiton, o Diplomata das Quatro Mãos"
+       sem isso, nomes longos como "Bortelmo, Mestre do Legado"
        passam por baixo do selo. */
     .bena-mascote--lendaria .bena-mascote__topo {
         padding-right: 5.5rem;
@@ -234,7 +234,13 @@
                     @if ($p)
                         <article class="bena-mascote">
                             <div class="bena-mascote__topo">
-                                <span class="bena-mascote__avatar" aria-hidden="true">{{ $p['emoji'] }}</span>
+                                <span class="bena-mascote__avatar" aria-hidden="true">
+                                    @if (! empty($p['sprite']))
+                                        <img src="{{ $p['sprite'] }}" alt="" class="bena-mascote__sprite" style="image-rendering: pixelated; width: 64px; height: 64px;">
+                                    @else
+                                        {{ $p['emoji'] }}
+                                    @endif
+                                </span>
                                 <div class="bena-mascote__identidade">
                                     <span class="bena-mascote__nome">{{ $p['nome'] }}</span>
                                     <span class="bena-mascote__personalidade">{{ $p['personalidade'] }}</span>
@@ -262,7 +268,13 @@
                     @if ($p)
                         <article class="bena-mascote bena-mascote--senior">
                             <div class="bena-mascote__topo">
-                                <span class="bena-mascote__avatar" aria-hidden="true">{{ $p['emoji'] }}</span>
+                                <span class="bena-mascote__avatar" aria-hidden="true">
+                                    @if (! empty($p['sprite']))
+                                        <img src="{{ $p['sprite'] }}" alt="" class="bena-mascote__sprite" style="image-rendering: pixelated; width: 64px; height: 64px;">
+                                    @else
+                                        {{ $p['emoji'] }}
+                                    @endif
+                                </span>
                                 <div class="bena-mascote__identidade">
                                     <span class="bena-mascote__nome">{{ $p['nome'] }}</span>
                                     <span class="bena-mascote__personalidade">{{ $p['personalidade'] }}</span>
@@ -291,7 +303,13 @@
                     @if ($p)
                         <article class="bena-mascote bena-mascote--lendaria">
                             <div class="bena-mascote__topo">
-                                <span class="bena-mascote__avatar" aria-hidden="true">{{ $p['emoji'] }}</span>
+                                <span class="bena-mascote__avatar" aria-hidden="true">
+                                    @if (! empty($p['sprite']))
+                                        <img src="{{ $p['sprite'] }}" alt="" class="bena-mascote__sprite" style="image-rendering: pixelated; width: 64px; height: 64px;">
+                                    @else
+                                        {{ $p['emoji'] }}
+                                    @endif
+                                </span>
                                 <div class="bena-mascote__identidade">
                                     <span class="bena-mascote__nome">{{ $p['nome'] }}</span>
                                     <span class="bena-mascote__personalidade">{{ $p['personalidade'] }}</span>

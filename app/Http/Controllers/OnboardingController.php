@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Estagiario;
 use App\Services\BuddyService;
+use App\Support\BuddySprite;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,7 +14,10 @@ use Illuminate\View\View;
 
 class OnboardingController extends Controller
 {
-    public function __construct(private readonly BuddyService $buddy) {}
+    public function __construct(
+        private readonly BuddyService $buddy,
+        private readonly BuddySprite $sprites,
+    ) {}
 
     public function show(Request $request): View
     {
@@ -33,6 +37,7 @@ class OnboardingController extends Controller
 
         return view('onboarding.show', [
             'buddy' => $buddyData,
+            'lucanderSprite' => $this->sprites->caminho('lucas'),
             'passos' => $this->passosPara($grupo),
         ]);
     }

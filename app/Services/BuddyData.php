@@ -11,5 +11,6 @@ final readonly class BuddyData
         public string $emoji,
         public string $nome,
         public string $frase,
+        public ?string $sprite = null,
     ) {}
 }

@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Estagiario;
+use App\Support\BuddySprite;
 use Carbon\CarbonImmutable;
 
 class BuddyService
 {
+    public function __construct(private readonly BuddySprite $sprites) {}
+
     public function garantirBuddy(Estagiario $estagiario, ?string $grupo = null): void
     {
         if ($estagiario->buddy_tipo !== null) {
@@ -70,6 +73,7 @@ class BuddyService
             emoji: (string) ($perfil['emoji'] ?? '🐾'),
             nome: (string) ($perfil['nome'] ?? 'Buddy'),
             frase: $frase,
+            sprite: $this->sprites->caminho($tipo),
         );
     }
 
@@ -107,6 +111,7 @@ class BuddyService
             emoji: (string) ($perfil['emoji'] ?? '🐾'),
             nome: (string) ($perfil['nome'] ?? 'Buddy'),
             frase: $frase,
+            sprite: $this->sprites->caminho($tipo),
         );
     }
 }

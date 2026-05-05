@@ -7,6 +7,7 @@ namespace Tests\Unit\Services;
 use App\Models\Estagiario;
 use App\Services\BuddyData;
 use App\Services\BuddyService;
+use App\Support\BuddySprite;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -14,6 +15,31 @@ use Tests\TestCase;
 class BuddyServiceTest extends TestCase
 {
     use RefreshDatabase;
+
+    private string $diretorioSprites = '';
+
+    protected function tearDown(): void
+    {
+        if ($this->diretorioSprites !== '') {
+            foreach (glob($this->diretorioSprites.'/*') ?: [] as $arquivo) {
+                unlink($arquivo);
+            }
+            @rmdir($this->diretorioSprites);
+        }
+        parent::tearDown();
+    }
+
+    private function bindSpriteFake(): string
+    {
+        $this->diretorioSprites = sys_get_temp_dir().'/buddy-sprite-test-'.uniqid();
+        mkdir($this->diretorioSprites, 0o755, true);
+        $this->app->instance(
+            BuddySprite::class,
+            new BuddySprite($this->diretorioSprites, '/images/buddies'),
+        );
+
+        return $this->diretorioSprites;
+    }
 
     public function test_garantir_buddy_atribui_tipo_quando_null(): void
     {
@@ -205,5 +231,40 @@ class BuddyServiceTest extends TestCase
             $estagiario->fresh()->buddy_tipo,
             config('buddies.tipos'),
         );
+    }
+
+    public function test_montar_popula_sprite_quando_png_existe(): void
+    {
+        $diretorio = $this->bindSpriteFake();
+        file_put_contents($diretorio.'/coruja.png', 'fake');
+
+        $estagiario = Estagiario::factory()->comBuddy('coruja')->create();
+
+        $data = app(BuddyService::class)->montar($estagiario, 'aguardando_entrada');
+
+        $this->assertSame('/images/buddies/coruja.png', $data->sprite);
+    }
+
+    public function test_montar_deixa_sprite_null_quando_png_ausente(): void
+    {
+        $this->bindSpriteFake();
+
+        $estagiario = Estagiario::factory()->comBuddy('coruja')->create();
+
+        $data = app(BuddyService::class)->montar($estagiario, 'aguardando_entrada');
+
+        $this->assertNull($data->sprite);
+    }
+
+    public function test_boas_vindas_popula_sprite_quando_png_existe(): void
+    {
+        $diretorio = $this->bindSpriteFake();
+        file_put_contents($diretorio.'/coruja.png', 'fake');
+
+        $estagiario = Estagiario::factory()->comBuddy('coruja')->create();
+
+        $data = app(BuddyService::class)->boasVindas($estagiario);
+
+        $this->assertSame('/images/buddies/coruja.png', $data->sprite);
     }
 }

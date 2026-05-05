@@ -12,7 +12,13 @@
 
     @isset($buddy)
         <div class="bena-buddy-card" role="status">
-            <div class="bena-buddy-card__avatar" aria-hidden="true">{{ $buddy->emoji }}</div>
+            <div class="bena-buddy-card__avatar" aria-hidden="true">
+                @if ($buddy->sprite)
+                    <img src="{{ $buddy->sprite }}" alt="" class="bena-buddy-card__sprite" style="image-rendering: pixelated; width: 64px; height: 64px;">
+                @else
+                    {{ $buddy->emoji }}
+                @endif
+            </div>
             <div class="bena-buddy-card__content">
                 <span class="bena-buddy-card__name">{{ $buddy->nome }}</span>
                 <p class="bena-buddy-card__frase">{{ $buddy->frase }}</p>

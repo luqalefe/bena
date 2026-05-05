@@ -7,13 +7,22 @@
         <header class="bena-onboarding-hero">
             <img src="{{ asset('img/bena.png') }}" alt="Bena" class="bena-onboarding-hero__logo">
             <h1 class="bena-onboarding-hero__title">Bem-vindo ao Bena</h1>
-            <div class="bena-onboarding-hero__narrator">
-                <span class="bena-onboarding-hero__avatar" aria-hidden="true">🧙‍♂️</span>
-                <span class="bena-onboarding-hero__narrator-text">
-                    Olá! Sou o <strong>Lucander, o Improvisador</strong> — criador do Bena.<br>
-                    Deixa eu te mostrar como funciona em 30 segundos.
-                </span>
-            </div>
+            <section class="bena-buddy-card bena-buddy-card--apresentacao bena-onboarding-hero__narrator-card" role="status">
+                <div class="bena-buddy-card__avatar bena-buddy-card__avatar--grande" aria-hidden="true">
+                    @if (! empty($lucanderSprite))
+                        <img src="{{ $lucanderSprite }}" alt="" class="bena-buddy-card__sprite" style="image-rendering: pixelated; width: 96px; height: 96px;">
+                    @else
+                        🧙‍♂️
+                    @endif
+                </div>
+                <div class="bena-buddy-card__content">
+                    <span class="bena-buddy-card__name">Lucander, o Improvisador</span>
+                    <p class="bena-buddy-card__frase">
+                        Olá! Sou o <strong>Lucander, o Improvisador</strong> — criador do Bena.
+                        Deixa eu te mostrar como funciona em 30 segundos.
+                    </p>
+                </div>
+            </section>
         </header>
 
         <section aria-labelledby="por-que-bena" style="background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 4px solid #d97706; border-radius: 8px; padding: 1.5rem 1.75rem; margin-bottom: 2.5rem; box-shadow: 0 1px 3px rgba(217, 119, 6, 0.08);">
@@ -74,7 +83,13 @@
                     Descobrir meu mascote
                 </button>
                 <section aria-labelledby="buddy-titulo" class="bena-buddy-card bena-buddy-card--apresentacao bena-buddy-reveal__card">
-                    <div class="bena-buddy-card__avatar bena-buddy-card__avatar--grande" aria-hidden="true">{{ $buddy->emoji }}</div>
+                    <div class="bena-buddy-card__avatar bena-buddy-card__avatar--grande" aria-hidden="true">
+                        @if ($buddy->sprite)
+                            <img src="{{ $buddy->sprite }}" alt="" class="bena-buddy-card__sprite" style="image-rendering: pixelated; width: 96px; height: 96px;">
+                        @else
+                            {{ $buddy->emoji }}
+                        @endif
+                    </div>
                     <div class="bena-buddy-card__content">
                         <span id="buddy-titulo" class="bena-buddy-card__name">Conheça seu mascote · {{ $buddy->nome }}</span>
                         <p class="bena-buddy-card__frase">{{ $buddy->frase }}</p>

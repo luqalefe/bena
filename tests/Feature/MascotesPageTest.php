@@ -5,12 +5,35 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Estagiario;
+use App\Support\BuddySprite;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MascotesPageTest extends TestCase
 {
     use RefreshDatabase;
+
+    private string $diretorioSprites = '';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->diretorioSprites = sys_get_temp_dir().'/mascotes-sprite-'.uniqid();
+        mkdir($this->diretorioSprites, 0o755, true);
+        $this->app->instance(
+            BuddySprite::class,
+            new BuddySprite($this->diretorioSprites, '/images/buddies'),
+        );
+    }
+
+    protected function tearDown(): void
+    {
+        foreach (glob($this->diretorioSprites.'/*') ?: [] as $f) {
+            unlink($f);
+        }
+        @rmdir($this->diretorioSprites);
+        parent::tearDown();
+    }
 
     /** @return array<string, string> */
     private function estagiarioHeaders(): array

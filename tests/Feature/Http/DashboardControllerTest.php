@@ -6,6 +6,7 @@ namespace Tests\Feature\Http;
 
 use App\Models\Estagiario;
 use App\Models\Frequencia;
+use App\Support\BuddySprite;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -71,6 +72,58 @@ class DashboardControllerTest extends TestCase
         ])->get('/')
             ->assertSee(route('frequencia.atual'), false)
             ->assertSee('Ver folha mensal');
+    }
+
+    public function test_dashboard_renderiza_img_do_buddy_quando_sprite_existe(): void
+    {
+        $diretorio = sys_get_temp_dir().'/buddy-sprite-feature-'.uniqid();
+        mkdir($diretorio, 0o755, true);
+        file_put_contents($diretorio.'/coruja.png', 'fake');
+        $this->app->instance(
+            BuddySprite::class,
+            new BuddySprite($diretorio, '/images/buddies'),
+        );
+
+        $estagiario = Estagiario::factory()->comBuddy('coruja')->create();
+
+        try {
+            $response = $this->withHeaders([
+                'Remote-User' => $estagiario->username,
+                'Remote-Groups' => 'estagiarios',
+            ])->get('/');
+
+            $response->assertStatus(200);
+            $response->assertSee('src="/images/buddies/coruja.png"', false);
+            $response->assertDontSee('aria-hidden="true">🦉<', false);
+        } finally {
+            unlink($diretorio.'/coruja.png');
+            @rmdir($diretorio);
+        }
+    }
+
+    public function test_dashboard_renderiza_emoji_quando_sprite_ausente(): void
+    {
+        $diretorio = sys_get_temp_dir().'/buddy-sprite-feature-'.uniqid();
+        mkdir($diretorio, 0o755, true);
+        $this->app->instance(
+            BuddySprite::class,
+            new BuddySprite($diretorio, '/images/buddies'),
+        );
+
+        $estagiario = Estagiario::factory()->comBuddy('coruja')->create();
+
+        try {
+            $response = $this->withHeaders([
+                'Remote-User' => $estagiario->username,
+                'Remote-Groups' => 'estagiarios',
+            ])->get('/');
+
+            $response->assertStatus(200);
+            $response->assertSee('🦉');
+            $response->assertDontSee('src="/images/buddies/coruja.png"', false);
+        } finally {
+            @rmdir($diretorio);
+        }
     }
 
     public function test_dashboard_renderiza_horas_e_dias_do_mes(): void

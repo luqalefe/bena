@@ -2,21 +2,19 @@
 
 namespace App\Providers;
 
+use App\Support\BuddySprite;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            BuddySprite::class,
+            fn () => new BuddySprite(public_path('images/buddies'), '/images/buddies'),
+        );
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         //

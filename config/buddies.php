@@ -33,7 +33,7 @@ return [
     // no pool sênior comum.
     'tipos_lendarios' => [
         'edcley', 'lucir', 'lucas', 'bortoli', 'ilis',
-        'felipe', 'thallys', 'jonatan', 'jair', 'keith',
+        'felipe', 'thallys', 'jonatan', 'jair',
     ],
 
     // Lotações que recebem o pool lendário. SSEC é parte do grupo
@@ -137,16 +137,6 @@ return [
             'habilidade' => 'Ideia Maluca — uma vez por sprint, propõe um experimento que parece absurdo. 70% de chance de virar MVP funcional.',
             'flavor' => 'Louco é quem me diz e não é feliz.',
             'historia' => 'O Lucírio aparece quando uma eleição precisa de algo que ainda não existe. Foi visto pela primeira vez numa apuração noturna de 1992, transformando uma planilha manuscrita num mapa que indicava com precisão onde cada urna estaria no dia seguinte — ninguém soube explicar como. Tem fama de propor soluções absurdas que insistem em funcionar.',
-        ],
-        'keith' => [
-            'emoji' => '👨‍🏫',
-            'nome' => 'Kéiton, o Diplomata das Quatro Mãos',
-            'personalidade' => 'Sábio do Domínio · Compreensão',
-            'raridade' => 'lendaria',
-            'classe' => 'Analista Veterano',
-            'habilidade' => 'Pareamento Profundo — ao parear, dobra a clareza dos requisitos e revela uma regra de negócio escondida por sessão.',
-            'flavor' => 'Antes da primeira linha, escute a casa inteira.',
-            'historia' => 'O Kéiton ouve juiz, mesário, servidor e estagiário com a mesma atenção — e traduz tudo numa ata clara que vira a base de qualquer novo sistema do tribunal. Conduziu, lado a lado com outro servidor, a análise da primeira urna eletrônica que chegou ao Acre. Onde houver dúvida sobre regra, ele estará sentado na ponta da mesa.',
         ],
         'bortoli' => [
             'emoji' => '👴',
@@ -1077,71 +1067,6 @@ return [
             ],
             'boas_vindas' => [
                 'E aí. Sou o Lucírio, o Alquimista. Bora destilar uma ideia maluca? 🧙',
-            ],
-        ],
-
-        'keith' => [
-            'segunda' => [
-                'aguardando_entrada' => [
-                    'Bom dia. Antes de qualquer linha, vamos ouvir a casa. Bata o ponto. 👨‍🏫',
-                ],
-                'em_andamento' => [
-                    'Em pareamento. Requisito mal entendido vira código jogado fora.',
-                ],
-                'concluido' => [
-                    'Encerrada. Ata clara, rumo claro.',
-                ],
-            ],
-            'terca' => [
-                'aguardando_entrada' => [
-                    'Terça. Hoje sentamos na ponta da mesa e escutamos o juiz.',
-                ],
-                'em_andamento' => [
-                    'Em diálogo. A diplomacia também fecha boletins.',
-                ],
-                'concluido' => [
-                    'Bom dia. Mais um requisito traduzido.',
-                ],
-            ],
-            'quarta' => [
-                'aguardando_entrada' => [
-                    'Quarta. Hora de validar entendimento com quem usa o sistema.',
-                ],
-                'em_andamento' => [
-                    'Em curso. Quatro mãos enxergam o que duas não veem.',
-                ],
-                'concluido' => [
-                    'Encerrada. Ata anotada, próximo encontro marcado.',
-                ],
-            ],
-            'quinta' => [
-                'aguardando_entrada' => [
-                    'Quinta. Reta final exige alinhamento — bata o ponto.',
-                ],
-                'em_andamento' => [
-                    'Em sintonia. Hoje não se decide nada sem ouvir mesário e juiz.',
-                ],
-                'concluido' => [
-                    'Bom dia. Quinta encerrada com o domínio entendido.',
-                ],
-            ],
-            'sexta' => [
-                'aguardando_entrada' => [
-                    'Sexta. Termine como começou: ouvindo antes de codar.',
-                ],
-                'em_andamento' => [
-                    'Última jornada. Diplomacia também fecha pleito.',
-                ],
-                'concluido' => [
-                    'Semana encerrada. Próxima segunda, novo requisito.',
-                ],
-            ],
-            'generica' => [
-                'Antes da primeira linha, escute a casa inteira. 👨‍🏫',
-                'Requisito mal entendido vira código jogado fora.',
-            ],
-            'boas_vindas' => [
-                'Olá. Sou o Kéiton, o Diplomata das Quatro Mãos. Vamos parear esse domínio. 👨‍🏫',
             ],
         ],
 

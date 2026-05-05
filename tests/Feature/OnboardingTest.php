@@ -5,12 +5,38 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Estagiario;
+use App\Support\BuddySprite;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class OnboardingTest extends TestCase
 {
     use RefreshDatabase;
+
+    private string $diretorioSprites = '';
+
+    protected function tearDown(): void
+    {
+        if ($this->diretorioSprites !== '') {
+            foreach (glob($this->diretorioSprites.'/*') ?: [] as $f) {
+                unlink($f);
+            }
+            @rmdir($this->diretorioSprites);
+        }
+        parent::tearDown();
+    }
+
+    private function bindSpriteFake(): string
+    {
+        $this->diretorioSprites = sys_get_temp_dir().'/onboarding-sprite-'.uniqid();
+        mkdir($this->diretorioSprites, 0o755, true);
+        $this->app->instance(
+            BuddySprite::class,
+            new BuddySprite($this->diretorioSprites, '/images/buddies'),
+        );
+
+        return $this->diretorioSprites;
+    }
 
     /** @return array<string, string> */
     private function estagiarioHeaders(string $username): array
@@ -88,6 +114,33 @@ class OnboardingTest extends TestCase
             ->get(route('onboarding.show'))
             ->assertSee('Lucander')
             ->assertSee('criador do Bena');
+    }
+
+    public function test_hero_renderiza_sprite_do_lucander_quando_existe(): void
+    {
+        $diretorio = $this->bindSpriteFake();
+        file_put_contents($diretorio.'/lucas.png', 'fake');
+
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $response = $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'));
+
+        $response->assertSee('src="/images/buddies/lucas.png"', false);
+        $response->assertSee('bena-onboarding-hero__narrator-card', false);
+    }
+
+    public function test_hero_renderiza_emoji_quando_sprite_do_lucander_ausente(): void
+    {
+        $this->bindSpriteFake();
+
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $response = $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'));
+
+        $response->assertSee('🧙‍♂️');
+        $response->assertDontSee('src="/images/buddies/lucas.png"', false);
     }
 
     public function test_estagiario_ve_fluxo_de_estagiario(): void
