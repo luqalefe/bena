@@ -27,17 +27,17 @@ return [
         'aguia', 'leao', 'elefante', 'urso',
     ],
 
-    // Pool lendário: dez cartas únicas inspiradas em personagens da casa.
+    // Pool lendário: cartas únicas inspiradas em personagens da casa.
     // Sorteadas exclusivamente pra estagiários lotados nas seções listadas
     // em `lotacoes_lendarias` — servidores e admin dessas seções continuam
     // no pool sênior comum.
     'tipos_lendarios' => [
-        'edcley', 'lucir', 'lucas', 'bortoli', 'ilis',
-        'felipe', 'thallys', 'jonatan', 'jair',
+        'waldirene', 'edcley', 'lucas', 'lucir', 'bortoli',
+        'ilis', 'felipe', 'thallys', 'jonatan', 'jair',
     ],
 
-    // Lotações que recebem o pool lendário. SSEC é parte do grupo
-    // institucional da STI, então entra junto.
+    // Lotações cujos estagiários recebem o pool lendário em vez do comum.
+    // SSEC é parte do mesmo grupo institucional da STI.
     'lotacoes_lendarias' => ['STI', 'SSEC'],
 
     'perfis' => [
@@ -45,79 +45,89 @@ return [
             'emoji' => '🦉',
             'nome' => 'Coruinha',
             'personalidade' => 'Sábia, formal',
-            'historia' => 'A Coruinha foi vista pela primeira vez na sala de apuração de 1996, quando a urna eletrônica chegou ao Acre. Estudou cada protocolo enquanto os servidores conferiam atas. Hoje observa, em silêncio, cada folha de ponto — como observou cada boletim.',
+            'historia' => 'A Coruinha foi vista pela primeira vez na sala de apuração de 1996, quando a urna eletrônica chegou ao Acre. Estudou cada protocolo enquanto os servidores conferiam atas — e nunca esqueceu o silêncio daquela primeira madrugada de votos digitais. Tem o hábito de pousar no alto do armário onde guardam o regimento e, dizem, abre os olhos quando alguém aproxima a mão de uma regra sem ler antes. Hoje observa, em silêncio, cada folha de ponto — como observou cada boletim. Quando concorda com o que vê, pisca devagar; quando discorda, vira a cabeça e fica olhando até a pessoa corrigir sozinha.',
         ],
         'gato' => [
             'emoji' => '🐱',
             'nome' => 'Miau',
             'personalidade' => 'Preguiçoso, cético',
-            'historia' => 'O Miau apareceu numa zona eleitoral do interior, dormindo em cima de uma pilha de boletins entre dois pleitos. Adotou o tribunal porque nada por ali tem urgência fora de eleição. Estagia, mas com prioridades claras — a soneca vem antes da apuração.',
+            'historia' => 'O Miau apareceu numa zona eleitoral do interior em 2002, dormindo em cima de uma pilha de boletins entre dois pleitos. Foi removido três vezes e voltou três vezes — desistiram. Adotou o tribunal porque, fora ano eleitoral, nada por ali tem urgência: as portas abrem devagar, o café demora, e os corredores ficam vazios à tarde. Estagia, mas com prioridades bem claras — a soneca vem antes da apuração, o sol da janela vem antes de qualquer reunião, e o cobertor do almoxarifado é território dele. Mas quando chega outubro de ano par, ninguém vê o Miau dormir.',
         ],
         'cachorro' => [
             'emoji' => '🐶',
             'nome' => 'Totó',
             'personalidade' => 'Empolgado, afetuoso',
-            'historia' => 'O Totó cresceu correndo entre caixas de seção eleitoral durante o transporte das urnas pelo Acre. Dá um latido por cada carga despachada — já passou de 200, sem perder a contagem. Tudo motivo de festa: a urna chegou! O caminhão saiu! VIVA A DEMOCRACIA!!!',
+            'historia' => 'O Totó cresceu correndo entre caixas de seção eleitoral durante o transporte das urnas pelo Acre — começou em 2004, num galpão de Rio Branco, e nunca mais sossegou. Dá um latido por cada carga despachada e já passou de 200, sem perder a contagem (alguém confere). Acompanhou comboio até Tarauacá, Cruzeiro do Sul, Brasileia — voltou empoeirado, esfomeado e mesmo assim feliz. Tudo é motivo de festa: a urna chegou! O caminhão saiu! O fiscal assinou a ata! VIVA A DEMOCRACIA!!! Em ano sem pleito, fica esperando outubro com a coleira na boca, pronto pro próximo comboio.',
         ],
         'capivara' => [
             'emoji' => '🦫',
             'nome' => 'Capi',
             'personalidade' => 'Zen, contemplativa',
-            'historia' => 'A Capi vive nas margens do Rio Acre e assistiu, sem se mexer, à chegada da primeira urna eletrônica numa cidade ribeirinha. "Tudo flui — voto, rio, tempo." Aprendeu a contar votos só observando os fiscais; em Bena, observa o ponto.',
+            'historia' => 'A Capi vive nas margens do Rio Acre e assistiu, sem se mexer, à chegada da primeira urna eletrônica numa cidade ribeirinha — 1996, o barco encostou no fim da tarde, ela já estava lá há horas. "Tudo flui — voto, rio, tempo." Aprendeu a contar votos só observando os fiscais, sem precisar de planilha; em Bena, observa o ponto com a mesma calma de quem passou cheia atrás de cheia. Quando alguém chega afobado pedindo prazo, ela inclina a cabeça e o silêncio dela já é a resposta — "o pleito chega na hora do pleito". Volta pra água quando a sessão fecha; volta na manhã seguinte, sem pressa.',
         ],
         'papagaio' => [
             'emoji' => '🦜',
             'nome' => 'Louro',
             'personalidade' => 'Fofoqueiro, antenado',
-            'historia' => 'O Louro morava na sala dos juízes eleitorais de uma comarca antiga do interior. Aprendeu a dizer "ata aberta" e "ata fechada" antes de aprender a falar "oi". Tudo que o tribunal cochicha, ele repete — mas só do tipo que não vira problema.',
+            'historia' => 'O Louro morava na sala dos juízes eleitorais de uma comarca antiga do interior — talvez Feijó, talvez Tarauacá, ninguém lembra direito. Aprendeu a dizer "ata aberta" e "ata fechada" antes de aprender a falar "oi", e logo passou a anunciar a chegada de cada autoridade com o nome certo, mesmo sem ser apresentado. Tudo que o tribunal cochicha, ele repete — mas só do tipo que não vira problema: data de feriado, fofoca de cafezinho, quem vai sair de férias. Os segredos sérios ele guarda; aprendeu cedo a diferença entre boletim e boato. Pousa no ombro de quem vai começar bem o dia.',
         ],
         'tartaruga' => [
             'emoji' => '🐢',
             'nome' => 'Lenta',
             'personalidade' => 'Devagar, café-dependente',
-            'historia' => 'A Lenta atravessou a Praça do TRE ao longo de três eleições. Quando chegou, seu próprio estágio já tinha começado e terminado três vezes. Mas revisa folhas com mais calma que qualquer auditor — devagar e detalhista.',
+            'historia' => 'A Lenta atravessou a Praça do TRE ao longo de três eleições — começou em 2014, chegou na escadaria em 2022, e ainda discute se isso conta como atraso. Quando finalmente chegou, seu próprio estágio já tinha começado e terminado três vezes, e ela teve que renovar o crachá duas vezes só pela troca de gestão. Mas revisa folhas com mais calma que qualquer auditor — devagar, devagar, devagar, e detalhista até onde ninguém mais teria paciência de ir. Toma café preto sem açúcar e só começa a trabalhar depois da segunda xícara. "Pleito apressado se erra; o meu nunca erra."',
         ],
         'pinguim' => [
             'emoji' => '🐧',
             'nome' => 'Pingu',
             'personalidade' => 'Profissional, pontual',
-            'historia' => 'O Pingu chegou ao TRE-AC de gravata. Ninguém soube explicar de onde. Foi visto pela primeira vez na sala da Presidência durante a transição de um pleito. Desde então, organiza pautas e nunca atrasou uma sessão.',
+            'historia' => 'O Pingu chegou ao TRE-AC de gravata e ninguém soube explicar de onde — apareceu uma manhã de segunda, com a pasta debaixo da asa, sentou na primeira cadeira vazia e pediu a pauta da semana. Foi visto pela primeira vez na sala da Presidência durante a transição de um pleito, e ninguém ousou perguntar credencial: estava arrumado demais pra ser intruso. Desde então, organiza pautas, lembra a data de cada sessão, e nunca, em hipótese alguma, atrasou. Quando o relógio bate o horário, ele já está sentado — sempre cinco minutos antes, sempre com café passado, sempre com a ata da anterior na mão.',
         ],
         'sapo' => [
             'emoji' => '🐸',
             'nome' => 'Sapão',
             'personalidade' => 'Descolado, parceiro',
-            'historia' => 'O Sapão veio das margens do Bacurau, depois de uma operação de logística reversa pós-apuração. Subiu numa urna que voltava pra estoque e ficou. "Mano, o tribunal é firmeza, eu fico." Hoje é o mais informal do quadro — mas na hora H, entrega.',
+            'historia' => 'O Sapão veio das margens do Bacurau, depois de uma operação de logística reversa pós-apuração — pulou numa urna que voltava pra estoque, ficou quieto até o galpão, e desceu cumprimentando o pessoal como se fosse de casa. "Mano, o tribunal é firmeza, eu fico." Hoje é o mais informal do quadro: usa boné dentro do prédio, chama todo mundo de "parceiro" e cumprimenta com soco-toco no balcão do café. Mas na hora H entrega — foi ele que salvou três caixas de boletins quando uma chuva tomou o telhado do almoxarifado em 2019, sem pedir nada em troca. "Tropa, é nóis. Tribunal não cai no meu turno."',
         ],
         'aguia' => [
             'emoji' => '🦅',
             'nome' => 'Águia',
             'personalidade' => 'Estrategista, visão panorâmica',
-            'historia' => 'A Águia voou sobre a Amazônia acompanhando o transporte aéreo das urnas eletrônicas para as zonas mais remotas do Acre. Conhece cada pista de pouso, cada ribeirão. Em Bena, ela vê a operação inteira do alto — antes que alguém perceba que algo saiu do plano.',
+            'historia' => 'A Águia voou sobre a Amazônia acompanhando o transporte aéreo das urnas eletrônicas para as zonas mais remotas do Acre — Marechal Thaumaturgo, Jordão, Porto Walter, lugares que só chegam de barco ou avião pequeno. Conhece cada pista de pouso, cada ribeirão, cada curva de rio onde a barcaça precisa diminuir o motor. Memorizou rotas inteiras só pra saber qual urna chegaria primeiro em cada zona. Em Bena, vê a operação inteira do alto — antes que alguém na sala perceba que algo saiu do plano, ela já desceu pra avisar quem precisa saber. "Pleito se vence olhando o todo. Detalhe sem mapa não vale."',
         ],
         'leao' => [
             'emoji' => '🦁',
             'nome' => 'Leão',
             'personalidade' => 'Mentor calmo, autoridade',
-            'historia' => 'O Leão liderou as primeiras equipes de mesários do Acre nas eleições municipais dos anos 80. Não precisava falar alto — a presença bastava. Hoje acompanha quem lidera estagiários e ensina que comando se exerce com calma, não com volume.',
+            'historia' => 'O Leão liderou as primeiras equipes de mesários do Acre nas eleições municipais dos anos 80, quando ainda se contava voto em papel, à mão, e a apuração varava a madrugada inteira. Não precisava falar alto — a presença bastava, e qualquer mesário sabia, sem que ninguém dissesse, que com ele por perto a urna ia ser cuidada até o último boletim. Atravessou três presidências do TRE-AC e ensinou três gerações de chefes de seção. Hoje acompanha quem lidera estagiários e mostra, sem discurso, que comando se exerce com calma e não com volume. "Líder bom é o que faz a equipe parecer melhor que ele."',
         ],
         'elefante' => [
             'emoji' => '🐘',
             'nome' => 'Elefon',
             'personalidade' => 'Memória prodigiosa, experiente',
-            'historia' => 'O Elefon acompanhou cada eleição do TRE-AC desde a fundação. Lembra do nome de cada juiz eleitoral, de cada presidente, de cada plebiscito. "Quem não esquece, não repete erros." É o registro vivo do que funcionou — e do que não.',
+            'historia' => 'O Elefon acompanhou cada eleição do TRE-AC desde a fundação, em 1962. Lembra do nome de cada juiz eleitoral, de cada presidente, de cada plebiscito — inclusive do mesário que faltou na seção 47 da zona 3 em 1988, e da bronca que ele tomou na sessão seguinte. "Quem não esquece, não repete erros." Se você descrever um problema atual, ele te diz qual ano isso já apareceu, o que tentaram, o que funcionou, e quem era o servidor responsável. É o registro vivo do que funcionou e do que não — e há quem diga que vale mais do que três armários de ata juntos.',
         ],
         'urso' => [
             'emoji' => '🐻',
             'nome' => 'Urso',
             'personalidade' => 'Protetor, paciente',
-            'historia' => 'O Urso vigiou a primeira urna eletrônica que chegou em uma comunidade indígena no Acre. Sentou na porta do galpão e ninguém passou sem ele acompanhar. Sereno, presente, paciente. Em Bena, cuida da equipe como cuidou daquele galpão.',
+            'historia' => 'O Urso vigiou a primeira urna eletrônica que chegou em uma comunidade indígena no Acre, no início dos anos 2000 — desembarcou do barco junto com a equipe e sentou-se na porta do galpão sem que ninguém pedisse. Ninguém passou sem ele acompanhar com os olhos. Sereno, presente, paciente, ficou ali três dias e três noites até a apuração terminar, e só voltou pro barco depois que o último servidor saiu. Em Bena, cuida da equipe como cuidou daquele galpão: sem pressa, sem alarde, mas sempre na porta certa, na hora certa. "Equipe protegida é equipe que entrega."',
         ],
 
         // ─── Cartas lendárias da STI ─────────────────────────────────────
         // Cada uma representa um amigo real da STI. Atribuídas por username,
         // não sorteadas. Inspiradas nos agradecimentos da página /sobre.
 
+        'waldirene' => [
+            'emoji' => '👩‍⚖️',
+            'nome' => 'Waldirene, a Magistrada das Florestas',
+            'personalidade' => 'Pioneira · Voz dos Confins',
+            'raridade' => 'lendaria',
+            'classe' => 'Presidenta do Pleito',
+            'habilidade' => 'Voto em Cada Canto — sob sua presidência, nenhuma seção fica sem fiscal e nenhum boletim deixa de ser apurado. Estagiários cumprimentados por ela no corredor ganham +2 em coragem até o fim do dia.',
+            'flavor' => 'Não se trata de ocupar um cargo, mas de abraçar um compromisso com a democracia, a cidadania e a história.',
+            'historia' => 'Começou em Xapuri em 1998 — promotora numa comarca onde o cartório fechava cedo e a floresta começava na esquina. Levou esse mapa pra capital: doze vezes assumiu o governo do Acre interinamente sem nunca perder o jeito de quem despachou em vara de interior. Em 2025, foi eleita por aclamação a 24ª Presidência do TRE-AC e comanda agora o pleito de 2026, prometendo que "cada eleitor — cidade, ribeirinho ou aldeia indígena" terá voto assegurado. Os xales floridos sobre a toga preta viraram lenda no plenário. "É só um lenço", diz. Os servidores antigos juram que não.',
+        ],
         'edcley' => [
             'emoji' => '👨‍🔧',
             'nome' => 'Edcleu, o Forjador de Raiz',
@@ -126,77 +136,7 @@ return [
             'classe' => 'Engenheiro de Núcleo',
             'habilidade' => 'Do Zero ao Núcleo — ignora todo framework opcional. Sistemas forjados sob sua tutela ganham +2 em longevidade e nunca dependem de plugin de terceiros.',
             'flavor' => 'Não sou um visionário, sou um engenheiro.',
-            'historia' => 'Reza a lenda que o Edcleu forjou os primeiros lacres das urnas eletrônicas que chegaram ao Acre. Não confiava em peça pronta — cada selo saía da bancada dele, do zero, e ninguém jamais conseguiu violar um pleito sob sua guarda. Quando perguntam o segredo, responde curto: "se não posso forjar, não posso garantir".',
-        ],
-        'lucir' => [
-            'emoji' => '🧙',
-            'nome' => 'Lucírio, o Alquimista',
-            'personalidade' => 'Visionário · Imaginação',
-            'raridade' => 'lendaria',
-            'classe' => 'Pioneiro Alquimista',
-            'habilidade' => 'Ideia Maluca — uma vez por sprint, propõe um experimento que parece absurdo. 70% de chance de virar MVP funcional.',
-            'flavor' => 'Louco é quem me diz e não é feliz.',
-            'historia' => 'O Lucírio aparece quando uma eleição precisa de algo que ainda não existe. Foi visto pela primeira vez numa apuração noturna de 1992, transformando uma planilha manuscrita num mapa que indicava com precisão onde cada urna estaria no dia seguinte — ninguém soube explicar como. Tem fama de propor soluções absurdas que insistem em funcionar.',
-        ],
-        'bortoli' => [
-            'emoji' => '👴',
-            'nome' => 'Bortelmo, Mestre do Legado',
-            'personalidade' => 'Veterano do Código Antigo · Pragmatismo Cru',
-            'raridade' => 'lendaria',
-            'classe' => 'Mestre do COBOL e do Clipper',
-            'habilidade' => 'Gambiarra Funcional — sustenta sistema legado com solução improvável que dura mais que reescrita planejada. +∞ em código que ninguém mais ousa tocar.',
-            'flavor' => 'Tá feio. Mas funciona desde 1992 — e vai funcionar amanhã também.',
-            'historia' => 'O Bortelmo escreveu rotina em COBOL antes do tribunal ter monitor colorido — e várias delas ainda rodam no canto, gerando relatório que ninguém mais sabe regenerar do zero. Domina Clipper como dialeto materno e faz gambiarras funcionais desde sempre: aquele tipo de solução que devia ser provisória e atravessa três gestões intacta. Quando algo precisa funcionar HOJE e não há tempo de refazer direito, é nele que se busca o jeitinho que segura o pleito — e que, no fim, dura uma década.',
-        ],
-        'ilis' => [
-            'emoji' => '🧘🏽‍♂️',
-            'nome' => 'Ilíseo, o Domador de Plone',
-            'personalidade' => 'Mestre Paciente · Resiliência',
-            'raridade' => 'lendaria',
-            'classe' => 'Sussurrador de CMS',
-            'habilidade' => 'Sussurrador de CMS — domestica qualquer sistema legado sem perder o tom calmo. +3 em paciência diante de tecnologia descontinuada.',
-            'flavor' => 'Calma. Vai funcionar. Só precisa de paciência.',
-            'historia' => 'O Ilíseo catalogou, durante três pleitos seguidos, todos os boletins de urna de uma comarca inteira do interior — sem perder uma classificação sequer. Calmo, paciente, jamais se exaltou nem com prazo curto nem com sistema travado. Hoje, quando alguma ferramenta antiga reclama, basta ele chegar perto que volta a funcionar.',
-        ],
-        'felipe' => [
-            'emoji' => '🙆🏿‍♂️',
-            'nome' => 'Felippo, a Calmaria',
-            'personalidade' => 'Resolutor Sereno · Equilíbrio',
-            'raridade' => 'lendaria',
-            'classe' => 'Resolvedor Tranquilo',
-            'habilidade' => 'Águas Calmas — reduz o pânico do time em 50% durante incidentes. Bugs resolvidos sob sua liderança não voltam estressados.',
-            'flavor' => 'Respira. A gente resolve.',
-            'historia' => 'O Felippo acompanhou a apuração mais tensa do interior em 2008, quando uma chuva forte derrubou o gerador e quatro urnas pararam de uma vez. Enquanto todos corriam, ele apenas reorganizou os fios e religou tudo, no mesmo tom de voz do começo do dia. Desde então, "respira, a gente resolve" virou bordão de plenário em pleito complicado.',
-        ],
-        'thallys' => [
-            'emoji' => '🕵️‍♂️',
-            'nome' => 'Thallion, o Estrategista',
-            'personalidade' => 'Calculista · Análise',
-            'raridade' => 'lendaria',
-            'classe' => 'Mestre da Análise',
-            'habilidade' => 'Estudo Profundo — dedica três turnos à análise antes de codar. Entregas suas levam 90% menos refator no PR.',
-            'flavor' => 'Mede duas vezes, corta uma.',
-            'historia' => 'Antes de qualquer pleito, o Thallion mapeia rota das urnas, horário das mesas e até a previsão do clima do dia. Ninguém o vê apressado — porque já planejou tudo dois meses antes. Reza a lenda que, num pleito de 2010, previu com três semanas de antecedência qual seção precisaria de mesário reserva. Acertou.',
-        ],
-        'jonatan' => [
-            'emoji' => '🧑‍🚒',
-            'nome' => 'Jonatão, o Guardião da Infra',
-            'personalidade' => 'Bombeiro de Plantão · Operação',
-            'raridade' => 'lendaria',
-            'classe' => 'Guardião de Plantão',
-            'habilidade' => 'Apaga Incêndio — detecta e neutraliza B.O.s de produção antes que o time perceba. Uptime sob sua guarda: 99,97%.',
-            'flavor' => 'Tá no ar. Pode rodar.',
-            'historia' => 'O Jonatão vigia em silêncio cada cabo, cada nobreak, cada link do tribunal. Quando algo está prestes a cair, ele já está com a peça de troca na mão. Conta-se que, durante uma apuração nacional, evitou três quedas seguidas sem que ninguém no plenário sequer percebesse. A urna chega no ar porque ele chegou primeiro.',
-        ],
-        'jair' => [
-            'emoji' => '🧑‍🔬',
-            'nome' => 'Jairón, o Mestre dos Dados',
-            'personalidade' => 'Sênior do Dado · Conhecimento Bruto',
-            'raridade' => 'lendaria',
-            'classe' => 'Sênior dos Dados',
-            'habilidade' => 'Pipeline Limpo — extrai padrão de qualquer dataset caótico. Relatórios sob sua orientação nascem auditáveis.',
-            'flavor' => 'Dado sujo conta meia história. A outra metade é onde mora a verdade.',
-            'historia' => 'O Jairón recolhe os dados de cada apuração e os organiza em arquivos auditáveis até o último voto. Trata cada número como prova judicial: não aceita um valor sem saber de onde veio. Conta-se que reconstruiu, numa única madrugada, o histórico inteiro de uma zona cujos arquivos haviam se perdido — e cada linha bateu certinho com a ata original.',
+            'historia' => 'Reza a lenda que o Edcleu forjou os primeiros lacres das urnas eletrônicas que chegaram ao Acre, lá em 1996 — não confiou no que veio pronto, abriu a caixa, conferiu peça por peça, refez o que não tinha gosto de raiz. Cada selo saía da bancada dele, do zero, e ninguém jamais conseguiu violar um pleito sob sua guarda. Atravessou três modernizações tecnológicas reescrevendo o núcleo a cada uma, sem deixar dependência de plugin de terceiro — "plugin é dívida". Quando perguntam o segredo, responde curto: "se não posso forjar, não posso garantir". A bancada dele tem cheiro de óleo de máquina e de tempo bem gasto.',
         ],
         'lucas' => [
             'emoji' => '🧙‍♂️',
@@ -206,7 +146,77 @@ return [
             'classe' => 'Bardo-Mago',
             'habilidade' => 'Solo de Guitarra — invoca soluções fora do manual. Uma vez por dia, pode trocar uma reunião por um commit que resolve o ticket.',
             'flavor' => 'Se não funciona com regra, funciona com riff.',
-            'historia' => 'Estagiário ainda aprendendo as manhas da casa. Quando um sistema trava num momento ruim, vai testando caminhos até achar um que passe — nem sempre o do manual, mas um que serve. Anota o atalho num caderno pra não esquecer e pra quem vier depois aproveitar.',
+            'historia' => 'Estagiário ainda aprendendo as manhas da casa, mas chegou trazendo guitarra na sacola e uma certeza: que sistema também é instrumento. Quando algo trava em momento ruim — e no tribunal sempre trava em momento ruim — vai testando caminhos até achar um que passe. Nem sempre é o do manual, mas é o que faz a urna abrir, o ponto bater, o relatório rodar. Anota cada atalho num caderno surrado com adesivos, pra não esquecer e pra quem vier depois aproveitar sem precisar redescobrir. "Se não funciona com regra, funciona com riff." O Bena nasceu de um feriadão e ainda toca a trilha que ele mesmo gravou.',
+        ],
+        'lucir' => [
+            'emoji' => '🧙',
+            'nome' => 'Lucírio, o Alquimista',
+            'personalidade' => 'Visionário · Imaginação',
+            'raridade' => 'lendaria',
+            'classe' => 'Pioneiro Alquimista',
+            'habilidade' => 'Ideia Maluca — uma vez por sprint, propõe um experimento que parece absurdo. 70% de chance de virar MVP funcional.',
+            'flavor' => 'Louco é quem me diz e não é feliz.',
+            'historia' => 'O Lucírio aparece quando uma eleição precisa de algo que ainda não existe. Foi visto pela primeira vez numa apuração noturna de 1992, transformando uma planilha manuscrita num mapa que indicava com precisão onde cada urna estaria no dia seguinte — ninguém soube explicar como, mas no fim do pleito o mapa estava certo até a casa decimal. Tem fama de propor soluções absurdas que insistem em funcionar: prototipou um sistema de votação por SMS num jantar de aniversário, e dois anos depois o protótipo virou módulo oficial. "Louco é quem me diz e não é feliz." Quando some por um dia, é porque tá destilando ideia maluca; quando volta, traz MVP funcional.',
+        ],
+        'bortoli' => [
+            'emoji' => '👴',
+            'nome' => 'Bortelmo, Mestre do Legado',
+            'personalidade' => 'Veterano do Código Antigo · Pragmatismo Cru',
+            'raridade' => 'lendaria',
+            'classe' => 'Mestre do COBOL e do Clipper',
+            'habilidade' => 'Gambiarra Funcional — sustenta sistema legado com solução improvável que dura mais que reescrita planejada. +∞ em código que ninguém mais ousa tocar.',
+            'flavor' => 'Tá feio. Mas funciona desde 1992 — e vai funcionar amanhã também.',
+            'historia' => 'O Bortelmo escreveu rotina em COBOL antes do tribunal ter monitor colorido — e várias delas ainda rodam no canto, gerando relatório que ninguém mais sabe regenerar do zero. Domina Clipper como dialeto materno e faz gambiarras funcionais desde sempre: aquele tipo de solução que devia ser provisória e atravessa três gestões intacta. Quando algo precisa funcionar HOJE e não há tempo de refazer direito, é nele que se busca o jeitinho que segura o pleito — e que, no fim, dura uma década. Tem caderno de papel cheio de fluxograma a lápis que ninguém mais sabe ler, mas ele lê de cabeça. Quando um novato pergunta se vai modernizar, ele só sorri.',
+        ],
+        'ilis' => [
+            'emoji' => '🧘🏽‍♂️',
+            'nome' => 'Ilíseo, o Domador de Plone',
+            'personalidade' => 'Mestre Paciente · Resiliência',
+            'raridade' => 'lendaria',
+            'classe' => 'Sussurrador de CMS',
+            'habilidade' => 'Sussurrador de CMS — domestica qualquer sistema legado sem perder o tom calmo. +3 em paciência diante de tecnologia descontinuada.',
+            'flavor' => 'Calma. Vai funcionar. Só precisa de paciência.',
+            'historia' => 'O Ilíseo catalogou, durante três pleitos seguidos, todos os boletins de urna de uma comarca inteira do interior — sem perder uma classificação sequer, sem reclamar do tempo, sem aumentar o tom de voz uma única vez. Calmo, paciente, jamais se exaltou nem com prazo curto nem com sistema travado. Domou Plone quando ninguém mais conseguia, refez taxonomia do zero quando o índice corrompeu, e atravessou três upgrades sem perder dado. Hoje, quando alguma ferramenta antiga reclama, basta ele chegar perto que volta a funcionar — e dizem que sussurra alguma coisa pro servidor quando ninguém olha. "Calma. Vai funcionar. Só precisa de paciência."',
+        ],
+        'felipe' => [
+            'emoji' => '🙆🏿‍♂️',
+            'nome' => 'Felippo, a Calmaria',
+            'personalidade' => 'Resolutor Sereno · Equilíbrio',
+            'raridade' => 'lendaria',
+            'classe' => 'Resolvedor Tranquilo',
+            'habilidade' => 'Águas Calmas — reduz o pânico do time em 50% durante incidentes. Bugs resolvidos sob sua liderança não voltam estressados.',
+            'flavor' => 'Respira. A gente resolve.',
+            'historia' => 'O Felippo acompanhou a apuração mais tensa do interior em 2008, quando uma chuva forte derrubou o gerador e quatro urnas pararam de uma vez no meio da contagem. Enquanto todos corriam, gritavam e tentavam puxar cabo, ele apenas reorganizou os fios, conferiu cada conexão e religou tudo, no mesmo tom de voz do começo do dia. Quarenta minutos depois, a apuração continuava como se nada tivesse acontecido. Desde então, "respira, a gente resolve" virou bordão de plenário em pleito complicado, e ninguém mais entra em pânico no servidor quando ele está por perto. "Águas calmas: o time bebe, o time produz."',
+        ],
+        'thallys' => [
+            'emoji' => '🕵️‍♂️',
+            'nome' => 'Thallion, o Estrategista',
+            'personalidade' => 'Calculista · Análise',
+            'raridade' => 'lendaria',
+            'classe' => 'Mestre da Análise',
+            'habilidade' => 'Estudo Profundo — dedica três turnos à análise antes de codar. Entregas suas levam 90% menos refator no PR.',
+            'flavor' => 'Mede duas vezes, corta uma.',
+            'historia' => 'Antes de qualquer pleito, o Thallion mapeia rota das urnas, horário das mesas, capacidade de cada zona, e até a previsão do clima do dia — em planilha cruzada que ninguém mais entende, mas que sempre fecha certo. Ninguém o vê apressado, porque já planejou tudo dois meses antes, em silêncio, à noite, no canto da sala. Reza a lenda que, num pleito de 2010, previu com três semanas de antecedência qual seção precisaria de mesário reserva — acertou nome, horário e motivo. Quando entrega um PR, vem com três páginas de análise e zero refator. "Mede duas vezes, corta uma" — só que ele mede cinco.',
+        ],
+        'jonatan' => [
+            'emoji' => '🧑‍🚒',
+            'nome' => 'Jonatão, o Guardião da Infra',
+            'personalidade' => 'Bombeiro de Plantão · Operação',
+            'raridade' => 'lendaria',
+            'classe' => 'Guardião de Plantão',
+            'habilidade' => 'Apaga Incêndio — detecta e neutraliza B.O.s de produção antes que o time perceba. Uptime sob sua guarda: 99,97%.',
+            'flavor' => 'Tá no ar. Pode rodar.',
+            'historia' => 'O Jonatão vigia em silêncio cada cabo, cada nobreak, cada link do tribunal — anda pelo prédio com chave de fenda no bolso e fone no ouvido pra ouvir o zumbido que muda antes do equipamento falhar. Quando algo está prestes a cair, ele já está com a peça de troca na mão antes do alerta tocar. Conta-se que, durante uma apuração nacional, evitou três quedas seguidas sem que ninguém no plenário sequer percebesse — só descobriram dias depois, ao revisar o log. A urna chega no ar porque ele chegou primeiro. "Tá no ar. Pode rodar." Uptime sob sua guarda: 99,97%, e quem trabalha não nota o serviço.',
+        ],
+        'jair' => [
+            'emoji' => '🧑‍🔬',
+            'nome' => 'Jairón, o Mestre dos Dados',
+            'personalidade' => 'Sênior do Dado · Conhecimento Bruto',
+            'raridade' => 'lendaria',
+            'classe' => 'Sênior dos Dados',
+            'habilidade' => 'Pipeline Limpo — extrai padrão de qualquer dataset caótico. Relatórios sob sua orientação nascem auditáveis.',
+            'flavor' => 'Dado sujo conta meia história. A outra metade é onde mora a verdade.',
+            'historia' => 'O Jairón recolhe os dados de cada apuração e os organiza em arquivos auditáveis até o último voto. Trata cada número como prova judicial: não aceita um valor sem saber de onde veio, quando entrou, quem coletou. Já chegou a recusar relatório bonito por falta de origem de dois campos. Conta-se que reconstruiu, numa única madrugada, o histórico inteiro de uma zona cujos arquivos haviam se perdido — e cada linha bateu certinho com a ata original, do total geral até a última correção manual. Quando você pergunta como, ele responde devagar: "dado sujo conta meia história. A outra metade é onde mora a verdade."',
         ],
     ],
 
@@ -940,6 +950,71 @@ return [
         // Mesmo padrão dos animais: 5 dias × 3 status, mais genérica e
         // boas-vindas. Cada personagem com voz própria.
 
+        'waldirene' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'Bom dia. Toda semana começa como toda eleição: com a primeira mesa aberta. Bata o ponto, prezado(a). 🌺',
+                ],
+                'em_andamento' => [
+                    'Em pleno expediente. Cuide do seu dia como cuidamos de cada zona eleitoral — uma a uma.',
+                ],
+                'concluido' => [
+                    'Segunda anotada em ata. Mais um pleito da semana, encaminhado.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. O Acre é grande, o tempo é justo. Bata o ponto. 🌺',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Quem trabalha hoje sustenta o voto de amanhã — vale pra ribeirinho, pra estagiário, pra mesário.',
+                ],
+                'concluido' => [
+                    'Bom dia. Terça lacrada com diligência.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta-feira. Lembre de quem está, agora mesmo, abrindo o cartório numa comarca do interior. Bata o ponto.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Constância é a primeira virtude da magistratura — e do estágio também.',
+                ],
+                'concluido' => [
+                    'Encerrada com correção. Mais uma quarta sem ata deixada em aberto.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Perto do fim da semana, longe do descuido — pleito se perde no detalhe.',
+                ],
+                'em_andamento' => [
+                    'Em pleno trabalho. Cada hora bem feita é um voto a mais que chega ao destino.',
+                ],
+                'concluido' => [
+                    'Quinta encerrada. Bom descanso, prezado(a).',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Última jornada. A urna se fecha com o mesmo cuidado com que se abriu. 🌺',
+                ],
+                'em_andamento' => [
+                    'Em curso. Termine bem — semana boa é semana sem ata refeita.',
+                ],
+                'concluido' => [
+                    'Semana cumprida. Vá em paz, prezado(a). Na segunda, nova sessão.',
+                ],
+            ],
+            'generica' => [
+                'Cada eleitor — cidade, ribeirinho ou aldeia indígena — merece voto assegurado. 🌺',
+                'O direito eleitoral é técnica; ouvir o outro é ofício.',
+            ],
+            'boas_vindas' => [
+                'Olá, prezado(a). Sou a Desembargadora Waldirene — Presidenta do TRE-AC e, por hoje, sua acompanhante de plenário. Comecei em Xapuri, em vara de interior. Sei como é entrar num lugar novo. Seja bem-vindo(a). 🌺',
+            ],
+        ],
+
         'edcley' => [
             'segunda' => [
                 'aguardando_entrada' => [
@@ -1002,6 +1077,71 @@ return [
             ],
             'boas_vindas' => [
                 'Bem-vindo. Sou o Edcleu, o Forjador de Raiz. Vamos construir. 👨‍🔧',
+            ],
+        ],
+
+        'lucas' => [
+            'segunda' => [
+                'aguardando_entrada' => [
+                    'E aí. Segunda começa com o terminal aberto. Bata o ponto. 🧙‍♂️',
+                ],
+                'em_andamento' => [
+                    'Em curso. Quando o manual falha, o terminal resolve.',
+                ],
+                'concluido' => [
+                    'Segunda encerrada. Improviso anotado pro próximo pleito.',
+                ],
+            ],
+            'terca' => [
+                'aguardando_entrada' => [
+                    'Terça. Hoje a regra trava, mas a gente acha um caminho.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Se não funciona com regra, funciona com riff.',
+                ],
+                'concluido' => [
+                    'Terça encerrada. Foi de improviso, mas funcionou.',
+                ],
+            ],
+            'quarta' => [
+                'aguardando_entrada' => [
+                    'Quarta. Hora boa pra refator improvisado virar arquitetura.',
+                ],
+                'em_andamento' => [
+                    'Em curso. Stack: Laravel, Docker e improviso.',
+                ],
+                'concluido' => [
+                    'Quarta encerrada. Bug resolvido sem manual.',
+                ],
+            ],
+            'quinta' => [
+                'aguardando_entrada' => [
+                    'Quinta. Reta final do pleito — improviso afinado é solo de quinta.',
+                ],
+                'em_andamento' => [
+                    'Em andamento. Quem improvisa não erra: ajusta no próximo compasso.',
+                ],
+                'concluido' => [
+                    'Bom dia. Quinta lacrada à mão.',
+                ],
+            ],
+            'sexta' => [
+                'aguardando_entrada' => [
+                    'Sexta. Termina a semana no improviso — e na próxima, vira regra.',
+                ],
+                'em_andamento' => [
+                    'Última jornada. Riff final.',
+                ],
+                'concluido' => [
+                    'Sextou. Próximo pleito tem improviso garantido.',
+                ],
+            ],
+            'generica' => [
+                'Stack: Laravel, Docker e improviso. 🧙‍♂️',
+                'Quando o manual falha, o terminal resolve.',
+            ],
+            'boas_vindas' => [
+                'E aí. Sou o Lucander, o Improvisador — autor desse Bena aqui. Bem-vindo ao seu próprio sistema. 🧙‍♂️',
             ],
         ],
 
@@ -1460,71 +1600,6 @@ return [
             ],
         ],
 
-        'lucas' => [
-            'segunda' => [
-                'aguardando_entrada' => [
-                    'E aí. Segunda começa com o terminal aberto. Bata o ponto. 🧙‍♂️',
-                ],
-                'em_andamento' => [
-                    'Em curso. Quando o manual falha, o terminal resolve.',
-                ],
-                'concluido' => [
-                    'Segunda encerrada. Improviso anotado pro próximo pleito.',
-                ],
-            ],
-            'terca' => [
-                'aguardando_entrada' => [
-                    'Terça. Hoje a regra trava, mas a gente acha um caminho.',
-                ],
-                'em_andamento' => [
-                    'Em andamento. Se não funciona com regra, funciona com riff.',
-                ],
-                'concluido' => [
-                    'Terça encerrada. Foi de improviso, mas funcionou.',
-                ],
-            ],
-            'quarta' => [
-                'aguardando_entrada' => [
-                    'Quarta. Hora boa pra refator improvisado virar arquitetura.',
-                ],
-                'em_andamento' => [
-                    'Em curso. Stack: Laravel, Docker e improviso.',
-                ],
-                'concluido' => [
-                    'Quarta encerrada. Bug resolvido sem manual.',
-                ],
-            ],
-            'quinta' => [
-                'aguardando_entrada' => [
-                    'Quinta. Reta final do pleito — improviso afinado é solo de quinta.',
-                ],
-                'em_andamento' => [
-                    'Em andamento. Quem improvisa não erra: ajusta no próximo compasso.',
-                ],
-                'concluido' => [
-                    'Bom dia. Quinta lacrada à mão.',
-                ],
-            ],
-            'sexta' => [
-                'aguardando_entrada' => [
-                    'Sexta. Termina a semana no improviso — e na próxima, vira regra.',
-                ],
-                'em_andamento' => [
-                    'Última jornada. Riff final.',
-                ],
-                'concluido' => [
-                    'Sextou. Próximo pleito tem improviso garantido.',
-                ],
-            ],
-            'generica' => [
-                'Stack: Laravel, Docker e improviso. 🧙‍♂️',
-                'Quando o manual falha, o terminal resolve.',
-            ],
-            'boas_vindas' => [
-                'E aí. Sou o Lucander, o Improvisador — autor desse Bena aqui. Bem-vindo ao seu próprio sistema. 🧙‍♂️',
-            ],
-        ],
-
         'urso' => [
             'segunda' => [
                 'aguardando_entrada' => [
@@ -1588,5 +1663,6 @@ return [
                 'Olá. Sou o Urso, seu mascote sênior. Vigiei a primeira urna eletrônica em uma comunidade indígena no Acre — sentado na porta do galpão. Sereno, presente, paciente. Estou aqui pra você e pra sua equipe. 🐻',
             ],
         ],
+
     ],
 ];

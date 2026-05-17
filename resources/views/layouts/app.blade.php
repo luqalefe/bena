@@ -20,6 +20,19 @@
     {{-- Tema institucional TRE-AC (carregado DEPOIS pra sobrescrever tokens) --}}
     <link href="{{ asset('css/tre-ac-theme.css') }}?v={{ filemtime(public_path('css/tre-ac-theme.css')) }}" rel="stylesheet">
 
+    @auth
+        {{-- Preload da trilha sonora pra reduzir o gap de áudio entre navegações.
+             Browser começa a baixar imediatamente em paralelo com o resto da página
+             e mantém em cache pras próximas views. --}}
+        <link rel="preload" as="audio" href="{{ asset('audio/bena-master.mp3') }}" type="audio/mpeg">
+
+        {{-- Turbo (Hotwire): intercepta navegação tradicional do Laravel e troca
+             só o conteúdo via fetch, preservando elementos marcados como
+             data-turbo-permanent (o player). Resultado: áudio sem cortes ao
+             trocar de página. --}}
+        <script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.12/dist/turbo.es2017-umd.min.js" data-turbo-eval="false"></script>
+    @endauth
+
     <style>
         /* ─────────────────────────────────────────────────────────────
            Header Bena — branco frosted glass com texto navy (cor da
@@ -1087,6 +1100,187 @@
             .bena-table thead { display: none; }
             .bena-table tbody td { padding: 0.7rem 0.85rem; }
         }
+
+        /* ─────────────────────────────────────────────────────────────
+           Player de trilha sonora — widget flutuante arrastável,
+           inspirado no mini player do Spotify (desktop macOS).
+           Aparece em todas as views autenticadas. Estado (play, tempo,
+           volume, mute, posição, dismissed) sobrevive à navegação via
+           sessionStorage.
+           ───────────────────────────────────────────────────────────── */
+        .bena-player {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 240px;
+            background: linear-gradient(180deg, rgba(30, 27, 75, 0.96) 0%, rgba(15, 12, 50, 0.96) 100%);
+            color: #f5f3ff;
+            border-radius: 16px;
+            box-shadow:
+                0 12px 32px rgba(0, 0, 0, 0.45),
+                0 2px 6px rgba(0, 0, 0, 0.25),
+                inset 0 0 0 1px rgba(250, 204, 21, 0.18);
+            padding: 12px 12px 14px;
+            z-index: 100;
+            user-select: none;
+            cursor: grab;
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            transition: box-shadow 0.2s ease, transform 0.05s ease;
+        }
+        .bena-player[hidden] { display: none; }
+        .bena-player.is-dragging {
+            cursor: grabbing;
+            box-shadow:
+                0 20px 48px rgba(0, 0, 0, 0.55),
+                0 3px 8px rgba(0, 0, 0, 0.35),
+                inset 0 0 0 1px rgba(250, 204, 21, 0.3);
+            transition: none;
+        }
+        .bena-player__cover {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #0f172a;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+            margin-bottom: 10px;
+        }
+        .bena-player__cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: pixelated;
+            display: block;
+        }
+        .bena-player__cover img[hidden] { display: none; }
+        .bena-player__cover-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(245, 243, 255, 0.35);
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, rgba(30, 27, 75, 0.6), rgba(15, 12, 50, 0.8));
+        }
+        .bena-player__info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .bena-player__info-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.25;
+            min-width: 0;
+            flex: 1;
+        }
+        .bena-player__title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffffff;
+            letter-spacing: 0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .bena-player__artist {
+            font-size: 0.76rem;
+            color: rgba(245, 243, 255, 0.65);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+        .bena-player__actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .bena-player__btn {
+            border: none;
+            background: transparent;
+            color: rgba(245, 243, 255, 0.85);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            transition: transform 0.1s ease, color 0.15s ease, background 0.15s ease;
+        }
+        .bena-player__btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.1); }
+        .bena-player__btn:active { transform: scale(0.94); }
+        .bena-player__btn--play { background: #fde68a; color: #1e1b4b; font-size: 0.78rem; }
+        .bena-player__btn--play:hover { background: #fef3c7; color: #1e1b4b; transform: scale(1.06); }
+        .bena-player__btn--play .fa-play { margin-left: 2px; }
+        .bena-player__progress {
+            position: relative;
+            height: 3px;
+            background: rgba(245, 243, 255, 0.15);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .bena-player__progress-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, #fde68a 0%, #f59e0b 100%);
+            transition: width 0.15s linear;
+            pointer-events: none;
+            border-radius: 999px;
+        }
+        .bena-player__volume {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.2s ease, max-height 0.2s ease;
+        }
+        .bena-player:hover .bena-player__volume { opacity: 1; max-height: 32px; }
+        .bena-player__volume input[type="range"] {
+            flex: 1;
+            accent-color: #fde68a;
+            height: 16px;
+            cursor: pointer;
+        }
+        .bena-player__close {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: rgba(220, 38, 38, 0.95);
+            color: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+            z-index: 2;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+        .bena-player__close:hover { background: #ef4444; transform: scale(1.08); }
+        .bena-player__close:active { transform: scale(0.92); }
+        @media (max-width: 640px) {
+            .bena-player { width: 200px; padding: 10px 10px 12px; }
+            .bena-player__volume { opacity: 1; max-height: 32px; }
+        }
     </style>
 
     @stack('styles')
@@ -1204,18 +1398,338 @@
         </div>
     </footer>
 
+    @auth
+        @php
+            // Player usa o mascote sorteado pro usuário como capa. Quando o
+            // usuário ainda não tem buddy assignado, o player começa em modo
+            // "aguardando sorteio" — o JS do slot machine (/bem-vindo) cicla
+            // os sprites e termina no mascote real, sem fallback hardcoded.
+            //
+            // Em /bem-vindo NO PRIMEIRO REVEAL (tutorial_visto_em ainda null)
+            // suprimimos o buddy no player pra não dar spoiler: o slot
+            // machine que vai revelar o mascote ao mesmo tempo no player.
+            $playerSpriteUrl = null;
+            $playerArtistNome = null;
+            $tipoBuddyAtual = auth()->user()->buddy_tipo ?? null;
+            $ehPrimeiroReveal = request()->routeIs('onboarding.show')
+                && auth()->user()->tutorial_visto_em === null;
+            if ($tipoBuddyAtual && ! $ehPrimeiroReveal) {
+                $perfilBuddyAtual = (array) config("buddies.perfis.{$tipoBuddyAtual}", []);
+                $caminhoBuddyAtual = app(\App\Support\BuddySprite::class)->caminho($tipoBuddyAtual);
+                if ($caminhoBuddyAtual) {
+                    $playerSpriteUrl = $caminhoBuddyAtual;
+                }
+                if (! empty($perfilBuddyAtual['nome'])) {
+                    $playerArtistNome = (string) $perfilBuddyAtual['nome'];
+                }
+            }
+        @endphp
+        <div class="bena-player" id="bena-player" role="region" aria-label="Trilha sonora do Bena" data-turbo-permanent>
+            <button type="button" class="bena-player__close" id="bena-player-close" aria-label="Fechar player e parar trilha">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <div class="bena-player__cover">
+                <img
+                    src="{{ $playerSpriteUrl ?? '' }}"
+                    alt="{{ $playerArtistNome ?? '' }}"
+                    @if (! $playerSpriteUrl) hidden @endif
+                >
+                @unless ($playerSpriteUrl)
+                    <div class="bena-player__cover-placeholder" aria-hidden="true">
+                        <i class="fas fa-music"></i>
+                    </div>
+                @endunless
+            </div>
+            <div class="bena-player__info">
+                <div class="bena-player__info-text">
+                    <span class="bena-player__title">BENA</span>
+                    <span class="bena-player__artist">{{ $playerArtistNome ?? 'Aguardando sorteio…' }}</span>
+                </div>
+                <div class="bena-player__actions">
+                    <button type="button" class="bena-player__btn" id="bena-player-mute" aria-label="Mutar trilha">
+                        <i class="fas fa-volume-up" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" class="bena-player__btn bena-player__btn--play" id="bena-player-toggle" aria-label="Tocar trilha">
+                        <i class="fas fa-play" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bena-player__progress">
+                <div class="bena-player__progress-bar" id="bena-player-progress-bar"></div>
+            </div>
+            <div class="bena-player__volume">
+                <i class="fas fa-volume-down" aria-hidden="true" style="color: rgba(245,243,255,0.5); font-size: 0.7rem;"></i>
+                <input type="range" id="bena-player-volume" min="0" max="100" value="60" aria-label="Volume">
+            </div>
+            <audio id="bena-player-audio" src="{{ asset('audio/bena-master.mp3') }}" preload="auto" loop></audio>
+        </div>
+
+        {{-- SFX da urna eletrônica: toca a cada bater de ponto.
+             data-turbo-permanent é essencial — sem ele, o Turbo substitui
+             o <audio> a cada navegação pós-submit e corta a reprodução,
+             tocando só o começo. Com permanent, o elemento (e o playback)
+             sobrevive ao morph do body. --}}
+        <audio id="urna-song-audio" src="{{ asset('audio/urna-song.mp3') }}" preload="auto" data-turbo-permanent></audio>
+
+        <script>
+            // Handler global: toca o som da urna eletrônica toda vez que o
+            // usuário bate ponto (form entrada ou saída). Sentinel pra
+            // não bindar duplicado em cada navegação do Turbo.
+            (function () {
+                if (window.__benaUrnaSongBound) return;
+                window.__benaUrnaSongBound = true;
+
+                document.addEventListener('submit', function (e) {
+                    var form = e.target;
+                    if (!form || form.tagName !== 'FORM') return;
+                    var action = form.getAttribute('action') || '';
+                    if (action.indexOf('ponto/entrada') === -1
+                        && action.indexOf('ponto/saida') === -1) return;
+                    var sfx = document.getElementById('urna-song-audio');
+                    if (!sfx) return;
+                    try { sfx.pause(); sfx.currentTime = 0; } catch (e) {}
+                    sfx.play().catch(function () {});
+                }, true);
+            })();
+        </script>
+
+        <script>
+            (function () {
+                const player = document.getElementById('bena-player');
+                const audio = document.getElementById('bena-player-audio');
+                const toggleBtn = document.getElementById('bena-player-toggle');
+                const muteBtn = document.getElementById('bena-player-mute');
+                const closeBtn = document.getElementById('bena-player-close');
+                const volumeInput = document.getElementById('bena-player-volume');
+                const progressBar = document.getElementById('bena-player-progress-bar');
+                if (!player || !audio || !toggleBtn || !muteBtn || !closeBtn || !volumeInput || !progressBar) return;
+
+                const toggleIcon = toggleBtn.querySelector('i');
+                const muteIcon = muteBtn.querySelector('i');
+                const STATE_KEY = 'bena-player-state';
+                const POS_KEY = 'bena-player-pos';
+                const DISMISS_KEY = 'bena-player-dismissed';
+                let saveTimer = null;
+
+                function setPlayIcon(playing) {
+                    if (playing) {
+                        toggleIcon.classList.replace('fa-play', 'fa-pause');
+                        toggleBtn.setAttribute('aria-label', 'Pausar trilha');
+                    } else {
+                        toggleIcon.classList.replace('fa-pause', 'fa-play');
+                        toggleBtn.setAttribute('aria-label', 'Tocar trilha');
+                    }
+                }
+                function setMuteIcon(muted) {
+                    if (muted) {
+                        muteIcon.classList.replace('fa-volume-up', 'fa-volume-mute');
+                    } else {
+                        muteIcon.classList.replace('fa-volume-mute', 'fa-volume-up');
+                    }
+                }
+                function saveState() {
+                    try {
+                        sessionStorage.setItem(STATE_KEY, JSON.stringify({
+                            playing: !audio.paused,
+                            time: audio.currentTime || 0,
+                            volume: audio.volume,
+                            muted: audio.muted,
+                        }));
+                    } catch (e) {}
+                }
+                function scheduleSave() {
+                    if (saveTimer) return;
+                    saveTimer = setTimeout(() => { saveTimer = null; saveState(); }, 2000);
+                }
+                function clampToViewport(left, top) {
+                    const rect = player.getBoundingClientRect();
+                    const maxLeft = window.innerWidth - rect.width - 8;
+                    const maxTop = window.innerHeight - rect.height - 8;
+                    return {
+                        left: Math.max(8, Math.min(left, maxLeft)),
+                        top: Math.max(8, Math.min(top, maxTop)),
+                    };
+                }
+                function applyPosition(left, top) {
+                    const clamped = clampToViewport(left, top);
+                    player.style.left = clamped.left + 'px';
+                    player.style.top = clamped.top + 'px';
+                    player.style.right = 'auto';
+                    player.style.bottom = 'auto';
+                }
+
+                // ─── Estado "dismissed" (usuário fechou no X) ─────────────
+                // Se a URL pediu autoplay (vindo do descobrir mascote), reseta
+                // a flag — o player deve reaparecer.
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('autoplay') === '1') {
+                    try { sessionStorage.removeItem(DISMISS_KEY); } catch (e) {}
+                }
+                let dismissed = false;
+                try { dismissed = sessionStorage.getItem(DISMISS_KEY) === '1'; } catch (e) {}
+                // Se dismissed, esconde o widget mas mantém JS ativo — assim
+                // o áudio responde a triggers externos (descobrir mascote no
+                // onboarding tira o player da hidden e dá play).
+                if (dismissed) {
+                    player.hidden = true;
+                }
+
+                // ─── Restaura estado do áudio ────────────────────────────
+                let saved = null;
+                try { saved = JSON.parse(sessionStorage.getItem(STATE_KEY) || 'null'); } catch (e) {}
+
+                const initialVolume = saved && typeof saved.volume === 'number' ? saved.volume : 0.6;
+                audio.volume = initialVolume;
+                volumeInput.value = Math.round(initialVolume * 100);
+                if (saved && saved.muted) { audio.muted = true; setMuteIcon(true); }
+
+                const wantsAutoplay = !dismissed && (params.get('autoplay') === '1' || (saved && saved.playing));
+
+                // Aplica tempo salvo e dispara autoplay assim que metadata
+                // estiver pronta (evita o "blip" de 0s antes do seek).
+                function readyAndGo() {
+                    if (saved && typeof saved.time === 'number' && saved.time > 0) {
+                        try { audio.currentTime = saved.time; } catch (e) {}
+                    }
+                    if (wantsAutoplay) {
+                        audio.play().then(() => setPlayIcon(true)).catch(() => {});
+                    }
+                }
+                if (audio.readyState >= 1) {
+                    readyAndGo();
+                } else {
+                    audio.addEventListener('loadedmetadata', readyAndGo, { once: true });
+                }
+
+                // ─── Restaura posição do widget ──────────────────────────
+                let savedPos = null;
+                try { savedPos = JSON.parse(sessionStorage.getItem(POS_KEY) || 'null'); } catch (e) {}
+                if (savedPos && typeof savedPos.left === 'number' && typeof savedPos.top === 'number') {
+                    applyPosition(savedPos.left, savedPos.top);
+                }
+
+                // ─── Controles ──────────────────────────────────────────
+                toggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (audio.paused) {
+                        audio.play().then(() => setPlayIcon(true)).catch(() => {});
+                    } else {
+                        audio.pause();
+                    }
+                });
+                muteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    audio.muted = !audio.muted;
+                    setMuteIcon(audio.muted);
+                    saveState();
+                });
+                volumeInput.addEventListener('input', (e) => {
+                    e.stopPropagation();
+                    audio.volume = volumeInput.value / 100;
+                    if (audio.muted && audio.volume > 0) {
+                        audio.muted = false;
+                        setMuteIcon(false);
+                    }
+                    scheduleSave();
+                });
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    audio.pause();
+                    audio.currentTime = 0;
+                    player.hidden = true;
+                    try { sessionStorage.setItem(DISMISS_KEY, '1'); } catch (e) {}
+                    saveState();
+                });
+
+                audio.addEventListener('play', () => { setPlayIcon(true); saveState(); });
+                audio.addEventListener('pause', () => { setPlayIcon(false); saveState(); });
+                audio.addEventListener('timeupdate', () => {
+                    if (audio.duration > 0) {
+                        progressBar.style.width = (100 * audio.currentTime / audio.duration) + '%';
+                    }
+                    scheduleSave();
+                });
+
+                // ─── Drag-and-drop ──────────────────────────────────────
+                const isInteractive = (el) => !!el.closest('button, input, a');
+                let dragOffsetX = 0, dragOffsetY = 0, dragging = false;
+
+                function onDragStart(clientX, clientY, target) {
+                    if (isInteractive(target)) return false;
+                    const rect = player.getBoundingClientRect();
+                    dragOffsetX = clientX - rect.left;
+                    dragOffsetY = clientY - rect.top;
+                    dragging = true;
+                    player.classList.add('is-dragging');
+                    return true;
+                }
+                function onDragMove(clientX, clientY) {
+                    if (!dragging) return;
+                    applyPosition(clientX - dragOffsetX, clientY - dragOffsetY);
+                }
+                function onDragEnd() {
+                    if (!dragging) return;
+                    dragging = false;
+                    player.classList.remove('is-dragging');
+                    try {
+                        const rect = player.getBoundingClientRect();
+                        sessionStorage.setItem(POS_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+                    } catch (e) {}
+                }
+
+                player.addEventListener('mousedown', (e) => {
+                    if (e.button !== 0) return;
+                    if (onDragStart(e.clientX, e.clientY, e.target)) e.preventDefault();
+                });
+                window.addEventListener('mousemove', (e) => onDragMove(e.clientX, e.clientY));
+                window.addEventListener('mouseup', onDragEnd);
+
+                player.addEventListener('touchstart', (e) => {
+                    const t = e.touches[0];
+                    onDragStart(t.clientX, t.clientY, e.target);
+                }, { passive: true });
+                window.addEventListener('touchmove', (e) => {
+                    if (!dragging) return;
+                    const t = e.touches[0];
+                    onDragMove(t.clientX, t.clientY);
+                    e.preventDefault();
+                }, { passive: false });
+                window.addEventListener('touchend', onDragEnd);
+
+                window.addEventListener('resize', () => {
+                    if (player.style.left) {
+                        const rect = player.getBoundingClientRect();
+                        applyPosition(rect.left, rect.top);
+                    }
+                });
+
+                window.addEventListener('pagehide', saveState);
+            })();
+        </script>
+    @endauth
+
     @stack('scripts')
 
-    {{-- Twemoji parser: troca emojis Unicode por <img> SVG do Twitter. --}}
+    {{-- Twemoji parser: troca emojis Unicode por <img> SVG do Twitter.
+         Reexecuta em cada turbo:load (primeira visita + cada navegação
+         soft do Turbo) pra cobrir conteúdo novo do <main>. --}}
     <script src="https://cdn.jsdelivr.net/npm/@twemoji/api@15.1.0/dist/twemoji.min.js" crossorigin="anonymous"></script>
     <script>
         (function () {
-            if (typeof twemoji === 'undefined') return;
-            twemoji.parse(document.body, {
-                folder: 'svg',
-                ext: '.svg',
-                base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/',
-            });
+            function parseEmojis() {
+                if (typeof twemoji === 'undefined') return;
+                twemoji.parse(document.body, {
+                    folder: 'svg',
+                    ext: '.svg',
+                    base: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/',
+                });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', parseEmojis, { once: true });
+            } else {
+                parseEmojis();
+            }
+            document.addEventListener('turbo:load', parseEmojis);
         })();
     </script>
 </body>

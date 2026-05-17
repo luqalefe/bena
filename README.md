@@ -209,7 +209,26 @@ H0.3 (`.gitlab-ci.yml`) aguarda migração pro GitLab interno.
   `/mascotes` com galeria e história de cada um ligada à Justiça
   Eleitoral do Acre.
 
-**Suíte:** 278 testes / 671 assertions, todos verdes (SQLite in-memory) ·
+✅ **Sprint 8 fechada — Áudio, player flutuante e reveal cinematográfico (H29–H34).**
+- **H29** — Carta lendária **Waldirene** (10ª da STI), ancorada na
+  carreira real da Desembargadora Waldirene Cordeiro (Xapuri 1998 →
+  Presidência TRE-AC 2025).
+- **H30** — Histórias dos 22 buddies expandidas pra ~600 chars cada,
+  com ano/local, quirk e citação característica.
+- **H31** — **Mini player flutuante estilo macOS Spotify**:
+  arrastável, cover com pixel art do mascote do usuário, controles
+  hover (play/pause/mute/volume), X vermelho de fechar com flag
+  dismissed persistente em `sessionStorage`.
+- **H32** — **Slot machine de 4s** no "Descobrir meu mascote" com sync
+  exato entre slot, mini player e carta de reveal (mesmo frame). Pré-
+  cache de sprites pra zero flicker.
+- **H33** — **Turbo (Hotwire)** via CDN + `data-turbo-permanent` no
+  player → trilha sonora (`bena-master.mp3`) contínua entre views,
+  sem corte de áudio.
+- **H34** — **SFX da urna eletrônica** ao bater ponto
+  (`urna-song.mp3`), handler global com sentinel anti-double-bind.
+
+**Suíte:** 437 testes / 1055 assertions, todos verdes (SQLite in-memory) ·
 gate de cobertura ≥ 80 %.
 
 🚧 **Próxima — Sprint 6 (Hardening)** — NFRs de segurança (NF1–NF7),

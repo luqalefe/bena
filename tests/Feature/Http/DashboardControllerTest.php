@@ -141,4 +141,25 @@ class DashboardControllerTest extends TestCase
         $response->assertSee('10,50 h');
         $response->assertSee('2', false); // dias batidos
     }
+
+    public function test_dashboard_renderiza_urna_song_e_handler_pra_bater_ponto(): void
+    {
+        // Toda vez que o usuário bate ponto (form entrada/saída), o som
+        // da urna eletrônica toca. O áudio fica pré-carregado no layout
+        // e um handler global no submit dispara o play.
+        $estagiario = Estagiario::factory()->create();
+
+        $response = $this->withHeaders([
+            'Remote-User' => $estagiario->username,
+            'Remote-Groups' => 'estagiarios',
+        ])->get('/');
+
+        $response->assertStatus(200);
+        $response->assertSee('id="urna-song-audio"', false);
+        $response->assertSee('/audio/urna-song.mp3', false);
+        // Handler que dispara o som no submit dos forms de ponto.
+        $response->assertSee('ponto/entrada', false);
+        $response->assertSee('ponto/saida', false);
+        $response->assertSee("getElementById('urna-song-audio')", false);
+    }
 }

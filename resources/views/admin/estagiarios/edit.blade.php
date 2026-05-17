@@ -40,7 +40,7 @@
     @endif
 
     <div class="bena-card">
-        <form method="POST" action="{{ route('admin.estagiarios.update', $estagiario) }}" enctype="multipart/form-data" class="bena-form">
+        <form method="POST" action="{{ route('admin.estagiarios.update', $estagiario) }}" enctype="multipart/form-data" class="bena-form" data-turbo="false">
             @csrf
             @method('PUT')
 

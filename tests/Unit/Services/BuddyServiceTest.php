@@ -49,6 +49,7 @@ class BuddyServiceTest extends TestCase
         app(BuddyService::class)->garantirBuddy($estagiario);
 
         $this->assertNotNull($estagiario->fresh()->buddy_tipo);
+        // Sem grupo → cai no pool comum (estagiário de setor não-lendário).
         $this->assertContains(
             $estagiario->fresh()->buddy_tipo,
             config('buddies.tipos'),
@@ -154,22 +155,11 @@ class BuddyServiceTest extends TestCase
         );
     }
 
-    public function test_garantir_buddy_de_estagiario_usa_pool_padrao(): void
+    public function test_garantir_buddy_estagiario_sti_sorteia_lendaria(): void
     {
-        $estagiario = Estagiario::factory()->create(['buddy_tipo' => null]);
-
-        app(BuddyService::class)->garantirBuddy($estagiario, 'E');
-
-        $this->assertContains(
-            $estagiario->fresh()->buddy_tipo,
-            config('buddies.tipos'),
-        );
-    }
-
-    public function test_garantir_buddy_estagiario_sti_sorteia_carta_lendaria(): void
-    {
+        // Estagiários lotados em STI (ou SSEC) recebem pool lendário exclusivo.
         $estagiario = Estagiario::factory()->create([
-            'username' => 'novo.estagiario',
+            'username' => 'novo.sti',
             'setor_id' => Setor::firstOrCreate(['sigla' => 'STI'], ['ativo' => true])->id,
             'buddy_tipo' => null,
         ]);
@@ -182,10 +172,9 @@ class BuddyServiceTest extends TestCase
         );
     }
 
-    public function test_garantir_buddy_estagiario_ssec_sorteia_carta_lendaria(): void
+    public function test_garantir_buddy_estagiario_ssec_sorteia_lendaria(): void
     {
-        // SSEC faz parte do mesmo grupo institucional da STI, então estagiários
-        // de lá entram no mesmo sorteio de cartas lendárias.
+        // SSEC faz parte do mesmo grupo institucional da STI.
         $estagiario = Estagiario::factory()->create([
             'username' => 'novo.ssec',
             'setor_id' => Setor::firstOrCreate(['sigla' => 'SSEC'], ['ativo' => true])->id,
@@ -200,26 +189,9 @@ class BuddyServiceTest extends TestCase
         );
     }
 
-    public function test_garantir_buddy_servidor_sti_usa_pool_senior_e_nao_lendaria(): void
+    public function test_garantir_buddy_estagiario_fora_da_sti_usa_pool_comum(): void
     {
-        // Servidores e admin da STI não recebem cartas lendárias — elas
-        // são exclusivas do sorteio dos estagiários da STI.
-        $estagiario = Estagiario::factory()->create([
-            'username' => 'servidor.sti',
-            'setor_id' => Setor::firstOrCreate(['sigla' => 'STI'], ['ativo' => true])->id,
-            'buddy_tipo' => null,
-        ]);
-
-        app(BuddyService::class)->garantirBuddy($estagiario, 'S');
-
-        $this->assertContains(
-            $estagiario->fresh()->buddy_tipo,
-            config('buddies.tipos_supervisores'),
-        );
-    }
-
-    public function test_garantir_buddy_estagiario_fora_da_sti_usa_pool_padrao(): void
-    {
+        // Estagiários de outros setores recebem o pool comum, não o lendário.
         $estagiario = Estagiario::factory()->create([
             'username' => 'estagiario.cogep',
             'setor_id' => Setor::firstOrCreate(['sigla' => 'COGEP'], ['ativo' => true])->id,
@@ -232,6 +204,66 @@ class BuddyServiceTest extends TestCase
             $estagiario->fresh()->buddy_tipo,
             config('buddies.tipos'),
         );
+        $this->assertNotContains(
+            $estagiario->fresh()->buddy_tipo,
+            config('buddies.tipos_lendarios'),
+        );
+    }
+
+    public function test_garantir_buddy_de_supervisor_nao_recebe_lendaria(): void
+    {
+        // Servidores e admin continuam no pool sênior — lendárias são
+        // exclusivas dos estagiários, independente do setor.
+        $estagiario = Estagiario::factory()->create([
+            'username' => 'servidor.qualquer',
+            'setor_id' => Setor::firstOrCreate(['sigla' => 'STI'], ['ativo' => true])->id,
+            'buddy_tipo' => null,
+        ]);
+
+        app(BuddyService::class)->garantirBuddy($estagiario, 'S');
+
+        $this->assertNotContains(
+            $estagiario->fresh()->buddy_tipo,
+            config('buddies.tipos_lendarios'),
+        );
+        $this->assertContains(
+            $estagiario->fresh()->buddy_tipo,
+            config('buddies.tipos_supervisores'),
+        );
+    }
+
+    public function test_carta_lendaria_waldirene_existe_no_pool(): void
+    {
+        $this->assertContains('waldirene', config('buddies.tipos_lendarios'));
+    }
+
+    public function test_carta_lendaria_waldirene_tem_perfil_completo(): void
+    {
+        $perfil = config('buddies.perfis.waldirene');
+
+        $this->assertIsArray($perfil);
+        foreach (['emoji', 'nome', 'personalidade', 'raridade', 'classe', 'habilidade', 'flavor', 'historia'] as $campo) {
+            $this->assertArrayHasKey($campo, $perfil, "campo {$campo} ausente no perfil da waldirene");
+            $this->assertNotEmpty($perfil[$campo], "campo {$campo} vazio no perfil da waldirene");
+        }
+        $this->assertSame('lendaria', $perfil['raridade']);
+    }
+
+    public function test_carta_lendaria_waldirene_tem_frases_para_todos_dias_e_status(): void
+    {
+        $frases = config('buddies.frases.waldirene');
+
+        $this->assertIsArray($frases);
+        foreach (['segunda', 'terca', 'quarta', 'quinta', 'sexta'] as $dia) {
+            foreach (['aguardando_entrada', 'em_andamento', 'concluido'] as $status) {
+                $this->assertNotEmpty(
+                    $frases[$dia][$status] ?? [],
+                    "frases.waldirene.{$dia}.{$status} vazio",
+                );
+            }
+        }
+        $this->assertNotEmpty($frases['generica'] ?? [], 'frases.waldirene.generica vazio');
+        $this->assertNotEmpty($frases['boas_vindas'] ?? [], 'frases.waldirene.boas_vindas vazio');
     }
 
     public function test_montar_popula_sprite_quando_png_existe(): void

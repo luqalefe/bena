@@ -121,17 +121,45 @@ eleitoral.
 
 ---
 
-## Pool lendário — 9 cartas da STI
+## Pool lendário — 10 cartas da STI
 
 Cartas únicas inspiradas em servidores reais que ensinaram o autor a
-amar a profissão. Cada uma tem **classe**, **habilidade** e **flavor
-text** no estilo de carta de RPG/TCG. Aparecem **apenas** no sorteio
-de estagiários lotados em STI ou SSEC (config
+amar a profissão (e uma carta institucional — a desembargadora que
+preside o TRE-AC no pleito atual). Cada uma tem **classe**, **habilidade**
+e **flavor text** no estilo de carta de RPG/TCG. Aparecem **apenas** no
+sorteio de estagiários lotados em STI ou SSEC (config
 `buddies.lotacoes_lendarias`).
 
 A intenção é dupla: atribuir um buddy temático pra quem entra na STI,
 e deixar registrado no próprio sistema o agradecimento de quem
 herdou a casa — *"a STI me ensinou a amar essa profissão"*.
+
+### 👩‍⚖️ Waldirene, a Magistrada das Florestas
+
+- **Classe:** Presidenta do Pleito
+- **Habilidade:** *Voto em Cada Canto* — sob sua presidência, nenhuma
+  seção fica sem fiscal e nenhum boletim deixa de ser apurado.
+  Estagiários cumprimentados por ela no corredor ganham +2 em coragem
+  até o fim do dia.
+- **Flavor:** *"Não se trata de ocupar um cargo, mas de abraçar um
+  compromisso com a democracia, a cidadania e a história."* (frase
+  textual do discurso de posse na Presidência do TRE-AC, ago/2025)
+
+> *Começou em Xapuri em 1998 — promotora numa comarca onde o cartório
+> fechava cedo e a floresta começava na esquina. Levou esse mapa pra
+> capital: doze vezes assumiu o governo do Acre interinamente sem
+> nunca perder o jeito de quem despachou em vara de interior. Em 2025,
+> foi eleita por aclamação a 24ª Presidência do TRE-AC e comanda agora
+> o pleito de 2026, prometendo que "cada eleitor — cidade, ribeirinho
+> ou aldeia indígena" terá voto assegurado. Os xales floridos sobre a
+> toga preta viraram lenda no plenário. "É só um lenço", diz. Os
+> servidores antigos juram que não.*
+
+Carta institucional, ancorada na carreira real da **Desembargadora
+Waldirene Oliveira da Cruz Lima Cordeiro** (UFAC 1991 → promotora em
+Xapuri 1998 → Desembargadora TJAC 2012 → Presidente TJAC 2021-23 →
+Presidente TRE-AC ago/2025-27). A única lendária que não vem da STI
+do tribunal: é a primeira a comandar o pleito sob o qual o Bena nasce.
 
 ### 👨‍🔧 Edcleu, o Forjador de Raiz
 
@@ -337,6 +365,66 @@ Amostras:
 > **Elefon (terça, aguardando entrada):**
 > *"Terça-feira. Lembro de uma terça em 2018, antes do pleito
 > municipal — muito parecida com essa."*
+
+---
+
+## Trilha sonora e SFX
+
+O Bena toca música. Não como um detalhe acidental — como parte do
+gesto de tornar um sistema interno de tribunal **menos frio do que
+precisa ser**.
+
+### `BENA` — trilha original
+
+Música autoral gravada pelo autor (Lucander, o Improvisador) num
+feriadão, com guitarra, baixo e bateria. Loop discreto que sustenta a
+navegação no sistema sem distrair.
+
+O **mini player** aparece em qualquer view autenticada — widget
+flutuante no canto inferior direito, estilo macOS Spotify:
+
+- **Cover** = pixel art do mascote sorteado pro usuário (Waldirene,
+  Edcleu, Coruinha, etc.). Cada usuário vê o seu próprio mascote na
+  capa.
+- **Artista** = nome do mascote (ex: "Waldirene, a Magistrada das
+  Florestas", "Coruinha").
+- **Controles** revelados em hover: play/pause, mute, volume.
+- **Arrastável** com mouse e touch; posição persistida em
+  `sessionStorage`.
+- **X vermelho** fecha o player e silencia a trilha — flag dismissed
+  persiste entre views.
+- Navegação entre páginas via **Turbo (Hotwire)** preserva o `<audio>`
+  (atributo `data-turbo-permanent`), então a música **não corta**.
+
+### Revelação cinematográfica do mascote
+
+Na primeira visita ao `/bem-vindo`, o player começa em modo
+"Aguardando sorteio…" (sem spoiler). O usuário clica em **Descobrir
+meu mascote** e duas coisas acontecem **no mesmo frame**:
+
+1. **Slot machine de 4 segundos** dentro da carta de reveal — sprites
+   ciclam aleatoriamente do roster inteiro (22 mascotes), com
+   deceleração quadrática (60ms entre swaps no início, 400ms no fim,
+   pra simular roleta parando).
+2. **Cover do mini player** cicla em sincronia exata — a cada tick do
+   slot, a capa do player troca pra mesma sprite.
+
+Ao final dos 4s, no mesmo `requestAnimationFrame`:
+- Slot trava no sprite real do mascote sorteado.
+- Cover do mini player atualiza pro mesmo sprite.
+- Texto do artista no player vira o nome do mascote.
+- Carta de reveal aparece com animação de scale-in.
+
+Não há `setTimeout` separando esses eventos. A intenção é que a
+revelação aconteça **exatamente no mesmo momento** nos três lugares.
+
+### `urna-song` — SFX
+
+A cada **bater de ponto** (entrada ou saída), toca o som da urna
+eletrônica, ~3s, sampleado de uma urna real. Disparado por handler
+global no submit dos forms `/ponto/entrada` e `/ponto/saida`. O
+`<audio>` é `data-turbo-permanent` pra reprodução não cortar quando
+o Turbo redireciona a página depois do submit.
 
 ---
 

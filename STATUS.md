@@ -4,7 +4,7 @@
 > trabalho. Detalhes longos vivem em `CLAUDE.md`, `REQUISITOS.md`,
 > `SPRINTS.md` e `docs/`.
 
-**Última atualização:** 2026-05-03 (Sprint 5 fechada · H18 integridade + H19 auditoria)
+**Última atualização:** 2026-05-16 (Sprint 8 fechada · H29–H34 áudio + player flutuante + reveal cinematográfico)
 
 **Repo:** [`luqalefe/bena`](https://github.com/luqalefe/bena.git) — branch `main` ·
 commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
@@ -164,7 +164,54 @@ commit inicial em 2026-05-01 cobrindo todo o trabalho até o fim da Sprint 3.
 - ✅ 5 testes feature em `MascotesPageTest` iteram sobre o config
   (resilientes a edição/expansão de mascotes futuros).
 
-**Suíte:** 278 testes, 671 assertions · cobertura ≥ 80 % (gate `--min=80`)
+✅ **Sprint 8 — Áudio, player flutuante e reveal cinematográfico (H29–H34)** — fechada
+- ✅ **H29** — Carta lendária **Waldirene** (10ª da STI), ancorada na
+  carreira real da Desembargadora Waldirene Cordeiro: UFAC 1991,
+  promotora em Xapuri 1998, presidente do TJAC 2021-23, presidente do
+  TRE-AC desde ago/2025 (comandando o pleito de 2026). Flavor extraído
+  do discurso de posse. Sprite pixel art 128×128 gerado no PixelLab.
+- ✅ **H30** — Histórias dos **22 buddies expandidas pra ~600 chars**
+  cada (mesmo tamanho da Waldirene), com ano/local específico, quirk de
+  comportamento e citação característica. Primeiros 30 chars preservados
+  pra não quebrar testes existentes.
+- ✅ **H31** — Mini player flutuante estilo **macOS Spotify** —
+  arrastável (mouse+touch) com posição persistente em `sessionStorage`,
+  cover quadrada = pixel art do mascote do usuário, controles
+  (play/pause/mute/volume) revelados em hover, barra de progresso fina
+  no topo, **X vermelho** de fechar com flag dismissed persistente. CSS
+  em `layouts/app.blade.php` dentro de `@auth`.
+- ✅ **H32** — **Slot machine de 4s** no botão "Descobrir meu mascote".
+  `requestAnimationFrame` cicla sprites com deceleração quadrática
+  (60ms → 400ms entre swaps). **Sync exato com o cover do mini player no
+  T=0 e T=4s** (mesmo frame que a carta de reveal). Pré-cache de todos
+  os sprites pra zero flicker. Lazy query do player no click handler
+  (script é injetado em `<main>` antes do `<div id="bena-player">`
+  existir no DOM).
+- ✅ **H33** — **Turbo (Hotwire) via CDN** + `data-turbo-permanent` no
+  player → trilha sonora (`bena-master.mp3`) contínua entre views, sem
+  corte de áudio. `data-turbo="false"` em downloads de PDF e form de
+  upload de contrato. Twemoji refatorado pra rodar em `turbo:load`.
+- ✅ **H34** — **SFX da urna eletrônica** ao bater ponto
+  (`urna-song.mp3`, ~112KB pré-carregado). Handler global no `submit`
+  (capture phase) filtra forms de `ponto/entrada` ou `ponto/saida` e
+  dispara `play()` do zero. Sentinel `window.__benaUrnaSongBound` evita
+  bind duplicado em Turbo Visits. `<audio>` marcado
+  `data-turbo-permanent` pra reprodução não cortar no
+  morph pós-submit.
+
+**Decisões importantes da Sprint 8:**
+- Player **suprimido no primeiro reveal de `/bem-vindo`** pra não dar
+  spoiler — `@php` do layout checa `routeIs('onboarding.show') &&
+  tutorial_visto_em === null` e renderiza placeholder ("Aguardando
+  sorteio…") em vez do buddy.
+- **Sem fallback hardcoded** de Lucander no player. Quando o usuário
+  ainda não tem buddy, placeholder com ícone de música.
+- Pool lendário **mantido exclusivo** pra STI/SSEC (`lotacoes_lendarias`)
+  após experimentos com pool aberto que diluíram a raridade.
+- Dev user `lucas.dev` configurado com `setor_id` apontando pra setor STI
+  (criado se não existir).
+
+**Suíte:** 437 testes, 1055 assertions · cobertura ≥ 80 % (gate `--min=80`)
 
 ### Mudanças de modelagem em 2026-05-01 (registradas em REQUISITOS.md)
 Atores refinados: **Supervisor** vira grupo Authelia próprio (`supervisores`),

@@ -67,7 +67,7 @@
                 <button type="submit" class="br-button primary"><i class="fas fa-stamp" aria-hidden="true"></i> Contra-assinar como supervisor</button>
             </form>
         @endif
-        <a href="{{ route('frequencia.pdf', array_merge(['ano' => $folha->ano, 'mes' => $folha->mes], $queryNavegacao)) }}" class="br-button">
+        <a href="{{ route('frequencia.pdf', array_merge(['ano' => $folha->ano, 'mes' => $folha->mes], $queryNavegacao)) }}" class="br-button" data-turbo="false">
             <i class="fas fa-file-pdf" aria-hidden="true"></i>
             Baixar PDF
         </a>

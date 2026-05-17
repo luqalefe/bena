@@ -4,6 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # Oracle Instant Client e oci8 só rodam em x86_64; em Apple Silicon
+    # usamos emulação (OrbStack/Rosetta). Produção é amd64 nativo.
+    platform: linux/amd64
     container_name: ponto-app
     restart: unless-stopped
     working_dir: /var/www/html

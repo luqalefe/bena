@@ -2,6 +2,75 @@
 
 @section('title', 'Bem-vindo ao Bena')
 
+@push('styles')
+<style>
+    .bena-buddy-slot {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 1.75rem;
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+        border: 2px solid rgba(250, 204, 21, 0.35);
+        border-radius: 16px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+        margin: 1.25rem auto 0;
+        max-width: 280px;
+    }
+    .bena-buddy-reveal[data-buddy-reveal="rolling"] .bena-buddy-reveal__trigger,
+    .bena-buddy-reveal[data-buddy-reveal="rolling"] .bena-buddy-reveal__intro {
+        display: none;
+    }
+    .bena-buddy-reveal[data-buddy-reveal="rolling"] .bena-buddy-slot {
+        display: flex;
+        animation: bena-slot-shake 0.18s infinite;
+    }
+    .bena-buddy-slot__frame {
+        width: 160px;
+        height: 160px;
+        border: 4px solid #fde68a;
+        border-radius: 12px;
+        background: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.5);
+    }
+    .bena-buddy-slot__avatar {
+        width: 128px;
+        height: 128px;
+        image-rendering: pixelated;
+    }
+    .bena-buddy-slot__label {
+        color: #fde68a;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        margin: 0;
+        animation: bena-slot-pulse 0.8s ease-in-out infinite;
+    }
+    @keyframes bena-slot-shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px) rotate(-0.5deg); }
+        75% { transform: translateX(3px) rotate(0.5deg); }
+    }
+    @keyframes bena-slot-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.55; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .bena-buddy-reveal[data-buddy-reveal="rolling"] .bena-buddy-slot {
+            animation: none;
+        }
+        .bena-buddy-slot__label {
+            animation: none;
+        }
+    }
+</style>
+@endpush
+
 @section('content')
     <div style="max-width: 720px; margin: 1rem auto;">
         <header class="bena-onboarding-hero">
@@ -73,6 +142,18 @@
         </ol>
 
         @isset($buddy)
+            @php
+                $spritesService = app(\App\Support\BuddySprite::class);
+                $tiposParaSlot = collect(array_merge(
+                    (array) config('buddies.tipos', []),
+                    (array) config('buddies.tipos_supervisores', []),
+                    (array) config('buddies.tipos_lendarios', []),
+                ))
+                    ->map(fn ($t) => $spritesService->caminho($t))
+                    ->filter()
+                    ->values()
+                    ->all();
+            @endphp
             <div class="bena-buddy-reveal" data-buddy-reveal="false">
                 <p class="bena-buddy-reveal__intro">
                     Antes de você entrar pra valer, eu sorteei um mascote pra te
@@ -82,6 +163,14 @@
                     <i class="fas fa-gift" aria-hidden="true"></i>
                     Descobrir meu mascote
                 </button>
+                <div class="bena-buddy-slot" data-buddy-slot>
+                    <div class="bena-buddy-slot__frame">
+                        {{-- src vazio no carregamento: o JS popula com sprite aleatório
+                             no clique pra evitar spoiler. --}}
+                        <img class="bena-buddy-slot__avatar" alt="" src="">
+                    </div>
+                    <p class="bena-buddy-slot__label">Sorteando…</p>
+                </div>
                 <section aria-labelledby="buddy-titulo" class="bena-buddy-card bena-buddy-card--apresentacao bena-buddy-reveal__card">
                     <div class="bena-buddy-card__avatar bena-buddy-card__avatar--grande" aria-hidden="true">
                         @if ($buddy->sprite)
@@ -100,7 +189,7 @@
                     </div>
                 </section>
                 <div class="bena-buddy-reveal__after">
-                    <a href="{{ route('mascotes.index') }}" class="br-button secondary">
+                    <a href="{{ route('mascotes.index') }}?autoplay=1" class="br-button secondary">
                         <i class="fas fa-paw" aria-hidden="true"></i>
                         Conhecer todos os mascotes
                     </a>
@@ -239,10 +328,140 @@
             if (!reveal) return;
             var trigger = reveal.querySelector('[data-buddy-trigger]');
             if (!trigger) return;
-            trigger.addEventListener('click', function () {
+            var slot = reveal.querySelector('[data-buddy-slot]');
+            var slotAvatar = slot ? slot.querySelector('.bena-buddy-slot__avatar') : null;
+
+            @isset($buddy)
+                var allSprites = @json($tiposParaSlot ?? []);
+                var finalSprite = @json($buddy->sprite ?? null);
+                var finalArtistName = @json($buddy->nome ?? '');
+            @else
+                var allSprites = [];
+                var finalSprite = null;
+                var finalArtistName = '';
+            @endisset
+
+            // Pré-cache de todos os sprites do slot machine. Cada troca de
+            // src durante a animação encontra a imagem já em cache, evitando
+            // flicker de loading e o "atraso" do mascote no mini player.
+            var preloadCache = [];
+            allSprites.forEach(function (url) {
+                var img = new Image();
+                img.src = url;
+                preloadCache.push(img);
+            });
+            if (finalSprite) {
+                var preloadFinal = new Image();
+                preloadFinal.src = finalSprite;
+                preloadCache.push(preloadFinal);
+            }
+
+            // Trilha sonora do sorteio: começa do zero a cada clique no
+            // descobrir mascote. Reusa o elemento <audio> do player global
+            // (em vez de criar um Audio() à parte) — sem isso teríamos duas
+            // instâncias tocando em paralelo. Estado é salvo no
+            // sessionStorage pelos listeners do próprio player global.
+            function iniciaTrilhaDoZero() {
+                var globalPlayer = document.getElementById('bena-player');
+                var globalAudio = document.getElementById('bena-player-audio');
+                if (!globalAudio) return;
+
+                // Se o usuário tinha fechado no X, reaparecer e desmarcar
+                // dismissed pras próximas views.
+                if (globalPlayer && globalPlayer.hidden) globalPlayer.hidden = false;
+                try { sessionStorage.removeItem('bena-player-dismissed'); } catch (e) {}
+
+                try { globalAudio.pause(); } catch (e) {}
+                try { globalAudio.currentTime = 0; } catch (e) {}
+                globalAudio.play().catch(function () {});
+            }
+
+            function revelaCarta() {
                 reveal.setAttribute('data-buddy-reveal', 'true');
                 var card = reveal.querySelector('.bena-buddy-reveal__card');
                 if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            trigger.addEventListener('click', function () {
+                // Música começa exatamente no momento do clique — mesmo no
+                // caminho de fallback (sem sprites pra animar).
+                iniciaTrilhaDoZero();
+
+                if (!slot || !slotAvatar || allSprites.length === 0) {
+                    revelaCarta();
+                    return;
+                }
+
+                // Queries do mini player no momento do clique (e não no parse
+                // do <script>): o script desta view é injetado dentro de
+                // <main>, mas o <div id="bena-player"> vem depois de </main>
+                // no layout. No parse time, querySelector retornaria null;
+                // no clique humano, o DOM inteiro já está pronto.
+                var playerCoverWrap = document.querySelector('#bena-player .bena-player__cover');
+                var playerArtistEl  = document.querySelector('#bena-player .bena-player__artist');
+
+                function atualizaPlayerCover(spriteUrl) {
+                    if (!playerCoverWrap || !spriteUrl) return;
+                    var img = playerCoverWrap.querySelector('img');
+                    if (!img) return;
+                    img.src = spriteUrl;
+                    img.removeAttribute('hidden');
+                    var ph = playerCoverWrap.querySelector('.bena-player__cover-placeholder');
+                    if (ph) ph.style.display = 'none';
+                }
+                function atualizaPlayerArtista(nome) {
+                    if (playerArtistEl && nome) playerArtistEl.textContent = nome;
+                }
+
+                // Pré-carrega slot e player no mesmo sprite aleatório ANTES
+                // de ativar o estado rolling — garante que ambos comecem a
+                // animação no mesmo frame, sem flash do sprite anterior.
+                var spriteInicial = allSprites[Math.floor(Math.random() * allSprites.length)];
+                slotAvatar.src = spriteInicial;
+                atualizaPlayerCover(spriteInicial);
+
+                reveal.setAttribute('data-buddy-reveal', 'rolling');
+
+                var duration = 4000;
+                var start = performance.now();
+                // lastSwap começa no passado pra forçar swap imediato no
+                // primeiro tick — slot e player não ficam parados nos
+                // primeiros 60ms da animação.
+                var lastSwap = start - 1000;
+
+                function intervaloSwap(progresso) {
+                    // Desacelera com o tempo: 60ms (rápido) → 400ms (suspense).
+                    return 60 + 340 * Math.pow(progresso, 2.5);
+                }
+
+                function tick(now) {
+                    var elapsed = now - start;
+                    var progresso = Math.min(elapsed / duration, 1);
+
+                    if (now - lastSwap >= intervaloSwap(progresso)) {
+                        var sprite = allSprites[Math.floor(Math.random() * allSprites.length)];
+                        slotAvatar.src = sprite;
+                        atualizaPlayerCover(sprite);
+                        lastSwap = now;
+                    }
+
+                    if (progresso >= 1) {
+                        // Tudo trava no mesmo frame: slot, mini player e carta.
+                        // Sem setTimeout — qualquer delay seria "antecipação"
+                        // do player em relação à animação que ainda não acabou.
+                        if (finalSprite) {
+                            slotAvatar.src = finalSprite;
+                            atualizaPlayerCover(finalSprite);
+                        }
+                        atualizaPlayerArtista(finalArtistName);
+                        revelaCarta();
+                        return;
+                    }
+
+                    requestAnimationFrame(tick);
+                }
+
+                requestAnimationFrame(tick);
             });
         })();
     </script>

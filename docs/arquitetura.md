@@ -213,7 +213,7 @@ mecanicamente:
 
 - `garantirBuddy(Estagiario, ?string $grupo): void` — se
   `buddy_tipo IS NULL`, sorteia do pool baseado em `(grupo, lotação)`.
-  - Estagiário (`'E'`) lotado em STI/SSEC → `tipos_lendarios` (9 cartas).
+  - Estagiário (`'E'`) lotado em STI/SSEC → `tipos_lendarios` (10 cartas — Sprint 8 adicionou Waldirene).
   - Estagiário fora dessas lotações → `tipos` (8 padrão).
   - Supervisor/admin (`'S'`/`'0'`) → `tipos_supervisores` (4 sêniores).
 - `montar(Estagiario, string $statusPonto): BuddyData` — escolhe

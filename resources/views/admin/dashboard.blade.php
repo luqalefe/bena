@@ -107,7 +107,7 @@
                                 <div style="display: inline-flex; gap: 0.4rem; flex-wrap: wrap; justify-content: flex-end;">
                                     <a href="{{ route('frequencia.show', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $linha->estagiario->username]) }}" class="br-button primary small">Ver folha</a>
                                     @if ($linha->liberadaParaRh())
-                                        <a href="{{ route('frequencia.pdf', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $linha->estagiario->username]) }}" class="br-button small">PDF</a>
+                                        <a href="{{ route('frequencia.pdf', ['ano' => $ano, 'mes' => $mes, 'estagiario' => $linha->estagiario->username]) }}" class="br-button small" data-turbo="false">PDF</a>
                                     @endif
                                     <a href="{{ route('admin.estagiarios.edit', $linha->estagiario) }}" class="br-button secondary small">Editar</a>
                                 </div>

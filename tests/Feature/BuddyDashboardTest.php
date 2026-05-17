@@ -78,6 +78,7 @@ class BuddyDashboardTest extends TestCase
         ])->get('/')->assertStatus(200);
 
         $this->assertNotNull($estagiario->fresh()->buddy_tipo);
+        // Estagiário sem setor STI/SSEC recebe pool comum.
         $this->assertContains(
             $estagiario->fresh()->buddy_tipo,
             config('buddies.tipos'),

@@ -32,20 +32,19 @@ class BuddyService
      */
     private function poolPara(Estagiario $estagiario, ?string $grupo): array
     {
-        // Estagiários das lotações listadas em `buddies.lotacoes_lendarias`
-        // (STI e SSEC, hoje) recebem o pool lendário, inspirado em personagens
-        // da casa. Servidores e admin dessas seções continuam no pool sênior.
+        // Supervisores e admin recebem o pool sênior, independente do setor.
+        if ($grupo === '0' || $grupo === 'S') {
+            return (array) config('buddies.tipos_supervisores', []);
+        }
+
+        // Estagiários lotados nas seções em `lotacoes_lendarias` (STI, SSEC)
+        // recebem o pool lendário exclusivo. Demais estagiários, pool comum.
         $lendarias = (array) config('buddies.lotacoes_lendarias', []);
-        if ($grupo === 'E' && in_array($estagiario->setor?->sigla, $lendarias, true)) {
+        if (in_array($estagiario->setor?->sigla, $lendarias, true)) {
             return (array) config('buddies.tipos_lendarios', []);
         }
 
-        $key = match ($grupo) {
-            '0', 'S' => 'tipos_supervisores',
-            default => 'tipos',
-        };
-
-        return (array) config("buddies.{$key}", []);
+        return (array) config('buddies.tipos', []);
     }
 
     public function montar(Estagiario $estagiario, string $statusPonto): BuddyData

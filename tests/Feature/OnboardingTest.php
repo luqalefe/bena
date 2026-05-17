@@ -203,6 +203,34 @@ class OnboardingTest extends TestCase
             ->assertSee('data-buddy-reveal="false"', false);
     }
 
+    public function test_descobrir_mascote_renderiza_slot_machine(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $response = $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'));
+
+        $response->assertStatus(200);
+        // Markup do slot machine (escondido até clique no trigger).
+        $response->assertSee('bena-buddy-slot', false);
+        $response->assertSee('data-buddy-slot', false);
+        $response->assertSee('Sorteando', false);
+    }
+
+    public function test_onboarding_referencia_trilha_para_tocar_no_sorteio(): void
+    {
+        Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);
+
+        $response = $this->withHeaders($this->estagiarioHeaders('novato.dev'))
+            ->get(route('onboarding.show'));
+
+        $response->assertStatus(200);
+        // O JS do descobrir referencia o MP3 da trilha (toca do zero a cada
+        // clique no sorteio).
+        $response->assertSee('/audio/bena-master.mp3', false);
+        $response->assertSee('iniciaTrilhaDoZero', false);
+    }
+
     public function test_view_inclui_origem_do_nome_bena(): void
     {
         Estagiario::factory()->semOnboarding()->create(['username' => 'novato.dev']);

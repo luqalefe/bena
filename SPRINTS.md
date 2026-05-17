@@ -259,6 +259,66 @@ tipo do buddy é persistido.
 
 ---
 
+## Sprint 8 — Áudio, player flutuante e reveal cinematográfico (UI/UX)
+
+**Objetivo:** Transformar a entrada do usuário no sistema num momento
+audiovisual. Trilha sonora própria que toca em qualquer view sem corte
+de navegação, mini player no estilo Spotify desktop com a cara do
+mascote do usuário, e revelação dramática do buddy na primeira visita
+ao `/bem-vindo`.
+
+| História | Resumo |
+|----------|--------|
+| **H29** | Carta lendária **Waldirene** (10ª da STI) — perfil ancorado na carreira real da Desembargadora Waldirene Cordeiro (UFAC 1991, promotora em Xapuri 1998, presidente do TJAC 2021-23, presidente do TRE-AC desde ago/2025 comandando o pleito de 2026). Flavor textual extraído do discurso de posse. |
+| **H30** | Histórias dos 22 buddies expandidas pra ~600 caracteres cada (mesmo tamanho de Waldirene). Cada uma ganhou ano/local específico, quirk de comportamento e citação característica. Mantido o início de cada frase pra não quebrar asserções de testes. |
+| **H31** | Mini player flutuante estilo macOS Spotify — widget arrastável (mouse + touch), posição persistente em `sessionStorage`, cover quadrada com pixel art do mascote do usuário, controles play/pause/mute/volume revelados em hover, barra de progresso fina no topo, X vermelho de fechar (com flag dismissed persistente). |
+| **H32** | Slot machine de 4s no botão "Descobrir meu mascote" — `requestAnimationFrame` cicla sprites com deceleração quadrática (60ms → 400ms entre swaps). Sync exato com o cover do mini player no T=0 e T=4s (mesmo frame que a carta de reveal). Pré-cache de todos os sprites pra zero flicker. |
+| **H33** | Turbo (Hotwire) via CDN no layout — intercepta navegação tradicional e morpha só o `<main>`, preservando `data-turbo-permanent`. Trilha sonora (`<audio id="bena-player-audio">`) e SFX (`<audio id="urna-song-audio">`) tocam sem corte entre views. `data-turbo="false"` em downloads de PDF e form de upload de contrato. |
+| **H34** | SFX da **urna eletrônica** ao bater ponto — `<audio>` global pré-carregado, handler global no submit (capture phase) que filtra forms de `ponto/entrada` ou `ponto/saida` e dispara `play()` do zero. Sentinel `window.__benaUrnaSongBound` evita bind duplicado em cada Turbo Visit. |
+
+**Decisões de design notáveis:**
+
+- **Player não é global por padrão na primeira visita ao /bem-vindo.** O
+  `@php` do layout suprime o buddy no player quando
+  `request()->routeIs('onboarding.show') && tutorial_visto_em === null` —
+  evita spoiler do que o slot machine vai revelar. Player mostra
+  placeholder ("Aguardando sorteio…") até o final dos 4s.
+- **Cover do mini player = mascote do usuário.** Sem fallback hardcoded
+  pra Lucander. Quando o usuário tem buddy assignado em outras views, o
+  cover mostra `auth()->user()->buddy_tipo`; quando não tem, placeholder
+  com ícone de música.
+- **Sincronia perfeita slot ↔ player ↔ carta.** No T=4s, `progresso >= 1`
+  dispara `slotAvatar.src`, `atualizaPlayerCover`, `atualizaPlayerArtista`
+  e `revelaCarta()` no mesmo frame — sem `setTimeout` que separaria os
+  três eventos visuais.
+- **Lazy query do player no handler de clique.** O `<script>` do slot é
+  injetado em `<main>` via `@yield('content')`, mas o `<div id="bena-player">`
+  vem depois de `</main>`. Queries `document.querySelector('#bena-player ...')`
+  no top-level do IIFE retornavam null. Mover as queries pra dentro do
+  click handler resolveu (click humano = pós-parse).
+- **Turbo + `data-turbo-permanent` no `<audio>` do urna song.** Sem o
+  permanent, cada submit/redirect substituía o `<audio>` e cortava a
+  reprodução no início. Permanent mantém o elemento idêntico entre
+  navegações, playback sobrevive.
+
+**DoD:**
+- 10 cartas lendárias no pool STI/SSEC (era 9): Waldirene + 9 originais.
+- 22 histórias com ~600 chars cada, todas testadas via
+  `test_pagina_mascotes_exibe_historia_e_personalidade` (primeiros 30
+  chars preservados).
+- Player aparece em qualquer view `@auth` (exceto suprimido no primeiro
+  reveal de `/bem-vindo`), arrastável, com cover do mascote do usuário.
+- Trilha sonora contínua entre navegações Turbo.
+- SFX da urna toca completo a cada bater de ponto (sem corte por
+  navegação pós-submit).
+- 7 testes novos cobrindo carta Waldirene, presença do player em views
+  autenticadas, placeholder sem fallback Lucander, slot machine markup,
+  link de autoplay no onboarding, marcação Turbo permanent, urna SFX no
+  dashboard.
+- Suíte: **437 verde / 1055 asserções**.
+
+---
+
 ## Sprint 6 — Hardening e homologação (semana 7)
 
 **Objetivo:** preparar pra entrar em homologação no tribunal. Foco em
@@ -294,6 +354,7 @@ NFRs, não em features novas.
 | 7a | — | H24, H25 | Filtros inteligentes (UI/UX) | ✅ **Done** |
 | 7b | — | H26, H27 | Calendário anual visual (UI/UX) | ✅ **Done** |
 | 7c | — | H28 | Buddy / mascote do estagiário | ✅ **Done** |
+| 8 | — | H29, H30, H31, H32, H33, H34 | Áudio + player flutuante + reveal | ✅ **Done** |
 | 6 | 7 | (NFRs) | Homologação | 📋 |
 
 ---
@@ -328,3 +389,4 @@ NFRs, não em features novas.
 | 2026-05-03 | **Página `/mascotes` + histórias eleitorais** — Página listando todos os 12 buddies (8 do pool padrão + 4 do sênior) com **personalidade** + **história curta** ligada à Justiça Eleitoral do Acre. Cada perfil em `config/buddies.php` ganhou as chaves `personalidade` e `historia` (ex.: Coruinha viu a chegada da urna eletrônica em 1996, Águia voou sobre as zonas remotas acompanhando transporte aéreo de urnas, Urso vigiou a primeira urna em comunidade indígena, etc.). Botão "Conhecer todos os mascotes" no `/bem-vindo`. `MascotesController` magrinho (lê do config). 5 testes feature em `MascotesPageTest` que iteram sobre o config — adicionar/editar mascote no futuro não quebra os testes. Suíte: 262 verde / 638 asserções. |
 | 2026-05-03 | **Frases dos buddies reescritas com tema eleitoral** — As ~150 frases (12 buddies × 5 dias × 3 status + boas_vindas + generica) em `config/buddies.php` foram reescritas mantendo a personalidade de cada um, mas costuradas com vocabulário/metáforas da Justiça Eleitoral: urna, ata, apuração, pleito, mesa receptora, mesário, BU, recurso, diplomação, fiscalização, ciclo eleitoral, pleito municipal/estadual, etc. Testes não quebraram porque verificam estrutura, não strings específicas. Suíte: 262 verde / 638 asserções. |
 | 2026-05-03 | **Sprint 5 fechada — H18 + H19** ✅ — **H18:** `AssinaturaService::diff(Assinatura)` compara snapshot gravado vs canônico atual; retorna `campo_alterado`/`dia_adicionado`/`dia_removido`. View `frequencia/show.blade.php` mostra `<details>` com lista de mudanças ao lado do badge "⚠ alterada". 6 testes novos. **H19:** Migration `create_auditoria_table` (Oracle-safe). Model `Auditoria` append-only. `AuditoriaService::registrar` insere log com payload JSON. Hooks integrados em `PontoController`, `ObservacaoController`, `AssinaturaController` (4 métodos), `FeriadoController` (3 métodos), `EstagiarioController`. Página `/admin/auditoria` com filtros (usuario, acao, intervalo de datas), limite de 500 linhas/consulta, admin-only. Link "Auditoria" na nav admin. 10 testes novos (3 unit + 7 feature). Suíte: 278 verde / 671 asserções. |
+| 2026-05-16 | **Sprint 8 fechada — H29–H34 (Áudio, player flutuante e reveal cinematográfico)** ✅ — **H29:** Carta lendária Waldirene (10ª da STI) com lore ancorada na carreira real da Desembargadora Cordeiro (Xapuri 1998 → Presidência TRE-AC 2025). Sprite pixel art 128x128 RGBA gerado no PixelLab. **H30:** Histórias dos 22 buddies expandidas pra ~600 chars cada (ano/local/quirk/citação), preservando primeiros 30 chars pra não quebrar testes. **H31:** Mini player flutuante estilo macOS Spotify — widget arrastável (mouse+touch) com posição persistente em sessionStorage, cover = pixel art do mascote do usuário, controles hover, X vermelho de fechar com flag dismissed. **H32:** Slot machine 4s no "Descobrir mascote" com sync exato slot↔player↔carta no mesmo frame (sem `setTimeout`). Lazy query do player no click handler (script é injetado em `<main>` antes do player existir no DOM). Pré-cache de sprites pra zero flicker. **H33:** Turbo (Hotwire) via CDN + `data-turbo-permanent` no player → trilha sonora contínua entre views, sem corte. `data-turbo="false"` em downloads PDF e form de upload contrato. **H34:** SFX urna eletrônica ao bater ponto — handler global no submit (capture phase) com sentinel pra evitar bind duplicado em Turbo Visits. Suíte: **437 verde / 1055 asserções**. |

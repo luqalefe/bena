@@ -205,6 +205,8 @@
         background: rgba(0, 51, 102, 0.06);
         color: #003366;
     }
+
+
 </style>
 @endpush
 
@@ -337,4 +339,5 @@
             </a>
         </p>
     </div>
+
 @endsection
